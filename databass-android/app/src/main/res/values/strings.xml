@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DataBASS</string>
+    <string name="click_me">Click Me</string>
+    <string name="main_toast_text">You clicked the button!</string>
+</resources>
