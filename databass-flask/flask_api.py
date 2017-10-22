@@ -44,7 +44,7 @@ def register():
         return content, status.HTTP_400_BAD_REQUEST
 
     # Check if email_address is valid
-    emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)")
+    emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
 
     if not emailRegex.match(email_address):
         error_code = "user_register_invalid_email"
