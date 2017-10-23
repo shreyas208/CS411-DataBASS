@@ -27,11 +27,24 @@ def register():
     email_address = request.form.get('email_address') # String (valid email)
     display_name = request.form.get('display_name') # String (1 <= characters <= 265)
 
+    # Connect to the MySQL database
+    cursor = mysql.connect().cursor()
+
     # Check if all the registration input parameters are valid
 
-    # Check if username is valid
+    # Check if username is in a valid form
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
         error_code = "user_register_invalid_username"
+
+        content = {"success": false, "error_code": error_code}
+        return content, status.HTTP_400_BAD_REQUEST
+
+    # Check if the username is new
+    cursor.execute("SELECT username FROM Users WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    if result:
+        error_code = "user_register_username_in_use"
 
         content = {"success": false, "error_code": error_code}
         return content, status.HTTP_400_BAD_REQUEST
@@ -62,9 +75,7 @@ def register():
     # If this line of the register() function is reached,
     # all the registration input parameters are valid.
 
-    # Connect to MySQL database and insert
-    # registration information into Users table
-    cursor = mysql.connect().cursor()
+    # Insert registration information into Users table
     cursor.execute("INSERT INTO Users values('" +
                     username + "', '" + password + "', '" +
                     email_address + "', '" + display_name + "'")
@@ -74,19 +85,59 @@ def register():
 
 
 # User Login
-@app.route("/api/user/login")
+@app.route("/api/user/login", Method="POST")
 def login():
-    return 0
+    # Read in login input parameters
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.form.get('password') # String (6 <= characters <= 256)
+
+    # Connect to the MySQL database
+    cursor = mysql.connect().cursor()
+
+    # Check if all the login input parameters are valid
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_login_invalid_username"
+
+        content = {"success": false, "error_code": error_code}
+        return content, status.HTTP_400_BAD_REQUEST
+
+    # Check if password is valid
+    if not (len(password) >= 6 and len(password) <= 256):
+        error_code = "user_login_invalid_password"
+
+        content = {"success": false, "error_code": error_code}
+        return content, status.HTTP_400_BAD_REQUEST
+
+    # If this line of the login() function is reached,
+    # all the login input parameters are valid.
+
+    # Search Users table for login information
+    cursor.execute("SELECT email_address, display_name, access_token FROM Users WHERE username='" + username + "' AND password='" + password + "'")
+    result = cursor.fetchone()
+
+    if not result:
+        error_code = "user_login_bad_credentials"
+
+        content = {"success": false, "error_code": error_code}
+        return content, status.HTTP_400_BAD_REQUEST
+    else:
+        email = result[0]
+        display_name = result[1]
+        access_token = result[2]
+        content = {"success": true, "email_address": email, "display_name": display_name, "access_token": access_token}
+        return content, status.HTTP_200_OK
 
 
 # User Profile
-@app.route("/api/user/profile")
+@app.route("/api/user/profile", Method="POST")
 def profile():
     return 0
 
 
 # City Checkin
-@app.route("/api/user/checkin")
+@app.route("/api/user/checkin", Method="POST")
 def checkin():
     return 0
 
