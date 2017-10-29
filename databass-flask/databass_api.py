@@ -1,8 +1,8 @@
 # Import all necessary Flask libraries and extensions
 from flask import Flask
-from flask.ext.mysql import MySQL # Connects Flask server to MySQL database
-from flask.ext.api import status # Handles error codes returned by Flask server
-from flask.ext.bcrypt import Bcrypt
+from flaskext.mysql import MySQL # Connects Flask server to MySQL database
+from flask_api import status # Handles error codes returned by Flask server
+from flask_bcrypt import Bcrypt
 
 from string import ascii_letters
 from string import digits
