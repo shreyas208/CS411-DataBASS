@@ -1,5 +1,5 @@
 # Import all necessary Flask libraries and extensions
-from flask import Flask
+from flask import Flask, request
 from flaskext.mysql import MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
@@ -22,7 +22,7 @@ mysql.init_app(app)
 
 
 # User Registration
-@app.route("/api/user/register", methods=["POST"])
+@app.route("/api/user/register", methods=["Get", "POST"])
 def register():
     # Read in registration input parameters
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
@@ -149,6 +149,9 @@ def checkin():
 @app.route("/")
 def root():
     return "You have reached our Flask server."
+
+if __name__ == "__main__":
+    app.run()
 
 #@app.route("/")
 #def hello():
