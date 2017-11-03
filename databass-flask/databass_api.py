@@ -1,6 +1,8 @@
 # Import all necessary Flask libraries and extensions
 from flask import Flask, request
-from flaskext.mysql import MySQL # Connects Flask server to MySQL database
+#from flaskext.mysql import MySQL # Connects Flask server to MySQL database
+#import MySQLdb
+import mysql.connector as MySQL
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
 
@@ -11,27 +13,36 @@ import re
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-mysql = MySQL()
+#app.debug = True
+#db = MySQL.connect(host="127.0.0.1", port=3306, user="root", password=personalPassword)
+db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
+
+#mysql = MySQL()
 
 app.debug = True
-app.config['MYSQL_DATABASE_USER'] = 'flaskuser'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'tCU8PvBYEPP4qkun'
-app.config['MYSQL_DATABASE_DB'] = 'cs_411_project'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+#app.config['MYSQL_DATABASE_USER'] = 'flaskuser'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'tCU8PvBYEPP4qkun'
+#app.config['MYSQL_DATABASE_DB'] = 'cs_411_project'
+#app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+#mysql.init_app(app)
+#Postgres
+
+# Should I research the "try" and "except" commands?  Should I research trying and catching errors?
 
 
 # User Registration
-@app.route("/api/user/register", methods=["Get", "POST"])
+@app.route("/api/user/register", methods=["POST"])
 def register():
     # Read in registration input parameters
-    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.form.get('password') # String (6 <= characters <= 256)
-    email_address = request.form.get('email_address') # String (valid email)
-    display_name = request.form.get('display_name') # String (1 <= characters <= 265)
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.values.get('password') # String (6 <= characters <= 256)
+    email_address = request.values.get('email_address') # String (valid email)
+    display_name = request.values.get('display_name') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
-    cursor = mysql.connect().cursor()
+    #cursor = mysql.connect().cursor()
+    cursor = db.cursor()
+    cursor.execute("USE cs_411_project")
 
     # Check if all the registration input parameters are valid
 
@@ -97,7 +108,8 @@ def login():
     password = request.form.get('password') # String (6 <= characters <= 256)
 
     # Connect to the MySQL database
-    cursor = mysql.connect().cursor()
+    #cursor = mysql.connect().cursor()
+    cursor = db.cursor()
 
     # Check if all the login input parameters are valid
 
