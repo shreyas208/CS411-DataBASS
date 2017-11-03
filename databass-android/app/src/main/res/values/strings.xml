@@ -1,5 +1,12 @@
 <resources>
-    <string name="app_name">DataBASS</string>
-    <string name="click_me">Click Me</string>
-    <string name="main_toast_text">You clicked the button!</string>
+    <string name="app_name">Travelations</string>
+    <string name="enter">Enter</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="sign_in">Sign in</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="display_name">Display name</string>
+    <string name="retype_password">Retype password</string>
+    <string name="cancel">Cancel</string>
 </resources>
