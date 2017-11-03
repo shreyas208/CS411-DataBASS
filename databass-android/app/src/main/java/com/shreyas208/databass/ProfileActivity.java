@@ -74,7 +74,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void clickSettingsButton(View view) {
 
-
+        Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(i);
 
     }
 
