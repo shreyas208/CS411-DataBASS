@@ -15,32 +15,36 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * Profile Activity class.
+ */
 public class ProfileActivity extends AppCompatActivity {
 
+    /**
+     * Creates the Profile Activity instance.
+     * @param savedInstanceState  previously saved instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        Toast.makeText(getApplicationContext(), "Logged in", Toast.LENGTH_LONG).show();
-
+        // Personalize text view
         TextView welcomeTextView = (TextView) findViewById(R.id.welcomeTextView);
         String welcome = "Welcome " + Dummy.displayName + "!";
         welcomeTextView.setText(welcome);
 
-        ListView locListView = (ListView) findViewById(R.id.locListView);
-
+        // Gather location and timestamp data
         HashMap<String, String> locationStamps = new HashMap<>();
-
         for (int i = 0; i < Dummy.locations.length; i++) {
 
             locationStamps.put(Dummy.timestamps[i], Dummy.locations[i]);
 
         }
 
+        // Create ListView adapter
         List<HashMap<String, String>> listItems = new ArrayList<>();
-
         SimpleAdapter adapter = new SimpleAdapter(
                 this,
                 listItems,
@@ -49,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
                 new int[] { R.id.text1, R.id.text2
         });
 
+        // Insert data into adapter
         for (Object o : locationStamps.entrySet()) {
 
             HashMap<String, String> resultMap = new HashMap<>();
@@ -59,10 +64,16 @@ public class ProfileActivity extends AppCompatActivity {
 
         }
 
+        // Create list view
+        ListView locListView = (ListView) findViewById(R.id.locListView);
         locListView.setAdapter(adapter);
 
     }
 
+    /**
+     * Logout button callback function. Will open the Login Activity.
+     * @param view  view
+     */
     public void clickLogoutButton(View view) {
 
         Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_LONG).show();
@@ -72,6 +83,10 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Settings button callback function. Will open the Settings Activity.
+     * @param view  view
+     */
     public void clickSettingsButton(View view) {
 
         Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
