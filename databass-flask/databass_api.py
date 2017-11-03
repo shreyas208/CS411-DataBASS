@@ -1,5 +1,5 @@
 # Import all necessary Flask libraries and extensions
-from flask import Flask, request
+from flask import Flask, request, jsonify
 #from flaskext.mysql import MySQL # Connects Flask server to MySQL database
 #import MySQLdb
 import mysql.connector as MySQL
@@ -54,7 +54,7 @@ def register():
         return content, status.HTTP_400_BAD_REQUEST
 
     # Check if the username is new
-    cursor.execute("SELECT username FROM Users WHERE username='" + username + "'")
+    cursor.execute("SELECT username FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
 
     if result:
@@ -92,12 +92,12 @@ def register():
     # all the registration input parameters are valid.
 
     # Insert registration information into Users table
-    cursor.execute("INSERT INTO Users values('" +
+    cursor.execute("INSERT INTO user values('" +
                     username + "', '" + password + "', '" +
                     email_address + "', '" + display_name + "'")
 
     content = {"success": True}
-    return content, status.HTTP_200_OK
+    return jsonify(content), status.HTTP_200_OK
 
 
 # User Login
@@ -131,7 +131,7 @@ def login():
     # all the login input parameters are valid.
 
     # Search Users table for login information
-    cursor.execute("SELECT email_address, display_name, access_token FROM Users WHERE username='" + username + "' AND password='" + password + "'")
+    cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password='" + password + "'")
     result = cursor.fetchone()
 
     if not result:
