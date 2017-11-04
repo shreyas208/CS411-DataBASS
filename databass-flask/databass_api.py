@@ -35,6 +35,7 @@ def register():
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
         error_code = "user_register_invalid_username"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -45,6 +46,7 @@ def register():
 
     if result:
         error_code = "user_register_username_in_use"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -52,6 +54,7 @@ def register():
     # Check if password is valid
     if not (len(password) >= 6 and len(password) <= 256):
         error_code = "user_register_invalid_password"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -61,6 +64,7 @@ def register():
 
     if not emailRegex.match(email_address):
         error_code = "user_register_invalid_email"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -68,6 +72,7 @@ def register():
     # Check if display_name is valid
     if not (len(display_name) >= 1 and len(display_name) <= 265):
         error_code = "user_register_invalid_display_name"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -81,6 +86,9 @@ def register():
     cursor.execute("INSERT INTO user values('" +
                     username + "', '" + email_address + "', '" + display_name + "', '" +
                     password_hash + "', NOW())")
+
+    db.commit()
+    cursor.close()
 
     content = {"success": True}
     return jsonify(content), status.HTTP_200_OK
@@ -101,6 +109,7 @@ def login():
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
         error_code = "user_login_invalid_username"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -108,6 +117,7 @@ def login():
     # Check if password is valid
     if not (len(password) >= 6 and len(password) <= 256):
         error_code = "user_login_invalid_password"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -120,6 +130,7 @@ def login():
 
     cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
     result = cursor.fetchone()
+    cursor.close()
 
     if not result:
         error_code = "user_login_bad_credentials"
