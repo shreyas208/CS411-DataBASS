@@ -21,10 +21,10 @@ db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8
 @app.route("/api/user/register", methods=["POST"])
 def register():
     # Read in registration input parameters
-    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.form.get('password') # String (6 <= characters <= 256)
-    email_address = request.form.get('email_address') # String (valid email)
-    display_name = request.form.get('display_name') # String (1 <= characters <= 265)
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.values.get('password') # String (6 <= characters <= 256)
+    email_address = request.values.get('email_address') # String (valid email)
+    display_name = request.values.get('display_name') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
     cursor = db.cursor()
@@ -89,8 +89,8 @@ def register():
 @app.route("/api/user/login", methods=["POST"])
 def login():
     # Read in login input parameters
-    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.form.get('password') # String (6 <= characters <= 256)
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.values.get('password') # String (6 <= characters <= 256)
 
     # Connect to the MySQL database
     cursor = db.cursor()
