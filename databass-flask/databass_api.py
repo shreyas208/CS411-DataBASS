@@ -4,6 +4,7 @@ import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
 
+# Import libaries for checking the validity of usernames and email addresses
 from string import ascii_letters
 from string import digits
 import re
@@ -11,7 +12,7 @@ import re
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-app.debug = True
+# Connect to the project database on the VM
 db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
 
 # Should I research the "try" and "except" commands?  Should I research trying and catching errors?
@@ -31,7 +32,7 @@ def register():
 
     # Check if all the registration input parameters are valid
 
-    # Check if username is in a valid form
+    # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
         error_code = "user_register_invalid_username"
 
@@ -55,8 +56,6 @@ def register():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    password_hash = bcrypt.generate_password_hash(password)
-
     # Check if email_address is valid
     emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
 
@@ -77,9 +76,11 @@ def register():
     # all the registration input parameters are valid.
 
     # Insert registration information into Users table
+    password_hash = bcrypt.generate_password_hash(password)
+
     cursor.execute("INSERT INTO user values('" +
-                    username + "', '" + password + "', '" +
-                    email_address + "', '" + display_name + "'")
+                    username + "', '" + email_address + "', '" + display_name + "', '" +
+                    password_hash + "', NOW()")
 
     content = {"success": True}
     return jsonify(content), status.HTTP_200_OK
@@ -115,7 +116,9 @@ def login():
     # all the login input parameters are valid.
 
     # Search Users table for login information
-    cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password='" + password + "'")
+    password_hash = bcrypt.generate_password_hash(password)
+
+    cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
     result = cursor.fetchone()
 
     if not result:
