@@ -80,7 +80,7 @@ def register():
 
     cursor.execute("INSERT INTO user values('" +
                     username + "', '" + email_address + "', '" + display_name + "', '" +
-                    password_hash + "', NOW()")
+                    password_hash + "', NOW())")
 
     content = {"success": True}
     return jsonify(content), status.HTTP_200_OK
