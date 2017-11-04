@@ -1,16 +1,6 @@
-# This line tests the commit
-
-
-
-
-
-
-
 # Import all necessary Flask libraries and extensions
 from flask import Flask, request, jsonify
-#from flaskext.mysql import MySQL # Connects Flask server to MySQL database
-#import MySQLdb
-import mysql.connector as MySQL
+import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
 
@@ -21,19 +11,8 @@ import re
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-#app.debug = True
-#db = MySQL.connect(host="127.0.0.1", port=3306, user="root", password=personalPassword)
-db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
-
-#mysql = MySQL()
-
 app.debug = True
-#app.config['MYSQL_DATABASE_USER'] = 'flaskuser'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'tCU8PvBYEPP4qkun'
-#app.config['MYSQL_DATABASE_DB'] = 'cs_411_project'
-#app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-#mysql.init_app(app)
-#Postgres
+db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
 
 # Should I research the "try" and "except" commands?  Should I research trying and catching errors?
 
@@ -42,15 +21,13 @@ app.debug = True
 @app.route("/api/user/register", methods=["POST"])
 def register():
     # Read in registration input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.values.get('password') # String (6 <= characters <= 256)
-    email_address = request.values.get('email_address') # String (valid email)
-    display_name = request.values.get('display_name') # String (1 <= characters <= 265)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.form.get('password') # String (6 <= characters <= 256)
+    email_address = request.form.get('email_address') # String (valid email)
+    display_name = request.form.get('display_name') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
-    #cursor = mysql.connect().cursor()
     cursor = db.cursor()
-    cursor.execute("USE cs_411_project")
 
     # Check if all the registration input parameters are valid
 
@@ -59,7 +36,7 @@ def register():
         error_code = "user_register_invalid_username"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if the username is new
     cursor.execute("SELECT username FROM user WHERE username='" + username + "'")
@@ -69,14 +46,14 @@ def register():
         error_code = "user_register_username_in_use"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if password is valid
     if not (len(password) >= 6 and len(password) <= 256):
         error_code = "user_register_invalid_password"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     password_hash = bcrypt.generate_password_hash(password)
 
@@ -87,14 +64,14 @@ def register():
         error_code = "user_register_invalid_email"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if display_name is valid
     if not (len(display_name) >= 1 and len(display_name) <= 265):
         error_code = "user_register_invalid_display_name"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # If this line of the register() function is reached,
     # all the registration input parameters are valid.
@@ -116,7 +93,6 @@ def login():
     password = request.form.get('password') # String (6 <= characters <= 256)
 
     # Connect to the MySQL database
-    #cursor = mysql.connect().cursor()
     cursor = db.cursor()
 
     # Check if all the login input parameters are valid
@@ -126,14 +102,14 @@ def login():
         error_code = "user_login_invalid_username"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if password is valid
     if not (len(password) >= 6 and len(password) <= 256):
         error_code = "user_login_invalid_password"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # If this line of the login() function is reached,
     # all the login input parameters are valid.
@@ -146,13 +122,13 @@ def login():
         error_code = "user_login_bad_credentials"
 
         content = {"success": False, "error_code": error_code}
-        return content, status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
     else:
         email = result[0]
         display_name = result[1]
         access_token = result[2]
         content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
-        return content, status.HTTP_200_OK
+        return jsonify(content), status.HTTP_200_OK
 
 
 # User Profile
@@ -172,12 +148,3 @@ def root():
 
 if __name__ == "__main__":
     app.run()
-
-#@app.route("/")
-#def hello():
-#    cursor = mysql.connect().cursor()
-#    cursor.execute('''SELECT * FROM world_cities WHERE City="paris"''')
-#    results = cursor.fetchall()
-#    return "Hello World! This is Flask." +
-#           "<br/>Here are all the cities in our database named Paris:<br/>" +
-#           "".join([s + "<br/>" for s in str(results).split("), (")])
