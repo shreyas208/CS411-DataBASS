@@ -179,7 +179,7 @@ def profile():
         result = cursor.fetchall()
         cursor.close()
         recent_checkins = [i[0] for i in result]
-        content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins" = recent_checkins}
+        content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
         return jsonify(content), status.HTTP_200_OK
 
 # City Checkin
