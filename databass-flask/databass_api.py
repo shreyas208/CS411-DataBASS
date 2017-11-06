@@ -225,6 +225,9 @@ def checkin():
             closestDistance = distance
             closestCity = city[0]
 
+    print(closestDistance)
+    print(closestCity)
+
     if closestDistance > 10:
         error_code = "user_checkin_not_close_enough_to_city"
 
