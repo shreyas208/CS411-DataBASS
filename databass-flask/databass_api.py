@@ -174,8 +174,8 @@ def profile():
     else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
         display_name = result[0][0]
         join_datetime = result[1][0]
-        num_cities_visited = sum(result[2])
-        recent_checkins = result[3]
+        num_cities_visited = sum(result[3])
+        recent_checkins = result[2]
         content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
         return jsonify(content), status.HTTP_200_OK
 
