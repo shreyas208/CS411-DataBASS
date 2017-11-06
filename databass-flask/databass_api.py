@@ -205,7 +205,7 @@ def checkin():
 
     closestDistance = float('inf')
     closestCity = -1
-    
+
     for city in cities:
         # approximate radius of earth in km
         R = 6373.0
@@ -213,8 +213,8 @@ def checkin():
         cityLatitude = radians(city[1])
         cityLongitude = radians(city[2])
 
-        dlon = cityLongitude - longitude
-        dlat = cityLatitude - latitude
+        dlon = float(cityLongitude) - float(longitude)
+        dlat = float(cityLatitude) - float(latitude)
 
         a = sin(dlat / 2)**2 + cos(latitude) * cos(cityLatitude) * sin(dlon / 2)**2
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
