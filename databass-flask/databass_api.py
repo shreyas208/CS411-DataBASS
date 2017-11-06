@@ -9,6 +9,8 @@ from string import ascii_letters
 from string import digits
 import re
 
+from math import sin, cos, sqrt, atan2, radians
+
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
@@ -196,7 +198,41 @@ def checkin():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    return 0
+    cursor = db.cursor()
+
+    cursor.execute("SELECT city_id, latitude, longitude FROM city")
+    cities = cursor.fetchall()
+
+    closestDistance = float('inf')
+    closestCity = -1
+
+    for city in cities:
+        # approximate radius of earth in km
+        R = 6373.0
+
+        cityLatitude = radians(city[1])
+        cityLongitude = radians(city[2])
+
+        dlon = cityLongitude - longitude
+        dlat = cityLatitude - latitude
+
+        a = sin(dlat / 2)**2 + cos(latitude) * cos(cityLatitude) * sin(dlon / 2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        distance = R * c
+
+        if distance < closestDistance:
+            closestDistance = distance
+            closestCity = city[0]
+
+    if closestDistance > 10:
+        error_code = "user_checkin_not_close_enough_to_city"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    else:
+        content = {"success": True, "city_id": closestCity}
+        return jsonify(content), status.HTTP_200_OK
 
 @app.route("/")
 def root():
