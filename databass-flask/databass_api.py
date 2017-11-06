@@ -128,8 +128,11 @@ def login():
     # all the login input parameters are valid.
 
     # Search Users table for login information
-    password_hash = bcrypt.generate_password_hash(password)
+    cursor.execute("SELECT password_hash FROM user WHERE username='" + username + "'")
+    password_hash = cursor.fetchone()
 
+    isCorrectPassword = bcrypt.check_password_hash(password_hash, password)
+    
     cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
     result = cursor.fetchone()
     cursor.close()
