@@ -148,6 +148,7 @@ def login():
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
+    # Read in profile input parameters
     username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.values.get('access_token')
 
@@ -182,6 +183,19 @@ def profile():
 # City Checkin
 @app.route("/api/user/checkin", methods=["POST"])
 def checkin():
+    # Read in checkin input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token') # String (6 <= characters <= 256)
+    timestamp = request.values.get('timestamp') # String (valid email)
+    latitude = request.values.get('latitude') # String (1 <= characters <= 265)
+    longitude = request.values.get('longitude') # String (1 <= characters <= 265)
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
+        error_code = "user_checkin_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    
     return 0
 
 @app.route("/")
