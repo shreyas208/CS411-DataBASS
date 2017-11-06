@@ -159,7 +159,7 @@ def profile():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     cursor = db.cursor()
-    cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "'") #query the database for that user
+    cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
     if not result:  #if no user exists
