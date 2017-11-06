@@ -194,7 +194,7 @@ def checkin():
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
-    
+
     return 0
 
 @app.route("/")
