@@ -200,7 +200,7 @@ def checkin():
 
     cursor = db.cursor()
 
-    cursor.execute("SELECT city_id, latitude, longitude FROM city")
+    cursor.execute("SELECT id, latitude, longitude FROM city")
     cities = cursor.fetchall()
 
     closestDistance = float('inf')
