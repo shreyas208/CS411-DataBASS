@@ -158,8 +158,10 @@ def profile():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
+    cursor = db.cursor()
     cursor.execute("SELECT display_name, join_date, city_id, COUNT(user.username) FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "' GROUP BY  city_id") #query the database for that user
     result = cursor.fetchall()
+    cursor.close();
 
 
     if not result:  #if no user exists
@@ -176,9 +178,6 @@ def profile():
         recent_checkins = result[3]
         content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
         return jsonify(content), status.HTTP_200_OK
-
-    return 0
-
 
 # City Checkin
 @app.route("/api/user/checkin", methods=["POST"])
