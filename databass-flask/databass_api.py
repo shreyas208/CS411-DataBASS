@@ -216,7 +216,7 @@ def checkin():
         dlon = float(cityLongitude) - float(longitude)
         dlat = float(cityLatitude) - float(latitude)
 
-        a = sin(dlat / 2)**2 + cos(latitude) * cos(cityLatitude) * sin(dlon / 2)**2
+        a = sin(dlat / 2)**2 + cos(float(latitude)) * cos(float(cityLatitude)) * sin(dlon / 2)**2
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
         distance = R * c
