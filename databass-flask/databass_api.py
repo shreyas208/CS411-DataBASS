@@ -161,7 +161,6 @@ def profile():
     cursor = db.cursor()
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "'") #query the database for that user
     result = cursor.fetchall()
-    cursor.close()
 
 
     if not result:  #if no user exists
