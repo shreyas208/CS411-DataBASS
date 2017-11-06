@@ -206,9 +206,9 @@ def checkin():
     closestDistance = float('inf')
     closestCity = -1
 
-    print(type(city[0][0]))
-    print(type(city[0][1]))
-    print(type(city[0][2]))
+    print(type(cities[0][0]))
+    print(type(cities[0][1]))
+    print(type(cities[0][2]))
     '''
     for city in cities:
         # approximate radius of earth in km
