@@ -148,6 +148,32 @@ def login():
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
+        error_code = "user_profile_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor.execute("SELECT display_name, join_datetime FROM user, checkin WHERE username='" + username + "'") #query the database for that user
+    result = cursor.fetchone()
+
+
+    if not result:  #if no user exists
+        error_code = "user_profile_invalid_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
+        display_name = result[0]
+        join_datetime = result[1]
+        num_cities_visited = 
+
+
     return 0
 
 
