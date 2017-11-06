@@ -157,8 +157,8 @@ def profile():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    cursor.execute("SELECT display_name, join_datetime FROM user, checkin WHERE username='" + username + "'") #query the database for that user
-    result = cursor.fetchone()
+    cursor.execute("SELECT display_name, join_date, city_id, COUNT(user.username) FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "' GROUP BY  city_id") #query the database for that user
+    result = cursor.fetchall()
 
 
     if not result:  #if no user exists
@@ -169,10 +169,12 @@ def profile():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
-        display_name = result[0]
-        join_datetime = result[1]
-        num_cities_visited = 
-
+        display_name = result[0][0]
+        join_datetime = result[1][0]
+        num_cities_visited = sum(result[2])
+        recent_checkins = result[3]
+        content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
+        return jsonify(content), status.HTTP_200_OK
 
     return 0
 
