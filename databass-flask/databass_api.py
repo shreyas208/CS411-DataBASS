@@ -205,10 +205,7 @@ def checkin():
 
     closestDistance = float('inf')
     closestCity = -1
-
-    content = {"success": False, "cities[0][0] type": type(cities[0][0]), "cities[0][1] type": type(cities[0][1]), "cities[0][2] type": type(cities[0][2])}
-    return jsonify(content), status.HTTP_400_BAD_REQUEST
-    '''
+    
     for city in cities:
         # approximate radius of earth in km
         R = 6373.0
@@ -236,7 +233,6 @@ def checkin():
     else:
         content = {"success": True, "city_id": closestCity}
         return jsonify(content), status.HTTP_200_OK
-    '''
 
 @app.route("/")
 def root():
