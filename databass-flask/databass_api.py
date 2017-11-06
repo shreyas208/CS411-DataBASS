@@ -206,6 +206,10 @@ def checkin():
     closestDistance = float('inf')
     closestCity = -1
 
+    print(type(city[0][0]))
+    print(type(city[0][1]))
+    print(type(city[0][2]))
+    '''
     for city in cities:
         # approximate radius of earth in km
         R = 6373.0
@@ -224,7 +228,7 @@ def checkin():
         if distance < closestDistance:
             closestDistance = distance
             closestCity = city[0]
-
+    '''
     if closestDistance > 10:
         error_code = "user_checkin_not_close_enough_to_city"
 
