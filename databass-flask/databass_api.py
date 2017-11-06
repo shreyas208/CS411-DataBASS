@@ -162,9 +162,8 @@ def profile():
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
-
     if not result:  #if no user exists
-        error_code = "user_profile_invalid_username"
+        error_code = "user_profile_bad_username"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
