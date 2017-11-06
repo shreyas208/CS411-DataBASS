@@ -206,11 +206,7 @@ def checkin():
     closestDistance = float('inf')
     closestCity = -1
 
-    print(type(cities[0][0]))
-    print(type(cities[0][1]))
-    print(type(cities[0][2]))
-
-    content = {"success": False, "error_code": error_code, "cities[0][0] type": type(cities[0][0]), "cities[0][1] type": type(cities[0][1]), "cities[0][2] type": type(cities[0][2])}
+    content = {"success": False, "cities[0][0] type": type(cities[0][0]), "cities[0][1] type": type(cities[0][1]), "cities[0][2] type": type(cities[0][2])}
     return jsonify(content), status.HTTP_400_BAD_REQUEST
     '''
     for city in cities:
