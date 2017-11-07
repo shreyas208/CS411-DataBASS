@@ -1,4 +1,4 @@
-package com.shreyas208.databass;
+package com.shreyas208.databass.ui;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.shreyas208.databass.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +31,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        // TODO
+        // Call API to get profile information
 
         // Personalize text view
         TextView welcomeTextView = (TextView) findViewById(R.id.welcomeTextView);
@@ -75,6 +80,9 @@ public class ProfileActivity extends AppCompatActivity {
      * @param view  view
      */
     public void clickLogoutButton(View view) {
+
+        // TODO
+        // Something with access tokens?
 
         Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_LONG).show();
 

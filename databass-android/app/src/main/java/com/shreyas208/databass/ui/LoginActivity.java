@@ -1,4 +1,4 @@
-package com.shreyas208.databass;
+package com.shreyas208.databass.ui;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.shreyas208.databass.R;
+import com.shreyas208.databass.api.service.TravelationsAPI;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -30,6 +36,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Initialize API
+        if (Global.api == null) {
+
+            Retrofit.Builder builder = new Retrofit.Builder()
+                    .baseUrl("http://fa17-cs411-18.cs.illinois.edu/")
+                    .addConverterFactory(GsonConverterFactory.create());
+
+            Retrofit retrofit = builder.build();
+
+            Global.api  = retrofit.create(TravelationsAPI.class);
+
+        }
+
     }
 
     /**
@@ -45,6 +64,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Verify login
         if (verifyLogin(emailLoginEditText.getText().toString(), passwordEditText.getText().toString())) {
+
+            // TODO
+            // Maybe we should save app data such as access token in Global?
 
             Dummy.email = emailLoginEditText.getText().toString();
             Dummy.password = passwordEditText.getText().toString();
@@ -71,6 +93,9 @@ public class LoginActivity extends AppCompatActivity {
      * @return          true on success
      */
     private boolean verifyLogin(String email, String password) {
+
+        // TODO
+        // Call API to verify login
 
         return email.equals(testEmail) && password.equals(testPassword);
 

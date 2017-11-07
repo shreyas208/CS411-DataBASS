@@ -1,4 +1,4 @@
-package com.shreyas208.databass;
+package com.shreyas208.databass.ui;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,8 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.shreyas208.databass.R;
 
 /**
  * Register Activity class.
@@ -48,6 +50,9 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_LONG).show();
             return;
         }
+
+        // TODO
+        // Call API to register the account
 
         // Set dummy account
         Dummy.email = emailRegisterTextView.getText().toString();

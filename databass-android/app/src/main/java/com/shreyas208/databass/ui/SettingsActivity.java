@@ -1,4 +1,4 @@
-package com.shreyas208.databass;
+package com.shreyas208.databass.ui;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.shreyas208.databass.R;
 
 
 /**
@@ -30,6 +32,9 @@ public class SettingsActivity extends AppCompatActivity {
      * @param view  view
      */
     public void clickUpdateDisplayNameButton(View view) {
+
+        // TODO
+        // Call API to update display name
 
         EditText editDisplayNameEditText = (EditText) findViewById(R.id.editDisplayNameEditText);
         Dummy.displayName = editDisplayNameEditText.getText().toString();
