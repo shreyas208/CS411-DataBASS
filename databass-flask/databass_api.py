@@ -28,7 +28,14 @@ def register():
     display_name = request.values.get('display_name') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
-    cursor = db.cursor()
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if all the registration input parameters are valid
 
