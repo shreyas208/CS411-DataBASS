@@ -17,8 +17,6 @@ bcrypt = Bcrypt(app)
 # Connect to the project database on the VM
 db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
 
-# Should I research the "try" and "except" commands?  Should I research trying and catching errors?
-
 
 # User Registration
 @app.route("/api/user/register", methods=["POST"])
@@ -30,6 +28,8 @@ def register():
     display_name = request.values.get('display_name') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
+    cursor = None
+
     try:
         cursor = db.cursor()
     except:
@@ -37,7 +37,7 @@ def register():
 
         content = {"success": False, "error_code": error_code}
         print(traceback.format_exc())
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if all the registration input parameters are valid
 
@@ -111,7 +111,16 @@ def login():
     password = request.values.get('password') # String (6 <= characters <= 256)
 
     # Connect to the MySQL database
-    cursor = db.cursor()
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if all the login input parameters are valid
 
@@ -139,7 +148,7 @@ def login():
     password_hash = cursor.fetchone()
 
     isCorrectPassword = bcrypt.check_password_hash(password_hash, password)
-    
+
     cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
     result = cursor.fetchone()
     cursor.close()
@@ -164,13 +173,24 @@ def profile():
     username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.values.get('access_token')
 
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
     if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
         error_code = "user_profile_invalid_username"
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    cursor = db.cursor()
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
@@ -202,13 +222,23 @@ def checkin():
     latitude = request.values.get('latitude') # String (1 <= characters <= 265)
     longitude = request.values.get('longitude') # String (1 <= characters <= 265)
 
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
     if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
         error_code = "user_checkin_invalid_username"
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    cursor = db.cursor()
 
     cursor.execute("SELECT id, latitude, longitude FROM city")
     cities = cursor.fetchall()
