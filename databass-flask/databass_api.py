@@ -9,6 +9,8 @@ from string import ascii_letters
 from string import digits
 import re
 
+from math import sin, cos, sqrt, atan2, radians
+
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
@@ -133,8 +135,11 @@ def login():
     # all the login input parameters are valid.
 
     # Search Users table for login information
-    password_hash = bcrypt.generate_password_hash(password)
+    cursor.execute("SELECT password_hash FROM user WHERE username='" + username + "'")
+    password_hash = cursor.fetchone()
 
+    isCorrectPassword = bcrypt.check_password_hash(password_hash, password)
+    
     cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
     result = cursor.fetchone()
     cursor.close()
@@ -155,13 +160,92 @@ def login():
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
-    return 0
+    # Read in profile input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
 
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
+        error_code = "user_profile_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor = db.cursor()
+    cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
+    result = cursor.fetchall()
+
+    if not result:  #if no user exists
+        error_code = "user_profile_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
+        display_name = result[0][0]
+        join_datetime = result[0][1]
+        num_cities_visited = len(result)
+        cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "')")
+        result = cursor.fetchall()
+        cursor.close()
+        recent_checkins = [i[0] for i in result]
+        content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
+        return jsonify(content), status.HTTP_200_OK
 
 # City Checkin
 @app.route("/api/user/checkin", methods=["POST"])
 def checkin():
-    return 0
+    # Read in checkin input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token') # String (6 <= characters <= 256)
+    timestamp = request.values.get('timestamp') # String (valid email)
+    latitude = request.values.get('latitude') # String (1 <= characters <= 265)
+    longitude = request.values.get('longitude') # String (1 <= characters <= 265)
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
+        error_code = "user_checkin_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor = db.cursor()
+
+    cursor.execute("SELECT id, latitude, longitude FROM city")
+    cities = cursor.fetchall()
+
+    closestDistance = float('inf')
+    closestCity = -1
+
+    for city in cities:
+        # approximate radius of earth in km
+        R = 6373.0
+
+        cityLatitude = radians(city[1])
+        cityLongitude = radians(city[2])
+
+        dlon = float(cityLongitude) - float(longitude)
+        dlat = float(cityLatitude) - float(latitude)
+
+        a = sin(dlat / 2)**2 + cos(float(latitude)) * cos(float(cityLatitude)) * sin(dlon / 2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        distance = R * c
+
+        if distance < closestDistance:
+            closestDistance = distance
+            closestCity = city[0]
+
+    print(closestDistance)
+    print(closestCity)
+
+    if closestDistance > 10:
+        error_code = "user_checkin_not_close_enough_to_city"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    else:
+        content = {"success": True, "city_id": closestCity}
+        return jsonify(content), status.HTTP_200_OK
 
 @app.route("/")
 def root():
