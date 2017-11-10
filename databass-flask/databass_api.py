@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
+import secrets # Generates access tokens
 
 # Import libaries for checking the validity of usernames and email addresses
 from string import ascii_letters
@@ -143,17 +144,20 @@ def login():
     # If this line of the login() function is reached,
     # all the login input parameters are valid.
 
-    # Search Users table for login information
-    cursor.execute("SELECT password_hash FROM user WHERE username='" + username + "'")
-    password_hash = cursor.fetchone()
-
-    isCorrectPassword = bcrypt.check_password_hash(password_hash, password)
-
-    cursor.execute("SELECT email_address, display_name, access_token FROM user WHERE username='" + username + "' AND password_hash='" + password_hash + "'")
+    # Search Users table for password hash to check if the password is correct
+    cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
-    cursor.close()
 
     if not result:
+        error_code = "user_login_bad_credentials"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    isCorrectPassword = bcrypt.check_password_hash(result[2], password)
+
+    if not isCorrectPassword:
         error_code = "user_login_bad_credentials"
 
         content = {"success": False, "error_code": error_code}
@@ -161,10 +165,88 @@ def login():
     else:
         email = result[0]
         display_name = result[1]
-        access_token = result[2]
+
+        access_token = secrets.token_hex(16)
+
+        cursor.execute("UPDATE user SET access_token='" + access_token + "' WHERE username='" + username + "'")
+        db.commit()
+        cursor.close()
+
         content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
         return jsonify(content), status.HTTP_200_OK
 
+
+# User Logout
+@app.route("/api/user/logout", methods=["POST"])
+def logout():
+    # Read in login input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
+
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if all the logout input parameters are valid
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_logout_invalid_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+    cursor.close()
+
+    if not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    # If this line of the logout() function is reached,
+    # all the logout input parameters are valid.
+
+    # Search Users table for password hash to check if the password is correct
+    cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    if not result:
+        error_code = "user_login_bad_credentials"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    isCorrectPassword = bcrypt.check_password_hash(result[2], password)
+
+    if not isCorrectPassword:
+        error_code = "user_login_bad_credentials"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    else:
+        email = result[0]
+        display_name = result[1]
+
+        access_token = secrets.token_hex(16)
+
+        cursor.close()
+
+        content = {"success": True, "email_address": email, "display_name": display_name, "access_token": access_token}
+        return jsonify(content), status.HTTP_200_OK
 
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
@@ -190,6 +272,9 @@ def profile():
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
 
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
