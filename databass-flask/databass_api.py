@@ -33,7 +33,7 @@ def register():
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
         error_code = "user_register_invalid_username"
-        
+
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
@@ -229,6 +229,13 @@ def profile():
     username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.values.get('access_token')
 
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_profile_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
     # Connect to the MySQL database
     cursor = None
 
@@ -241,11 +248,19 @@ def profile():
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
-        error_code = "user_profile_invalid_username"
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    if not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    # If this line of the profile() function is reached,
+    # all the profile input parameters are valid.
 
     cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
@@ -301,6 +316,47 @@ def checkin():
 
     cursor.execute("SELECT id, latitude, longitude FROM city")
     cities = cursor.fetchall()
+
+    # Distance is in miles
+    cursor.execute
+    (
+        "SELECT *" +
+        "FROM" +
+        "(" +
+            "(" +
+                "SELECT *, ( 3959 * acos( cos( radians(48.856062) ) * cos( radians( Latitude ) ) *" +
+                "cos( radians( Longitude ) - radians(2.347510) ) + sin( radians(48.856062) ) *" +
+                "sin( radians( Latitude ) ) ) ) AS distance" +
+                "FROM city" +
+                "HAVING distance < 5" +
+                "ORDER BY population DESC" +
+                "LIMIT 0, 1" +
+            ")" +
+            "UNION" +
+            "(" +
+                "SELECT *, ( 3959 * acos( cos( radians(48.856062) ) * cos( radians( Latitude ) ) *" +
+                "cos( radians( Longitude ) - radians(2.347510) ) + sin( radians(48.856062) ) *" +
+                "sin( radians( Latitude ) ) ) ) AS distance" +
+                "FROM city" +
+                "HAVING distance < 5" +
+                "ORDER BY distance" +
+                "LIMIT 0, 1" +
+            ")" +
+        ") distpop" +
+        "ORDER BY population DESC, distance ASC" +
+        "LIMIT 0,1"
+    )
+
+
+
+
+
+    cursor.execute("SELECT *, ( 3959 * acos( cos( radians(" + latitude + ") ) * cos( radians( Latitude ) ) *" +
+                   "cos( radians( Longitude ) - radians(" + longitude + ") ) + sin( radians(" + latitude + ") ) *" +
+                   "sin( radians( Latitude ) ) ) ) AS distance FROM city WHERE  HAVING" +
+                   "distance < 25 ORDER BY distance LIMIT 0 , 20")
+
+
 
     closestDistance = float('inf')
     closestCity = -1
