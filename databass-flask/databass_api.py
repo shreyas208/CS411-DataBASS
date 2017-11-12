@@ -117,7 +117,7 @@ def login():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if the input password matches the password hash in the user table and therefore, correct
-    isCorrectPassword = bcrypt.check_password_hash(result[2], password)
+    isCorrectPassword = bcrypt.check_password_hash(str(result[2]), password)
 
     # Return a bad login credential error if the password isn't correct
     if not isCorrectPassword:
@@ -470,7 +470,7 @@ def remove():
     content = {"success": True}
 
     return jsonify(content), status.HTTP_200_OK
-    
+
 # Change Password
 @app.route("/api/user/changePassword", methods=["POST"])
 def changePassword():
@@ -510,7 +510,7 @@ def changePassword():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Check if the old password matches the password hash in the user table and therefore, correct
-    isCorrectPassword = bcrypt.check_password_hash(result[0], old_password)
+    isCorrectPassword = bcrypt.check_password_hash(str(result[0]), old_password)
 
     # Return a bad old_password error if the old password isn't correct
     if not isCorrectPassword:
