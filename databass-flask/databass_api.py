@@ -1,4 +1,4 @@
-DisplayName# Import all necessary Flask libraries and extensions
+# Import all necessary Flask libraries and extensions
 from flask import Flask, request, jsonify
 import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
@@ -373,7 +373,7 @@ def changePassword():
 
     else:
         password_hash = bcrypt.generate_password_hash(new_password)
-        
+
         cursor.execute("UPDATE user SET password_hash='" + password_hash + "' WHERE username='" + username + "'")
         db.commit()
         cursor.close()
