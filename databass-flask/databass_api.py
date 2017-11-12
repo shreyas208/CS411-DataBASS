@@ -3,7 +3,10 @@ from flask import Flask, request, jsonify
 import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
-import secrets # Generates access tokens
+
+# Generates access tokens
+import binascii
+import os
 
 # Import libaries for checking the validity of usernames and email addresses
 from string import ascii_letters
@@ -23,10 +26,10 @@ db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8
 @app.route("/api/user/register", methods=["POST"])
 def register():
     # Read in registration input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.values.get('password') # String (6 <= characters <= 256)
-    email_address = request.values.get('email_address') # String (valid email)
-    display_name = request.values.get('display_name') # String (1 <= characters <= 265)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.form.get('password') # String (6 <= characters <= 256)
+    email_address = request.form.get('email_address') # String (valid email)
+    display_name = request.form.get('display_name') # String (1 <= characters <= 265)
 
     # Check if all the registration input parameters are valid
 
@@ -104,8 +107,8 @@ def register():
 @app.route("/api/user/login", methods=["POST"])
 def login():
     # Read in login input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.values.get('password') # String (6 <= characters <= 256)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.form.get('password') # String (6 <= characters <= 256)
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -163,7 +166,7 @@ def login():
         display_name = result[1]
 
         # Generate an access token and insert it into the user table
-        access_token = secrets.token_hex(16)
+        access_token = binascii.hexlify(os.urandom(32)).decode()
 
         cursor.execute("UPDATE user SET access_token='" + access_token + "' WHERE username='" + username + "'")
         db.commit()
@@ -177,8 +180,8 @@ def login():
 @app.route("/api/user/logout", methods=["POST"])
 def logout():
     # Read in logout input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -230,12 +233,18 @@ def logout():
         return jsonify(content), status.HTTP_200_OK
 
 
+# Search User
+@app.route("/api/user/search", methods=["POST"])
+def search():
+    pass
+
+
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
     # Read in profile input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -284,16 +293,16 @@ def profile():
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
-    else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
-        display_name = result[0][0]
-        join_datetime = result[0][1]
-        num_cities_visited = len(result)
-        cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "')")
-        result = cursor.fetchall()
-        cursor.close()
-        recent_checkins = [i[0] for i in result]
-        content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
-        return jsonify(content), status.HTTP_200_OK
+    #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
+    display_name = result[0][0]
+    join_datetime = result[0][1]
+    num_cities_visited = len(result)
+    cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "')")
+    result = cursor.fetchall()
+    cursor.close()
+    recent_checkins = [i[0] for i in result]
+    content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
+    return jsonify(content), status.HTTP_200_OK
 
 # Follow User
 @app.route("/api/user/follow", methods=["POST"])
@@ -433,10 +442,10 @@ def remove():
 @app.route("/api/user/changePassword", methods=["POST"])
 def changePassword():
     # Read in password change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    old_password = request.values.get('old_password') # String (6 <= characters <= 256)
-    new_password = request.values.get('new_password') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    old_password = request.form.get('old_password') # String (6 <= characters <= 256)
+    new_password = request.form.get('new_password') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -519,9 +528,9 @@ def changePassword():
 @app.route("/api/user/changeDisplayName", methods=["POST"])
 def changeDisplayName():
     # Read in display name change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    display_name = request.values.get('display_name') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    display_name = request.form.get('display_name') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -584,9 +593,9 @@ def changeDisplayName():
 @app.route("/api/user/changeEmailAddress", methods=["POST"])
 def changeEmailAddress():
     # Read in email address change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    email_address = request.values.get('email_address') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    email_address = request.form.get('email_address') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -651,11 +660,11 @@ def changeEmailAddress():
 @app.route("/api/user/checkin", methods=["POST"])
 def checkin():
     # Read in checkin input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token') # String (6 <= characters <= 256)
-    timestamp = request.values.get('timestamp') # String (valid email)
-    latitude = request.values.get('latitude') # String (1 <= characters <= 265)
-    longitude = request.values.get('longitude') # String (1 <= characters <= 265)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token') # String (6 <= characters <= 256)
+    timestamp = request.form.get('timestamp') # String (valid email)
+    latitude = request.form.get('latitude') # String (1 <= characters <= 265)
+    longitude = request.form.get('longitude') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
     cursor = None
@@ -753,9 +762,29 @@ def checkin():
         content = {"success": True, "city_id": closestCity}
         return jsonify(content), status.HTTP_200_OK
 
+
+# Follow User
+@app.route("/api/user/follow", methods=["POST"])
+def follow():
+    pass
+
+
+# Unfollow User
+@app.route("/api/user/unfollow", methods=["POST"])
+def unfollow():
+    pass
+
+
+# Remove User
+@app.route("/api/user/remove", methods=["POST"])
+def remove():
+    pass
+
+
 @app.route("/")
 def root():
     return "You have reached our Flask server."
+
 
 if __name__ == "__main__":
     app.run()
