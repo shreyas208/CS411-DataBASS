@@ -32,36 +32,10 @@ def register():
     display_name = request.form.get('display_name') # String (1 <= characters <= 265)
 
     # Check if all the registration input parameters are valid
+    check = validateParameters("register", username=username, password=password, email_address=email_address, display_name=display_name)
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_register_invalid_username"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if password is valid
-    if not (len(password) >= 6 and len(password) <= 256):
-        error_code = "user_register_invalid_password"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if email_address is valid
-    emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
-
-    if not emailRegex.match(email_address):
-        error_code = "user_register_invalid_email"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if display_name is valid
-    if not (len(display_name) >= 1 and len(display_name) <= 265):
-        error_code = "user_register_invalid_display_name"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -110,19 +84,10 @@ def login():
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     password = request.form.get('password') # String (6 <= characters <= 256)
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_login_invalid_username"
+    check = validateParameters("login", username=username, password=password)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if password is valid
-    if not (len(password) >= 6 and len(password) <= 256):
-        error_code = "user_login_invalid_password"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -183,12 +148,10 @@ def logout():
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_logout_invalid_username"
+    check = validateParameters("logout", username=username)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -246,12 +209,10 @@ def profile():
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_profile_invalid_username"
+    check = validateParameters("profile", username=username)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -314,26 +275,10 @@ def changePassword():
     new_password = request.form.get('new_password') # String (6 <= characters <= 256)
     access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_changePassword_invalid_username"
+    check = validateParameters("changePassword", username=username, password=old_password, password2=new_password)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if old_password is valid
-    if not (len(old_password) >= 6 and len(old_password) <= 256):
-        error_code = "user_changePassword_invalid_old_password"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if new_password is valid
-    if not (len(new_password) >= 6 and len(new_password) <= 256):
-        error_code = "user_changePassword_invalid_new_password"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -399,19 +344,10 @@ def changeDisplayName():
     display_name = request.form.get('display_name') # String (6 <= characters <= 256)
     access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_changeDisplayName_invalid_username"
+    check = validateParameters("changeDisplayName", username=username, display_name=display_name)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if display_name is valid
-    if not (len(display_name) >= 1 and len(display_name) <= 265):
-        error_code = "user_changeDisplayName_invalid_display_name"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -464,21 +400,10 @@ def changeEmailAddress():
     email_address = request.form.get('email_address') # String (6 <= characters <= 256)
     access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_changeEmailAddress_invalid_username"
+    check = validateParameters("changeEmailAddress", username=username, email_address=email_address)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    # Check if email_address is valid
-    emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
-
-    if not emailRegex.match(email_address):
-        error_code = "user_changeEmailAddress_invalid_email"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -555,14 +480,16 @@ def checkin():
     cities = cursor.fetchall()
 
     # Distance is in miles
+    # Paris latitude: 48.856062
+    # Paris longitude: 2.347510
     cursor.execute
     (
         "SELECT *" +
         "FROM" +
         "(" +
             "(" +
-                "SELECT *, ( 3959 * acos( cos( radians(48.856062) ) * cos( radians( Latitude ) ) *" +
-                "cos( radians( Longitude ) - radians(2.347510) ) + sin( radians(48.856062) ) *" +
+                "SELECT *, ( 3959 * acos( cos( radians(latitude) ) * cos( radians( Latitude ) ) *" +
+                "cos( radians( Longitude ) - radians(longitude) ) + sin( radians(latitude) ) *" +
                 "sin( radians( Latitude ) ) ) ) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
@@ -571,8 +498,8 @@ def checkin():
             ")" +
             "UNION" +
             "(" +
-                "SELECT *, ( 3959 * acos( cos( radians(48.856062) ) * cos( radians( Latitude ) ) *" +
-                "cos( radians( Longitude ) - radians(2.347510) ) + sin( radians(48.856062) ) *" +
+                "SELECT *, ( 3959 * acos( cos( radians(latitude) ) * cos( radians( Latitude ) ) *" +
+                "cos( radians( Longitude ) - radians(longitude) ) + sin( radians(latitude) ) *" +
                 "sin( radians( Latitude ) ) ) ) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
@@ -651,6 +578,58 @@ def remove():
 @app.route("/")
 def root():
     return "You have reached our Flask server."
+
+
+def validateParameters(functionName, username=None, password=None, password2=None, email_address=None, display_name=None):
+    # Check if username is valid
+    if username not None:
+        if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+            error_code = "user_" + functionName + "_invalid_username"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if password is valid
+    if password not None:
+        if not (len(password) >= 6 and len(password) <= 256):
+            if functionName == "changePassword":
+                error_code = "user_" + functionName + "_invalid_old_password"
+            else:
+                error_code = "user_" + functionName + "_invalid_password"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if password2 is valid
+    if password2 not None:
+        if not (len(password2) >= 6 and len(password2) <= 256):
+            if functionName == "changePassword":
+                error_code = "user_" + functionName + "_invalid_new_password"
+            else:
+                error_code = "user_" + functionName + "_invalid_password"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if email_address is valid
+    if email_address not None:
+        emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
+
+        if not emailRegex.match(email_address):
+            error_code = "user_" + functionName + "_invalid_email"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if display_name is valid
+    if display_name not None:
+        if not (len(display_name) >= 1 and len(display_name) <= 265):
+            error_code = "user_" + functionName + "_invalid_display_name"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    return None
 
 
 if __name__ == "__main__":
