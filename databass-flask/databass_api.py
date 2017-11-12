@@ -1,4 +1,4 @@
-# Import all necessary Flask libraries and extensions
+DisplayName# Import all necessary Flask libraries and extensions
 from flask import Flask, request, jsonify
 import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
@@ -91,7 +91,7 @@ def register():
 
     cursor.execute("INSERT INTO user values('" +
                     username + "', '" + email_address + "', '" + display_name + "', '" +
-                    password_hash + "', NOW())")
+                    password_hash + "', NOW(), NULL)")
 
     db.commit()
     cursor.close()
@@ -176,7 +176,7 @@ def login():
 # User Logout
 @app.route("/api/user/logout", methods=["POST"])
 def logout():
-    # Read in login input parameters
+    # Read in logout input parameters
     username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.values.get('access_token')
 
@@ -203,7 +203,15 @@ def logout():
     cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
 
-    if not (access_token == result[0]):
+    # Return a bad username error if the username isn't in the table
+    if not result:  #if no user exists
+        error_code = "user_logout_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
@@ -252,7 +260,15 @@ def profile():
     cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
 
-    if not (access_token == result[0]):
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_profile_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
@@ -268,13 +284,6 @@ def profile():
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
-    if not result:  #if no user exists
-        error_code = "user_profile_bad_username"
-        cursor.close()
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
     else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
         display_name = result[0][0]
         join_datetime = result[0][1]
@@ -285,6 +294,204 @@ def profile():
         recent_checkins = [i[0] for i in result]
         content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
         return jsonify(content), status.HTTP_200_OK
+
+
+# Change Password
+@app.route("/api/user/changePassword", methods=["POST"])
+def changePassword():
+    # Read in password change input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.values.get('password') # String (6 <= characters <= 256)
+    access_token = request.values.get('access_token')
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_changePassword_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Check if password is valid
+    if not (len(password) >= 6 and len(password) <= 256):
+        error_code = "user_changePassword_invalid_password"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_changePassword_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    # If this line of the changePassword() function is reached,
+    # all the password change input parameters are valid.
+
+    else:
+        cursor.execute("UPDATE user SET password='" + password + "' WHERE username='" + username + "'")
+        db.commit()
+        cursor.close()
+
+        content = {"success": True}
+        return jsonify(content), status.HTTP_200_OK
+
+
+# Change Display Name
+@app.route("/api/user/changeDisplayName", methods=["POST"])
+def changeDisplayName():
+    # Read in display name change input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    display_name = request.values.get('display_name') # String (6 <= characters <= 256)
+    access_token = request.values.get('access_token')
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_changeDisplayName_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Check if display_name is valid
+    if not (len(display_name) >= 1 and len(display_name) <= 265):
+        error_code = "user_changeDisplayName_invalid_display_name"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_changeDisplayName_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    # If this line of the changeDisplayName() function is reached,
+    # all the display name change input parameters are valid.
+
+    else:
+        cursor.execute("UPDATE user SET display_name='" + display_name + "' WHERE username='" + username + "'")
+        db.commit()
+        cursor.close()
+
+        content = {"success": True}
+        return jsonify(content), status.HTTP_200_OK
+
+
+# Change Email Address
+@app.route("/api/user/changeEmailAddress", methods=["POST"])
+def changeEmailAddress():
+    # Read in email address change input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    email_address = request.values.get('email_address') # String (6 <= characters <= 256)
+    access_token = request.values.get('access_token')
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_changeEmailAddress_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Check if email_address is valid
+    emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
+
+    if not emailRegex.match(email_address):
+        error_code = "user_changeEmailAddress_invalid_email"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_changeEmailAddress_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    # If this line of the changeEmailAddress() function is reached,
+    # all the email address change input parameters are valid.
+
+    else:
+        cursor.execute("UPDATE user SET email_address='" + email_address + "' WHERE username='" + username + "'")
+        db.commit()
+        cursor.close()
+
+        content = {"success": True}
+        return jsonify(content), status.HTTP_200_OK
+
 
 # City Checkin
 @app.route("/api/user/checkin", methods=["POST"])
