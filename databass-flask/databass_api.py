@@ -374,6 +374,78 @@ def follow():
 
     return jsonify(content), status.HTTP_200_OK
 
+
+# Unfollow User
+@app.route("/api/user/unfollow", methods=["POST"])
+def unfollow():
+    follower_username = request.values.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
+    followee_username = request.values.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in follower_username):
+        error_code = "user_follow_invalid_follower_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in followee_username):
+        error_code = "user_follow_invalid_followee_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_follow_bad_follower_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    cursor.execute("SELECT * FROM user WHERE username='" + followee_username + "'")
+    result = cursor.fetchone()
+
+    #return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_follow_bad_followee_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    #finished argument checking here
+
+    #add the follow to the table
+    cursor.execute("DELETE FROM follow WHERE username_follower = '" + follower_username + "' AND username_followee = '" + followee_username + "'")
+
+    cursor.close()
+
+    content = {"success": True}
+
+    return jsonify(content), status.HTTP_200_OK
+
+
 # Delete User
 @app.route("/api/user/remove", methods=["POST"])
 def remove():
@@ -762,23 +834,6 @@ def checkin():
         content = {"success": True, "city_id": closestCity}
         return jsonify(content), status.HTTP_200_OK
 
-
-# Follow User
-@app.route("/api/user/follow", methods=["POST"])
-def follow():
-    pass
-
-
-# Unfollow User
-@app.route("/api/user/unfollow", methods=["POST"])
-def unfollow():
-    pass
-
-
-# Remove User
-@app.route("/api/user/remove", methods=["POST"])
-def remove():
-    pass
 
 
 @app.route("/")
