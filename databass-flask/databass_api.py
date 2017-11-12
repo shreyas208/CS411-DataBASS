@@ -268,21 +268,14 @@ def profile():
 # Follow User
 @app.route("/api/user/follow", methods=["POST"])
 def follow():
-    follower_username = request.values.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
-    followee_username = request.values.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    follower_username = request.form.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
+    followee_username = request.form.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
-    if not all((c in ascii_letters + digits + '-' + '_') for c in follower_username):
-        error_code = "user_follow_invalid_follower_username"
+    check = validateParameters("follow", username=follower_username, username2=followee_username)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    if not all((c in ascii_letters + digits + '-' + '_') for c in followee_username):
-        error_code = "user_follow_invalid_followee_username"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     cursor = None
 
@@ -339,21 +332,14 @@ def follow():
 # Unfollow User
 @app.route("/api/user/unfollow", methods=["POST"])
 def unfollow():
-    follower_username = request.values.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
-    followee_username = request.values.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    follower_username = request.form.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
+    followee_username = request.form.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
-    if not all((c in ascii_letters + digits + '-' + '_') for c in follower_username):
-        error_code = "user_follow_invalid_follower_username"
+    check = validateParameters("unfollow", username=follower_username, username2=followee_username)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    if not all((c in ascii_letters + digits + '-' + '_') for c in followee_username):
-        error_code = "user_follow_invalid_followee_username"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     cursor = None
 
@@ -411,15 +397,13 @@ def unfollow():
 @app.route("/api/user/remove", methods=["POST"])
 def remove():
     # Read in profile input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
-    # Check if username is valid
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-        error_code = "user_profile_invalid_username"
+    check = validateParameters("remove", username=username)
 
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    if check not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -768,11 +752,25 @@ def root():
     return "You have reached our Flask server."
 
 
-def validateParameters(functionName, username=None, password=None, password2=None, email_address=None, display_name=None):
+def validateParameters(functionName, username=None, username2=None, password=None, password2=None, email_address=None, display_name=None):
     # Check if username is valid
     if username not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-            error_code = "user_" + functionName + "_invalid_username"
+            if functionName == "follow" or functionName == "unfollow":
+                error_code = "user_" + functionName + "_invalid_follower_username"
+            else:
+                error_code = "user_" + functionName + "_invalid_username"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if username is valid
+    if username2 not None:
+        if not all((c in ascii_letters + digits + '-' + '_') for c in username2):
+            if functionName == "follow" or functionName == "unfollow":
+                error_code = "user_" + functionName + "_invalid_followee_username"
+            else:
+                error_code = "user_" + functionName + "_invalid_username"
 
             content = {"success": False, "error_code": error_code}
             return content
