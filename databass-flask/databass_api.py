@@ -295,7 +295,140 @@ def profile():
         content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
         return jsonify(content), status.HTTP_200_OK
 
+# Follow User
+@app.route("/api/user/follow", methods=["POST"])
+def follow():
+    follower_username = request.values.get('follower_username') # String (a-z, A-Z, 0-9, -, _)
+    followee_username = request.values.get('followee_username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
 
+    if not all((c in ascii_letters + digits + '-' + '_') for c in follower_username):
+        error_code = "user_follow_invalid_follower_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    if not all((c in ascii_letters + digits + '-' + '_') for c in followee_username):
+        error_code = "user_follow_invalid_followee_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_follow_bad_follower_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    cursor.execute("SELECT * FROM user WHERE username='" + followee_username + "'")
+    result = cursor.fetchone()
+
+    #return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_follow_bad_followee_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    #finished argument checking here
+
+    #add the follow to the table
+    cursor.execute("INSERT INTO follow VALUES ('" + follower_username + "', '" + followee_username + "')")
+
+    cursor.close()
+
+    content = {"success": True}
+
+    return jsonify(content), status.HTTP_200_OK
+
+# Delete User
+@app.route("/api/user/remove", methods=["POST"])
+def remove():
+    # Read in profile input parameters
+    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.values.get('access_token')
+
+    # Check if username is valid
+    if not all((c in ascii_letters + digits + '-' + '_') for c in username):
+        error_code = "user_profile_invalid_username"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Connect to the MySQL database
+    cursor = None
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_profile_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
+
+    #arguments are valid
+
+    #remove user from checkin table
+    cursor.execute("DELETE FROM checkin WHERE username = '" + username + "'")
+
+    #remove user from follow where username is the follower
+    cursor.execute("DELETE FROM follow WHERE username_follower = '" + username + "'")
+    #remove user from follow where username is the followee
+    cursor.execute("DELETE FROM follow WHERE username_followee = '" + username + "'")
+
+    #remove user from user table
+    cursor.execute("DELETE FROM user WHERE username = '" + username + "'")
+
+    cursor.close()
+
+    content = {"success": True}
+
+    return jsonify(content), status.HTTP_200_OK
+    
 # Change Password
 @app.route("/api/user/changePassword", methods=["POST"])
 def changePassword():
