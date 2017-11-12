@@ -301,7 +301,8 @@ def profile():
 def changePassword():
     # Read in password change input parameters
     username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.values.get('password') # String (6 <= characters <= 256)
+    old_password = request.values.get('old_password') # String (6 <= characters <= 256)
+    new_password = request.values.get('new_password') # String (6 <= characters <= 256)
     access_token = request.values.get('access_token')
 
     # Check if username is valid
@@ -311,9 +312,16 @@ def changePassword():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    # Check if password is valid
-    if not (len(password) >= 6 and len(password) <= 256):
-        error_code = "user_changePassword_invalid_password"
+    # Check if old_password is valid
+    if not (len(old_password) >= 6 and len(old_password) <= 256):
+        error_code = "user_changePassword_invalid_old_password"
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    # Check if new_password is valid
+    if not (len(new_password) >= 6 and len(new_password) <= 256):
+        error_code = "user_changePassword_invalid_new_password"
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
@@ -330,8 +338,8 @@ def changePassword():
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    # Check if the old password and access token are valid
+    cursor.execute("SELECT password_hash, access_token FROM user WHERE username='" + username + "'")
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -342,7 +350,18 @@ def changePassword():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    elif not (access_token == result[0]):
+    # Check if the old password matches the password hash in the user table and therefore, correct
+    isCorrectPassword = bcrypt.check_password_hash(result[0], old_password)
+
+    # Return a bad old_password error if the old password isn't correct
+    if not isCorrectPassword:
+        error_code = "user_changePassword_bad_old_password"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[1]):
         error_code = "user_bad_access_token"
         cursor.close()
 
@@ -353,7 +372,9 @@ def changePassword():
     # all the password change input parameters are valid.
 
     else:
-        cursor.execute("UPDATE user SET password='" + password + "' WHERE username='" + username + "'")
+        password_hash = bcrypt.generate_password_hash(new_password)
+        
+        cursor.execute("UPDATE user SET password_hash='" + password_hash + "' WHERE username='" + username + "'")
         db.commit()
         cursor.close()
 
@@ -565,30 +586,30 @@ def checkin():
 
 
 
-    closestDistance = float('inf')
-    closestCity = -1
-
-    for city in cities:
-        # approximate radius of earth in km
-        R = 6373.0
-
-        cityLatitude = radians(city[1])
-        cityLongitude = radians(city[2])
-
-        dlon = float(cityLongitude) - float(longitude)
-        dlat = float(cityLatitude) - float(latitude)
-
-        a = sin(dlat / 2)**2 + cos(float(latitude)) * cos(float(cityLatitude)) * sin(dlon / 2)**2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        distance = R * c
-
-        if distance < closestDistance:
-            closestDistance = distance
-            closestCity = city[0]
-
-    print(closestDistance)
-    print(closestCity)
+    #closestDistance = float('inf')
+    #closestCity = -1
+    #
+    #for city in cities:
+    #    # approximate radius of earth in km
+    #    R = 6373.0
+    #
+    #    cityLatitude = radians(city[1])
+    #    cityLongitude = radians(city[2])
+    #
+    #    dlon = float(cityLongitude) - float(longitude)
+    #    dlat = float(cityLatitude) - float(latitude)
+    #
+    #    a = sin(dlat / 2)**2 + cos(float(latitude)) * cos(float(cityLatitude)) * sin(dlon / 2)**2
+    #    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    #
+    #    distance = R * c
+    #
+    #    if distance < closestDistance:
+    #        closestDistance = distance
+    #        closestCity = city[0]
+    #
+    #print(closestDistance)
+    #print(closestCity)
 
     if closestDistance > 10:
         error_code = "user_checkin_not_close_enough_to_city"
