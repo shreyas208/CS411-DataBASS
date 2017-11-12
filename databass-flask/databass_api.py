@@ -3,7 +3,10 @@ from flask import Flask, request, jsonify
 import mysql.connector as MySQL # Connects Flask server to MySQL database
 from flask_api import status # Handles error codes returned by Flask server
 from flask_bcrypt import Bcrypt
-import secrets # Generates access tokens
+
+# Generates access tokens
+import binascii
+import os
 
 # Import libaries for checking the validity of usernames and email addresses
 from string import ascii_letters
@@ -163,7 +166,7 @@ def login():
         display_name = result[1]
 
         # Generate an access token and insert it into the user table
-        access_token = secrets.token_hex(16)
+        access_token = binascii.hexlify(os.urandom(32)).decode()
 
         cursor.execute("UPDATE user SET access_token='" + access_token + "' WHERE username='" + username + "'")
         db.commit()
