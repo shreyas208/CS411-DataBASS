@@ -107,8 +107,8 @@ def register():
 @app.route("/api/user/login", methods=["POST"])
 def login():
     # Read in login input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    password = request.values.get('password') # String (6 <= characters <= 256)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    password = request.form.get('password') # String (6 <= characters <= 256)
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -180,8 +180,8 @@ def login():
 @app.route("/api/user/logout", methods=["POST"])
 def logout():
     # Read in logout input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -243,8 +243,8 @@ def search():
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
     # Read in profile input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -309,10 +309,10 @@ def profile():
 @app.route("/api/user/changePassword", methods=["POST"])
 def changePassword():
     # Read in password change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    old_password = request.values.get('old_password') # String (6 <= characters <= 256)
-    new_password = request.values.get('new_password') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    old_password = request.form.get('old_password') # String (6 <= characters <= 256)
+    new_password = request.form.get('new_password') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -395,9 +395,9 @@ def changePassword():
 @app.route("/api/user/changeDisplayName", methods=["POST"])
 def changeDisplayName():
     # Read in display name change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    display_name = request.values.get('display_name') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    display_name = request.form.get('display_name') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -460,9 +460,9 @@ def changeDisplayName():
 @app.route("/api/user/changeEmailAddress", methods=["POST"])
 def changeEmailAddress():
     # Read in email address change input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    email_address = request.values.get('email_address') # String (6 <= characters <= 256)
-    access_token = request.values.get('access_token')
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    email_address = request.form.get('email_address') # String (6 <= characters <= 256)
+    access_token = request.form.get('access_token')
 
     # Check if username is valid
     if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -527,11 +527,11 @@ def changeEmailAddress():
 @app.route("/api/user/checkin", methods=["POST"])
 def checkin():
     # Read in checkin input parameters
-    username = request.values.get('username') # String (a-z, A-Z, 0-9, -, _)
-    access_token = request.values.get('access_token') # String (6 <= characters <= 256)
-    timestamp = request.values.get('timestamp') # String (valid email)
-    latitude = request.values.get('latitude') # String (1 <= characters <= 265)
-    longitude = request.values.get('longitude') # String (1 <= characters <= 265)
+    username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token') # String (6 <= characters <= 256)
+    timestamp = request.form.get('timestamp') # String (valid email)
+    latitude = request.form.get('latitude') # String (1 <= characters <= 265)
+    longitude = request.form.get('longitude') # String (1 <= characters <= 265)
 
     # Connect to the MySQL database
     cursor = None
