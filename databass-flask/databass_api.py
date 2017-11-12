@@ -230,6 +230,12 @@ def logout():
         return jsonify(content), status.HTTP_200_OK
 
 
+# Search User
+@app.route("/api/user/search", methods=["POST"])
+def search():
+    pass
+
+
 # User Profile
 @app.route("/api/user/profile", methods=["POST"])
 def profile():
@@ -284,16 +290,16 @@ def profile():
     cursor.execute("SELECT display_name, join_date, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "'") #query the database for that user
     result = cursor.fetchall()
 
-    else: #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
-        display_name = result[0][0]
-        join_datetime = result[0][1]
-        num_cities_visited = len(result)
-        cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "')")
-        result = cursor.fetchall()
-        cursor.close()
-        recent_checkins = [i[0] for i in result]
-        content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
-        return jsonify(content), status.HTTP_200_OK
+    #we need to get join_datetime, display_name, num_cities_visited, recent_checkins
+    display_name = result[0][0]
+    join_datetime = result[0][1]
+    num_cities_visited = len(result)
+    cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "')")
+    result = cursor.fetchall()
+    cursor.close()
+    recent_checkins = [i[0] for i in result]
+    content = {"success": True, "join_datetime": join_datetime, "display_name": display_name, "num_cities_visited": num_cities_visited, "recent_checkins": recent_checkins}
+    return jsonify(content), status.HTTP_200_OK
 
 
 # Change Password
@@ -620,9 +626,29 @@ def checkin():
         content = {"success": True, "city_id": closestCity}
         return jsonify(content), status.HTTP_200_OK
 
+
+# Follow User
+@app.route("/api/user/follow", methods=["POST"])
+def follow():
+    pass
+
+
+# Unfollow User
+@app.route("/api/user/unfollow", methods=["POST"])
+def unfollow():
+    pass
+
+
+# Remove User
+@app.route("/api/user/remove", methods=["POST"])
+def remove():
+    pass
+
+
 @app.route("/")
 def root():
     return "You have reached our Flask server."
+
 
 if __name__ == "__main__":
     app.run()
