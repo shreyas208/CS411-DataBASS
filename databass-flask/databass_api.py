@@ -705,8 +705,8 @@ def checkin():
     print(longitude)
     print(type(longitude))
 
-    checkin_query =
-    (
+    checkin_query = "" +
+    #(
         "SELECT *" +
         "FROM" +
         "(" +
@@ -732,7 +732,7 @@ def checkin():
         ") AS distpop" +
         "ORDER BY population DESC, distance ASC" +
         "LIMIT 0,1"
-    )
+    #)
 
     cursor.execute(checkin_query)
 
