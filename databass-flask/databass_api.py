@@ -754,7 +754,7 @@ def root():
 
 def validateParameters(functionName, username=None, username2=None, password=None, password2=None, email_address=None, display_name=None):
     # Check if username is valid
-    if username not None:
+    if username is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
             if functionName == "follow" or functionName == "unfollow":
                 error_code = "user_" + functionName + "_invalid_follower_username"
@@ -765,7 +765,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if username is valid
-    if username2 not None:
+    if username2 is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username2):
             if functionName == "follow" or functionName == "unfollow":
                 error_code = "user_" + functionName + "_invalid_followee_username"
@@ -776,7 +776,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if password is valid
-    if password not None:
+    if password is not None:
         if not (len(password) >= 6 and len(password) <= 256):
             if functionName == "changePassword":
                 error_code = "user_" + functionName + "_invalid_old_password"
@@ -787,7 +787,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if password2 is valid
-    if password2 not None:
+    if password2 is not None:
         if not (len(password2) >= 6 and len(password2) <= 256):
             if functionName == "changePassword":
                 error_code = "user_" + functionName + "_invalid_new_password"
@@ -798,7 +798,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if email_address is valid
-    if email_address not None:
+    if email_address is not None:
         emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
 
         if not emailRegex.match(email_address):
@@ -808,7 +808,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if display_name is valid
-    if display_name not None:
+    if display_name is not None:
         if not (len(display_name) >= 1 and len(display_name) <= 265):
             error_code = "user_" + functionName + "_invalid_display_name"
 
