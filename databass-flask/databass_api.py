@@ -700,9 +700,9 @@ def checkin():
         "FROM" +
         "(" +
             "(" +
-                "SELECT *, ( 3959 * acos( cos( radians(latitude) ) * cos( radians( Latitude ) ) *" +
-                "cos( radians( Longitude ) - radians(longitude) ) + sin( radians(latitude) ) *" +
-                "sin( radians( Latitude ) ) ) ) AS distance" +
+                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
                 "ORDER BY population DESC" +
@@ -710,15 +710,15 @@ def checkin():
             ")" +
             "UNION" +
             "(" +
-                "SELECT *, ( 3959 * acos( cos( radians(latitude) ) * cos( radians( Latitude ) ) *" +
-                "cos( radians( Longitude ) - radians(longitude) ) + sin( radians(latitude) ) *" +
-                "sin( radians( Latitude ) ) ) ) AS distance" +
+                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
                 "ORDER BY distance" +
                 "LIMIT 0, 1" +
             ")" +
-        ") distpop" +
+        ") AS distpop" +
         "ORDER BY population DESC, distance ASC" +
         "LIMIT 0,1"
     )
