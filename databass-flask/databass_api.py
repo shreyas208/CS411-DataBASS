@@ -711,8 +711,8 @@ def checkin():
         "FROM" +
         "(" +
             "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + float(latitude) + ")) * cos(radians(latitude)) *" +
-                "cos(radians(longitude) - radians(" + float(longitude) + ")) + sin(radians(" + float(latitude) + ")) *" +
+                "SELECT *, (3959 * acos(cos(radians(" + str(float(latitude)) + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + str(float(longitude)) + ")) + sin(radians(" + str(float(latitude)) + ")) *" +
                 "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
@@ -721,8 +721,8 @@ def checkin():
             ")" +
             "UNION" +
             "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + float(latitude) + ")) * cos(radians(latitude)) *" +
-                "cos(radians(longitude) - radians(" + float(longitude) + ")) + sin(radians(" + float(latitude) + ")) *" +
+                "SELECT *, (3959 * acos(cos(radians(" + str(float(latitude)) + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + str(float(longitude)) + ")) + sin(radians(" + str(float(latitude)) + ")) *" +
                 "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
