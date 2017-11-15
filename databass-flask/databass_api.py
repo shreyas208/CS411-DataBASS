@@ -383,7 +383,7 @@ def unfollow():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
     #finished argument checking here
 
-    #add the follow to the table
+    #remove the follow to the table
     cursor.execute("DELETE FROM follow WHERE username_follower = '" + follower_username + "' AND username_followee = '" + followee_username + "'")
 
     cursor.close()
