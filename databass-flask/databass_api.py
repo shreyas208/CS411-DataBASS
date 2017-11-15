@@ -735,6 +735,7 @@ def checkin():
     )
 
     result = cursor.fetchone()
+    print(result)
 
     if not result:
         error_code = "user_checkin_not_close_enough_to_city"
