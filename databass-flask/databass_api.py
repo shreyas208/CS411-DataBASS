@@ -693,7 +693,12 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
+    print(latitude)
+    print(type(latitude))
 
+    print(longitude)
+    print(type(longitude))
+    
     cursor.execute
     (
         "SELECT *" +
