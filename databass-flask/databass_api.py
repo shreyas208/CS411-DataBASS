@@ -705,7 +705,36 @@ def checkin():
     print(longitude)
     print(type(longitude))
 
-    cursor.execute("SELECT * FROM((SELECT *, (3959 * acos(cos(radians(" + str(float(latitude)) + ")) * cos(radians(latitude)) * cos(radians(longitude) - radians(" + str(float(longitude)) + ")) + sin(radians(" + str(float(latitude)) + ")) * sin(radians(latitude)))) AS distance FROM city HAVING distance < 5 ORDER BY population DESC LIMIT 0, 1) UNION (SELECT *, (3959 * acos(cos(radians(" + str(float(latitude)) + ")) * cos(radians(latitude)) * cos(radians(longitude) - radians(" + str(float(longitude)) + ")) + sin(radians(" + str(float(latitude)) + ")) * sin(radians(latitude)))) AS distance FROM city HAVING distance < 5 ORDER BY distance LIMIT 0, 1)) AS distpop ORDER BY population DESC, distance ASC LIMIT 0,1")
+    checkin_query =
+    (
+        "SELECT *" +
+        "FROM" +
+        "(" +
+            "(" +
+                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "sin(radians(latitude)))) AS distance" +
+                "FROM city" +
+                "HAVING distance < 5" +
+                "ORDER BY population DESC" +
+                "LIMIT 0, 1" +
+            ")" +
+            "UNION" +
+            "(" +
+                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "sin(radians(latitude)))) AS distance" +
+                "FROM city" +
+                "HAVING distance < 5" +
+                "ORDER BY distance" +
+                "LIMIT 0, 1" +
+            ")" +
+        ") AS distpop" +
+        "ORDER BY population DESC, distance ASC" +
+        "LIMIT 0,1"
+    )
+
+    cursor.execute(checkin_query)
 
     result = cursor.fetchone()
     print(result)
@@ -728,7 +757,7 @@ def checkin():
         "WHERE username='" + username + "'"
     )
 
-    cursor.execute("INSERT INTO checkin values('" + username + "', '" + result[0] + "', NOW())")
+    cursor.execute("INSERT INTO checkin values('" + username + "', " + str(result[0]) + ", NOW())")
     db.commit()
     cursor.close()
 
