@@ -828,22 +828,22 @@ def validateParameters(functionName, username=None, username2=None, password=Non
             return content
 
     # Check if latitude is valid
-    if latitude is not None:
-        if not ((latitude > -90.0) and (latitude < 90.0)):
-            print(latitude)
-            error_code = "user_" + functionName + "_invalid_latlong"
-
-            content = {"success": False, "error_code": error_code}
-            return content
+    #if latitude is not None:
+    #    if not (latitude >= -90.0 and latitude <= 90.0):
+    #        #print(latitude)
+    #        error_code = "user_" + functionName + "_invalid_latlong"
+    #
+    #        content = {"success": False, "error_code": error_code}
+    #        return content
 
     # Check if longitude is valid
-    if longitude is not None:
-        if not ((longitude > -180) and (longitude < 180)):
-            #print(longitude)
-            error_code = "user_" + functionName + "_invalid_latlong"
-
-            content = {"success": False, "error_code": error_code}
-            return content
+    #if longitude is not None:
+    #    if not (longitude >= -180 and longitude <= 180):
+    #        #print(longitude)
+    #        error_code = "user_" + functionName + "_invalid_latlong"
+    #
+    #        content = {"success": False, "error_code": error_code}
+    #        return content
 
     return None
 
