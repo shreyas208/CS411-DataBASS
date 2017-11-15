@@ -22,6 +22,9 @@ bcrypt = Bcrypt(app)
 db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8PvBYEPP4qkun", database="cs_411_project")
 
 
+# Note to self: Try to add constraints to the display_name to avoid SQL Injection (a display name containing SQL queries)
+
+
 # User Registration
 @app.route("/api/user/register", methods=["POST"])
 def register():
@@ -643,9 +646,14 @@ def checkin():
     # Read in checkin input parameters
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token') # String (6 <= characters <= 256)
-    timestamp = request.form.get('timestamp') # String (valid email)
+    #timestamp = request.form.get('timestamp') # String (valid email)
     latitude = request.form.get('latitude') # String (1 <= characters <= 265)
     longitude = request.form.get('longitude') # String (1 <= characters <= 265)
+
+    check = validateParameters("checkin", username=username, latitude=latitude, longitude=longitude)
+
+    if check is not None:
+        return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
     cursor = None
@@ -659,18 +667,18 @@ def checkin():
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    if not all((c in ascii_letters + digits + '-' + '_') for c in username): #check if username is vlaid
-        error_code = "user_checkin_invalid_username"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
-    cursor.execute("SELECT id, latitude, longitude FROM city")
-    cities = cursor.fetchall()
+    #cursor.execute("SELECT id, latitude, longitude FROM city")
+    #cities = cursor.fetchall()
 
     # Distance is in miles
     # Paris latitude: 48.856062
     # Paris longitude: 2.347510
+
+    # Suggestions for improving performance:
+    # 1. Use a square then a circle to query for cities
+    # 2. Parallel query execution- Run the two queries in Parallel
+    # 3. Run the query once in SQL and sort it twice in Python
+
     cursor.execute
     (
         "SELECT *" +
@@ -700,14 +708,18 @@ def checkin():
         "LIMIT 0,1"
     )
 
+    result = cursor.fetchall()
+
+    content = {"success:": True}
+    return jsonify(content), status.HTTP_200_OK
 
 
 
 
-    cursor.execute("SELECT *, ( 3959 * acos( cos( radians(" + latitude + ") ) * cos( radians( Latitude ) ) *" +
-                   "cos( radians( Longitude ) - radians(" + longitude + ") ) + sin( radians(" + latitude + ") ) *" +
-                   "sin( radians( Latitude ) ) ) ) AS distance FROM city WHERE  HAVING" +
-                   "distance < 25 ORDER BY distance LIMIT 0 , 20")
+    #cursor.execute("SELECT *, ( 3959 * acos( cos( radians(" + latitude + ") ) * cos( radians( Latitude ) ) *" +
+    #               "cos( radians( Longitude ) - radians(" + longitude + ") ) + sin( radians(" + latitude + ") ) *" +
+    #               "sin( radians( Latitude ) ) ) ) AS distance FROM city WHERE  HAVING" +
+    #               "distance < 25 ORDER BY distance LIMIT 0 , 20")
 
 
 
@@ -736,14 +748,14 @@ def checkin():
     #print(closestDistance)
     #print(closestCity)
 
-    if closestDistance > 10:
-        error_code = "user_checkin_not_close_enough_to_city"
-
-        content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-    else:
-        content = {"success": True, "city_id": closestCity}
-        return jsonify(content), status.HTTP_200_OK
+    #if closestDistance > 10:
+    #    error_code = "user_checkin_not_close_enough_to_city"
+    #
+    #    content = {"success": False, "error_code": error_code}
+    #    return jsonify(content), status.HTTP_400_BAD_REQUEST
+    #else:
+    #    content = {"success": True, "city_id": closestCity}
+    #    return jsonify(content), status.HTTP_200_OK
 
 
 
@@ -752,7 +764,7 @@ def root():
     return "You have reached our Flask server."
 
 
-def validateParameters(functionName, username=None, username2=None, password=None, password2=None, email_address=None, display_name=None):
+def validateParameters(functionName, username=None, username2=None, password=None, password2=None, email_address=None, display_name=None, latitude=None, longitude=None):
     # Check if username is valid
     if username is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
@@ -811,6 +823,22 @@ def validateParameters(functionName, username=None, username2=None, password=Non
     if display_name is not None:
         if not (len(display_name) >= 1 and len(display_name) <= 265):
             error_code = "user_" + functionName + "_invalid_display_name"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if latitude is valid
+    if latitude is not None:
+        if not (latitude >= -90 and latitude <= 90):
+            error_code = "user_" + functionName + "_invalid_latlong"
+
+            content = {"success": False, "error_code": error_code}
+            return content
+
+    # Check if longitude is valid
+    if longitude is not None:
+        if not (longitude >= -180 and longitude <= 180):
+            error_code = "user_" + functionName + "_invalid_latlong"
 
             content = {"success": False, "error_code": error_code}
             return content
