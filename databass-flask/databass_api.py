@@ -708,7 +708,7 @@ def checkin():
         "LIMIT 0,1"
     )
 
-    result = cursor.fetchall()
+    result = cursor.fetchone()
 
     content = {"success:": True}
     return jsonify(content), status.HTTP_200_OK
