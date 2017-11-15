@@ -705,30 +705,30 @@ def checkin():
     print(longitude)
     print(type(longitude))
 
-    cursor.execute("SELECT *" +
-                   "FROM" +
+    cursor.execute("SELECT * " +
+                   "FROM " +
                    "(" +
                        "(" +
-                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
-                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
-                           "sin(radians(latitude)))) AS distance" +
-                           "FROM city" +
-                           "HAVING distance < 5" +
-                           "ORDER BY population DESC" +
+                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "sin(radians(latitude)))) AS distance " +
+                           "FROM city " +
+                           "HAVING distance < 5 " +
+                           "ORDER BY population DESC " +
                            "LIMIT 0, 1" +
                        ")" +
                        "UNION" +
                        "(" +
-                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
-                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
-                           "sin(radians(latitude)))) AS distance" +
-                           "FROM city" +
-                           "HAVING distance < 5" +
-                           "ORDER BY distance" +
+                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "sin(radians(latitude)))) AS distance " +
+                           "FROM city " +
+                           "HAVING distance < 5 " +
+                           "ORDER BY distance " +
                            "LIMIT 0, 1" +
                        ")" +
-                   ") AS distpop" +
-                   "ORDER BY population DESC, distance ASC" +
+                   ") AS distpop " +
+                   "ORDER BY population DESC, distance ASC " +
                    "LIMIT 0,1")
     
     result = cursor.fetchone()
