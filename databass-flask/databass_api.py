@@ -34,7 +34,7 @@ def register():
     # Check if all the registration input parameters are valid
     check = validateParameters("register", username=username, password=password, email_address=email_address, display_name=display_name)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -86,7 +86,7 @@ def login():
 
     check = validateParameters("login", username=username, password=password)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -150,7 +150,7 @@ def logout():
 
     check = validateParameters("logout", username=username)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -211,7 +211,7 @@ def profile():
 
     check = validateParameters("profile", username=username)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -274,7 +274,7 @@ def follow():
 
     check = validateParameters("follow", username=follower_username, username2=followee_username)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     cursor = None
@@ -338,7 +338,7 @@ def unfollow():
 
     check = validateParameters("unfollow", username=follower_username, username2=followee_username)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     cursor = None
@@ -402,7 +402,7 @@ def remove():
 
     check = validateParameters("remove", username=username)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -466,7 +466,7 @@ def changePassword():
 
     check = validateParameters("changePassword", username=username, password=old_password, password2=new_password)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -535,7 +535,7 @@ def changeDisplayName():
 
     check = validateParameters("changeDisplayName", username=username, display_name=display_name)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
@@ -591,7 +591,7 @@ def changeEmailAddress():
 
     check = validateParameters("changeEmailAddress", username=username, email_address=email_address)
 
-    if check not None:
+    if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
     # Connect to the MySQL database
