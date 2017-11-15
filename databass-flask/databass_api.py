@@ -646,9 +646,8 @@ def checkin():
     # Read in checkin input parameters
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token') # String (6 <= characters <= 256)
-    #timestamp = request.form.get('timestamp') # String (valid email)
-    latitude = request.form.get('latitude') # String (1 <= characters <= 265)
-    longitude = request.form.get('longitude') # String (1 <= characters <= 265)
+    latitude = request.form.get('latitude') # Float (-90 <= latitude <= 90)
+    longitude = request.form.get('longitude') # Float (-180 <= longitude <= 180)
 
     check = validateParameters("checkin", username=username, latitude=latitude, longitude=longitude)
 
@@ -667,8 +666,24 @@ def checkin():
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    #cursor.execute("SELECT id, latitude, longitude FROM city")
-    #cities = cursor.fetchall()
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "'")
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_checkin_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_403_FORBIDDEN
 
     # Distance is in miles
     # Paris latitude: 48.856062
@@ -710,7 +725,29 @@ def checkin():
 
     result = cursor.fetchone()
 
-    content = {"success:": True}
+    if result is None:
+        error_code = "user_checkin_not_close_enough_to_city"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    cursor.execute
+    (
+        "UPDATE user" +
+        "SET num_cities_visited=" +
+        "(" +
+            "SELECT num_cities_visited + 1" +
+            "FROM (SELECT num_cities_visited FROM user WHERE username='" + username + "') AS intermediate" +
+        ")" +
+        "WHERE username='" + username + "'"
+    )
+
+    cursor.execute("INSERT INTO checkin values('" + username + "', '" + result[0] + "', NOW())")
+    db.commit()
+    cursor.close()
+
+    content = {"success": True, "city_name": result[2], "region_name": "NA", "region_code": result[3], "country_name": "NA", "country_code": result[1]}
     return jsonify(content), status.HTTP_200_OK
 
 
