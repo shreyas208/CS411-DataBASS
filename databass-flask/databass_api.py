@@ -693,46 +693,44 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
-    print(username)
-    print(type(username))
 
-    print(access_token)
-    print(type(access_token))
+    #print(username)
+    #print(type(username))
 
-    print(latitude)
-    print(type(latitude))
+    #print(access_token)
+    #print(type(access_token))
 
-    print(longitude)
-    print(type(longitude))
+    #print(latitude)
+    #print(type(latitude))
 
-    cursor.execute
-    (
-        "SELECT * " +
-        "FROM " +
-        "(" +
-            "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-                "sin(radians(latitude)))) AS distance " +
-                "FROM city " +
-                "HAVING distance < 5 " +
-                "ORDER BY population DESC " +
-                "LIMIT 0, 1" +
-            ")" +
-            "UNION" +
-            "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-                "sin(radians(latitude)))) AS distance " +
-                "FROM city " +
-                "HAVING distance < 5 " +
-                "ORDER BY distance " +
-                "LIMIT 0, 1" +
-            ")" +
-        ") AS distpop " +
-        "ORDER BY population DESC, distance ASC " +
-        "LIMIT 0,1"
-    )
+    #print(longitude)
+    #print(type(longitude))
+
+    cursor.execute("SELECT * " +
+                   "FROM " +
+                   "(" +
+                       "(" +
+                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "sin(radians(latitude)))) AS distance " +
+                           "FROM city " +
+                           "HAVING distance < 5 " +
+                           "ORDER BY population DESC " +
+                           "LIMIT 0, 1" +
+                       ")" +
+                       "UNION" +
+                       "(" +
+                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "sin(radians(latitude)))) AS distance " +
+                           "FROM city " +
+                           "HAVING distance < 5 " +
+                           "ORDER BY distance " +
+                           "LIMIT 0, 1" +
+                       ")" +
+                   ") AS distpop " +
+                   "ORDER BY population DESC, distance ASC " +
+                   "LIMIT 0,1")
 
     result = cursor.fetchone()
     print(result)
@@ -744,16 +742,13 @@ def checkin():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    cursor.execute
-    (
-        "UPDATE user" +
-        "SET num_cities_visited=" +
-        "(" +
-            "SELECT num_cities_visited + 1" +
-            "FROM (SELECT num_cities_visited FROM user WHERE username='" + username + "') AS intermediate" +
-        ")" +
-        "WHERE username='" + username + "'"
-    )
+    cursor.execute("UPDATE user " +
+                   "SET num_cities_visited=" +
+                   "(" +
+                       "SELECT num_cities_visited + 1 " +
+                       "FROM (SELECT num_cities_visited FROM user WHERE username='" + username + "') AS intermediate" +
+                   ") " +
+                   "WHERE username='" + username + "'")
 
     cursor.execute("INSERT INTO checkin values('" + username + "', " + str(result[0]) + ", NOW())")
     db.commit()
@@ -878,7 +873,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
 
     # Check if latitude is valid
     if latitude is not None:
-        if not (float(latitude) >= -90.0 and float(latitude) <= 90.0):
+        if not (float(latitude) >= -90 and float(latitude) <= 90):
             error_code = "user_" + functionName + "_invalid_latlong"
 
             content = {"success": False, "error_code": error_code}
