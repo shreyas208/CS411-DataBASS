@@ -693,20 +693,26 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
+    print(username)
+    print(type(username))
+
+    print(access_token)
+    print(type(access_token))
+
     print(latitude)
     print(type(latitude))
 
     print(longitude)
     print(type(longitude))
-    
+
     cursor.execute
     (
         "SELECT *" +
         "FROM" +
         "(" +
             "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
-                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "SELECT *, (3959 * acos(cos(radians(" + float(latitude) + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + float(longitude) + ")) + sin(radians(" + float(latitude) + ")) *" +
                 "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
@@ -715,8 +721,8 @@ def checkin():
             ")" +
             "UNION" +
             "(" +
-                "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) *" +
-                "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) *" +
+                "SELECT *, (3959 * acos(cos(radians(" + float(latitude) + ")) * cos(radians(latitude)) *" +
+                "cos(radians(longitude) - radians(" + float(longitude) + ")) + sin(radians(" + float(latitude) + ")) *" +
                 "sin(radians(latitude)))) AS distance" +
                 "FROM city" +
                 "HAVING distance < 5" +
