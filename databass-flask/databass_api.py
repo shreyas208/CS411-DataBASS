@@ -67,7 +67,7 @@ def register():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the username is new
-    cursor.execute("SELECT username FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT username FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     if result:
@@ -83,9 +83,8 @@ def register():
     # Insert registration information into user table
     password_hash = bcrypt.generate_password_hash(password)
 
-    cursor.execute("INSERT INTO user values('" +
-                    username + "', '" + email_address + "', '" + display_name + "', '" +
-                    password_hash + "', NOW(), NULL, 0);")
+    cursor.execute("INSERT INTO user values(%s, %s, %s, %s, NOW(), NULL, 0);",
+                   (username, email_address, display_name, password_hash))
 
     db.commit()
     cursor.close()
@@ -128,7 +127,7 @@ def login():
     # all the login input parameters are valid.
 
     # Search user table for password hash to check if the password is correct
-    cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT email_address, display_name, password_hash FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad login credential error if the username isn't in the table
@@ -156,7 +155,7 @@ def login():
         # Generate an access token and insert it into the user table
         access_token = binascii.hexlify(os.urandom(32)).decode()
 
-        cursor.execute("UPDATE user SET access_token='" + access_token + "' WHERE username='" + username + "';")
+        cursor.execute("UPDATE user SET access_token=%s WHERE username=%s;", (access_token, username))
         db.commit()
         cursor.close()
 
@@ -219,7 +218,7 @@ def logout():
     # all the logout input parameters are valid.
 
     else:
-        cursor.execute("UPDATE user SET access_token=NULL WHERE username='" + username + "';")
+        cursor.execute("UPDATE user SET access_token=NULL WHERE username=%s;", (username,))
         db.commit()
         cursor.close()
 
@@ -280,7 +279,7 @@ def search():
         return jsonify(content), status.HTTP_403_FORBIDDEN
 
     # Find all usernames similar to the provided username
-    cursor.execute("SELECT username, display_name FROM user WHERE username LIKE '" + search_username + "%';")
+    cursor.execute("SELECT username, display_name FROM user WHERE username LIKE %s%;", (search_username,))
     results = cursor.fetchall()
     cursor.close()
 
@@ -349,7 +348,7 @@ def profile():
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
 
-    cursor.execute("SELECT email_address, display_name, join_date, num_checkins, city_id FROM user, checkin WHERE user.username = checkin.username and user.username ='" + username + "';") #query the database for that user
+    cursor.execute("SELECT email_address, display_name, join_date, num_checkins, city_id FROM user, checkin WHERE user.username = checkin.username and user.username = %s;", (username,)) #query the database for that user
     checkins = cursor.fetchall()
 
     #we need to get email_address, display_name, join_datetime, num_checkins, and recent_checkins
@@ -358,7 +357,7 @@ def profile():
     join_datetime = checkins[0][2]
     num_checkins = checkins[0][3]
 
-    cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = '" + username + "' and checkin.username = '" + username + "');")
+    cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = %s and checkin.username = %s);", (username, username))
     city_names = cursor.fetchall()
     cursor.close()
 
@@ -437,7 +436,7 @@ def changePassword():
     else:
         password_hash = bcrypt.generate_password_hash(new_password)
 
-        cursor.execute("UPDATE user SET password_hash='" + password_hash + "' WHERE username='" + username + "';")
+        cursor.execute("UPDATE user SET password_hash=%s WHERE username=%s;", (password_hash, username))
         db.commit()
         cursor.close()
 
@@ -501,7 +500,7 @@ def changeDisplayName():
     # all the display name change input parameters are valid.
 
     else:
-        cursor.execute("UPDATE user SET display_name='" + display_name + "' WHERE username='" + username + "';")
+        cursor.execute("UPDATE user SET display_name=%s WHERE username=%s;", (display_name, username))
         db.commit()
         cursor.close()
 
@@ -565,7 +564,7 @@ def changeEmailAddress():
     # all the email address change input parameters are valid.
 
     else:
-        cursor.execute("UPDATE user SET email_address='" + email_address + "' WHERE username='" + username + "';")
+        cursor.execute("UPDATE user SET email_address=%s WHERE username=%s;", (email_address, username))
         db.commit()
         cursor.close()
 
@@ -667,21 +666,21 @@ def checkin():
                    "FROM " +
                    "(" +
                        "(" +
-                           "SELECT *, (%d * acos(cos(radians(%f)) * cos(radians(latitude)) * " +
-                           "cos(radians(longitude) - radians(%f)) + sin(radians(%f)) * " +
+                           "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < %d " +
+                           "HAVING distance < %s " +
                            "ORDER BY population DESC " +
                            "LIMIT 0, 1" +
                        ")" +
                        "UNION" +
                        "(" +
-                           "SELECT *, (%d * acos(cos(radians(%f)) * cos(radians(latitude)) * " +
-                           "cos(radians(longitude) - radians(%f)) + sin(radians(%f)) * " +
+                           "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < %d " +
+                           "HAVING distance < %s " +
                            "ORDER BY distance " +
                            "LIMIT 0, 1" +
                        ")" +
@@ -716,11 +715,11 @@ def checkin():
                    "SET num_checkins=" +
                    "(" +
                        "SELECT num_checkins + 1 " +
-                       "FROM (SELECT num_checkins FROM user WHERE username='" + username + "') AS intermediate" +
+                       "FROM (SELECT num_checkins FROM user WHERE username=%s) AS intermediate" +
                    ") " +
-                   "WHERE username=%s;", (username,))
+                   "WHERE username=%s;", (username, username))
 
-    cursor.execute("INSERT INTO checkin values('" + username + "', " + str(final_result[0]) + ", NOW());")
+    cursor.execute("INSERT INTO checkin values(%s, %s, NOW());", (username, str(final_result[0])))
     db.commit()
     cursor.close()
 
@@ -779,7 +778,7 @@ def follow():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_403_FORBIDDEN
 
-    cursor.execute("SELECT * FROM user WHERE username='" + followee_username + "';")
+    cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
 
     #return a bad username error if the username isn't in the table
@@ -792,7 +791,7 @@ def follow():
     #finished argument checking here
 
     #add the follow to the table
-    cursor.execute("INSERT INTO follow VALUES ('" + follower_username + "', '" + followee_username + "');")
+    cursor.execute("INSERT INTO follow VALUES (%s, %s);", (follower_username, followee_username))
     db.commit()
     cursor.close()
 
@@ -851,7 +850,7 @@ def unfollow():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_403_FORBIDDEN
 
-    cursor.execute("SELECT * FROM user WHERE username='" + followee_username + "';")
+    cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
 
     #return a bad username error if the username isn't in the table
@@ -864,7 +863,8 @@ def unfollow():
     #finished argument checking here
 
     #remove the follow to the table
-    cursor.execute("DELETE FROM follow WHERE username_follower = '" + follower_username + "' AND username_followee = '" + followee_username + "';")
+    cursor.execute("DELETE FROM follow WHERE username_follower=%s AND username_followee=%s;",
+                   (follower_username, followee_username))
     db.commit()
     cursor.close()
 
@@ -903,7 +903,7 @@ def remove():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -924,13 +924,13 @@ def remove():
     #arguments are valid
 
     #remove user from checkin table
-    cursor.execute("DELETE FROM checkin WHERE username = '" + username + "';")
+    cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
 
     #remove user from follow table
-    cursor.execute("DELETE FROM follow WHERE username_follower = '" + username + "' OR username_followee = '" + username + "';")
+    cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
 
     #remove user from user table
-    cursor.execute("DELETE FROM user WHERE username = '" + username + "';")
+    cursor.execute("DELETE FROM user WHERE username=%s;", (username,))
     db.commit()
     cursor.close()
 
