@@ -195,7 +195,9 @@ def logout():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -286,7 +288,9 @@ def search():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
-    content = {"success": True, "results": results}
+    users = [{"username": result[0], "display_name": result[1]} for result in results]
+
+    content = {"success": True, "results": users}
     return jsonify(content), status.HTTP_200_OK
 
 
@@ -744,7 +748,9 @@ def follow():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
