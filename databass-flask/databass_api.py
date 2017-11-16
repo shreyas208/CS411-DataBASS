@@ -694,17 +694,31 @@ def checkin():
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
 
-    #print(username)
-    #print(type(username))
-
-    #print(access_token)
-    #print(type(access_token))
-
-    #print(latitude)
-    #print(type(latitude))
-
-    #print(longitude)
-    #print(type(longitude))
+    #cursor.execute("SELECT * " +
+    #               "FROM " +
+    #               "(" +
+    #                   "(" +
+    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+    #                       "sin(radians(latitude)))) AS distance " +
+    #                       "FROM city " +
+    #                       "HAVING distance < 5 " +
+    #                       "ORDER BY population DESC " +
+    #                       "LIMIT 0, 1" +
+    #                   ")" +
+    #                   "UNION" +
+    #                   "(" +
+    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+    #                       "sin(radians(latitude)))) AS distance " +
+    #                       "FROM city " +
+    #                       "HAVING distance < 5 " +
+    #                       "ORDER BY distance " +
+    #                       "LIMIT 0, 1" +
+    #                   ")" +
+    #               ") AS distpop " +
+    #               "ORDER BY population DESC, distance ASC " +
+    #               "LIMIT 0,1")
 
     cursor.execute("SELECT * " +
                    "FROM " +
@@ -729,11 +743,11 @@ def checkin():
                            "LIMIT 0, 1" +
                        ")" +
                    ") AS distpop " +
-                   "ORDER BY population DESC, distance ASC " +
-                   "LIMIT 0,1")
+                   "ORDER BY distance ASC, population DESC " +
+                   "LIMIT 0,2")
 
-    result = cursor.fetchone()
-    #print(result)
+    #result = cursor.fetchone()
+    results = cursor.fetchall()
 
     if not result:
         error_code = "user_checkin_not_close_enough_to_city"
@@ -741,6 +755,15 @@ def checkin():
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    final_result = None
+
+    if len(results) == 1:
+        final_result = results[0]
+    elif (results[0][4] == 0) and not(results[1][4] == 0):
+        final_result = results[1]
+    else:
+        final_result = results[0]
 
     cursor.execute("UPDATE user " +
                    "SET num_checkins=" +
@@ -750,57 +773,12 @@ def checkin():
                    ") " +
                    "WHERE username='" + username + "'")
 
-    cursor.execute("INSERT INTO checkin values('" + username + "', " + str(result[0]) + ", NOW())")
+    cursor.execute("INSERT INTO checkin values('" + username + "', " + str(final_result[0]) + ", NOW())")
     db.commit()
     cursor.close()
 
-    content = {"success": True, "city_name": result[2], "region_name": "NA", "region_code": result[3], "country_name": "NA", "country_code": result[1]}
+    content = {"success": True, "city_name": final_result[2], "region_name": "NA", "region_code": final_result[3], "country_name": "NA", "country_code": final_result[1]}
     return jsonify(content), status.HTTP_200_OK
-
-
-
-
-    #cursor.execute("SELECT *, ( 3959 * acos( cos( radians(" + latitude + ") ) * cos( radians( Latitude ) ) *" +
-    #               "cos( radians( Longitude ) - radians(" + longitude + ") ) + sin( radians(" + latitude + ") ) *" +
-    #               "sin( radians( Latitude ) ) ) ) AS distance FROM city WHERE  HAVING" +
-    #               "distance < 25 ORDER BY distance LIMIT 0 , 20")
-
-
-
-    #closestDistance = float('inf')
-    #closestCity = -1
-    #
-    #for city in cities:
-    #    # approximate radius of earth in km
-    #    R = 6373.0
-    #
-    #    cityLatitude = radians(city[1])
-    #    cityLongitude = radians(city[2])
-    #
-    #    dlon = float(cityLongitude) - float(longitude)
-    #    dlat = float(cityLatitude) - float(latitude)
-    #
-    #    a = sin(dlat / 2)**2 + cos(float(latitude)) * cos(float(cityLatitude)) * sin(dlon / 2)**2
-    #    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    #
-    #    distance = R * c
-    #
-    #    if distance < closestDistance:
-    #        closestDistance = distance
-    #        closestCity = city[0]
-    #
-    #print(closestDistance)
-    #print(closestCity)
-
-    #if closestDistance > 10:
-    #    error_code = "user_checkin_not_close_enough_to_city"
-    #
-    #    content = {"success": False, "error_code": error_code}
-    #    return jsonify(content), status.HTTP_400_BAD_REQUEST
-    #else:
-    #    content = {"success": True, "city_id": closestCity}
-    #    return jsonify(content), status.HTTP_200_OK
-
 
 
 @app.route("/")
