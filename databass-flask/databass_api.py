@@ -259,7 +259,9 @@ def search():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -325,7 +327,8 @@ def profile():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -397,7 +400,9 @@ def changePassword():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the old password and access token are valid
-    cursor.execute("SELECT password_hash, access_token FROM user WHERE username='" + username + "';")
+
+    #cursor.execute("SELECT password_hash, access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT password_hash, access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -472,7 +477,9 @@ def changeDisplayName():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -534,7 +541,9 @@ def changeEmailAddress():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -597,7 +606,9 @@ def checkin():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -656,27 +667,27 @@ def checkin():
                    "FROM " +
                    "(" +
                        "(" +
-                           "SELECT *, (" + CONSTANT + " * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "SELECT *, (%d * acos(cos(radians(%f)) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(%f)) + sin(radians(%f)) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < " + DISTANCE_THRESHOLD + " " +
+                           "HAVING distance < %d " +
                            "ORDER BY population DESC " +
                            "LIMIT 0, 1" +
                        ")" +
                        "UNION" +
                        "(" +
-                           "SELECT *, (" + CONSTANT + " * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                           "SELECT *, (%d * acos(cos(radians(%f)) * cos(radians(latitude)) * " +
+                           "cos(radians(longitude) - radians(%f)) + sin(radians(%f)) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < " + DISTANCE_THRESHOLD + " " +
+                           "HAVING distance < %d " +
                            "ORDER BY distance " +
                            "LIMIT 0, 1" +
                        ")" +
                    ") AS distpop " +
                    "ORDER BY distance ASC, population DESC " +
-                   "LIMIT 0,2;")
+                   "LIMIT 0,2;", (CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD))
 
     results = cursor.fetchall()
 
@@ -707,7 +718,7 @@ def checkin():
                        "SELECT num_checkins + 1 " +
                        "FROM (SELECT num_checkins FROM user WHERE username='" + username + "') AS intermediate" +
                    ") " +
-                   "WHERE username='" + username + "';")
+                   "WHERE username=%s;", (username,))
 
     cursor.execute("INSERT INTO checkin values('" + username + "', " + str(final_result[0]) + ", NOW());")
     db.commit()
@@ -748,9 +759,9 @@ def follow():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
 
     #cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -820,7 +831,9 @@ def unfollow():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
+
+    #cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -992,7 +1005,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
     if email_address is not None:
         emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])")
 
-        if (not all((c in ascii_letters + digits + '-' + '_') for c in email_address)) or (not emailRegex.match(email_address)):
+        if not emailRegex.match(email_address):
             error_code = "user_" + functionName + "_invalid_email"
 
             content = {"success": False, "error_code": error_code}
@@ -1000,7 +1013,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
 
     # Check if display_name is valid
     if display_name is not None:
-        if (not all((c in ascii_letters + digits + '-' + '_') for c in display_name)) or (not (len(display_name) >= 1 and len(display_name) <= 265)):
+        if (not all((c in ascii_letters + digits + '-' + '_' + ' ') for c in display_name)) or (not (len(display_name) >= 1 and len(display_name) <= 265)):
             error_code = "user_" + functionName + "_invalid_display_name"
 
             content = {"success": False, "error_code": error_code}
