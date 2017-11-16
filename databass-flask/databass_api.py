@@ -733,7 +733,7 @@ def checkin():
                    "LIMIT 0,1")
 
     result = cursor.fetchone()
-    print(result)
+    #print(result)
 
     if not result:
         error_code = "user_checkin_not_close_enough_to_city"
@@ -743,10 +743,10 @@ def checkin():
         return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     cursor.execute("UPDATE user " +
-                   "SET num_cities_visited=" +
+                   "SET num_checkins=" +
                    "(" +
-                       "SELECT num_cities_visited + 1 " +
-                       "FROM (SELECT num_cities_visited FROM user WHERE username='" + username + "') AS intermediate" +
+                       "SELECT num_checkins + 1 " +
+                       "FROM (SELECT num_checkins FROM user WHERE username='" + username + "') AS intermediate" +
                    ") " +
                    "WHERE username='" + username + "'")
 
