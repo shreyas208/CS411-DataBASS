@@ -645,26 +645,28 @@ def checkin():
     #               ") AS distpop " +
     #               "ORDER BY population DESC, distance ASC " +
     #               "LIMIT 0,1")
+    CONSTANT = 3959
+    DISTANCE_THRESHOLD = 3
 
     cursor.execute("SELECT * " +
                    "FROM " +
                    "(" +
                        "(" +
-                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "SELECT *, (" + CONSTANT + " * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
                            "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < 5 " +
+                           "HAVING distance < " + DISTANCE_THRESHOLD + " " +
                            "ORDER BY population DESC " +
                            "LIMIT 0, 1" +
                        ")" +
                        "UNION" +
                        "(" +
-                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                           "SELECT *, (" + CONSTANT + " * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
                            "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
                            "sin(radians(latitude)))) AS distance " +
                            "FROM city " +
-                           "HAVING distance < 5 " +
+                           "HAVING distance < " + DISTANCE_THRESHOLD + " " +
                            "ORDER BY distance " +
                            "LIMIT 0, 1" +
                        ")" +
@@ -672,9 +674,7 @@ def checkin():
                    "ORDER BY distance ASC, population DESC " +
                    "LIMIT 0,2;")
 
-    #result = cursor.fetchone()
     results = cursor.fetchall()
-    #print(results)
 
     if not results:
         error_code = "user_checkin_not_close_enough_to_city"
@@ -801,6 +801,7 @@ def unfollow():
     if check2 is not None:
         return jsonify(check2), status.HTTP_400_BAD_REQUEST
 
+    # Connect to the MySQL database
     cursor = None
 
     try:
@@ -818,7 +819,7 @@ def unfollow():
 
     # Return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_follow_bad_follower_username"
+        error_code = "user_unfollow_bad_follower_username"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -836,7 +837,7 @@ def unfollow():
 
     #return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_follow_bad_followee_username"
+        error_code = "user_unfollow_bad_followee_username"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -845,11 +846,10 @@ def unfollow():
 
     #remove the follow to the table
     cursor.execute("DELETE FROM follow WHERE username_follower = '" + follower_username + "' AND username_followee = '" + followee_username + "';")
-
+    db.commit()
     cursor.close()
 
     content = {"success": True}
-
     return jsonify(content), status.HTTP_200_OK
 
 
@@ -860,6 +860,7 @@ def remove():
     username = request.form.get('username') # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
+    # Check if all the remove input parameters are valid
     check = checkForNone("remove", [("username", username)])
 
     if check is not None:
@@ -888,7 +889,7 @@ def remove():
 
     # Return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_profile_bad_username"
+        error_code = "user_remove_bad_username"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -906,18 +907,15 @@ def remove():
     #remove user from checkin table
     cursor.execute("DELETE FROM checkin WHERE username = '" + username + "';")
 
-    #remove user from follow where username is the follower
-    cursor.execute("DELETE FROM follow WHERE username_follower = '" + username + "';")
-    #remove user from follow where username is the followee
-    cursor.execute("DELETE FROM follow WHERE username_followee = '" + username + "';")
+    #remove user from follow table
+    cursor.execute("DELETE FROM follow WHERE username_follower = '" + username + "' OR username_followee = '" + username + "';")
 
     #remove user from user table
     cursor.execute("DELETE FROM user WHERE username = '" + username + "';")
-
+    db.commit()
     cursor.close()
 
     content = {"success": True}
-
     return jsonify(content), status.HTTP_200_OK
 
 
