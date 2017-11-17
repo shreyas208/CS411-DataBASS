@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -50,6 +51,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private TextView tvDisplayName, tvUsername, tvJoinDate, tvCheckinCount, tvFollowerCount, tvFollowingCount;
     private RecyclerView rvRecentCheckins;
+    private LinearLayout llCheckin;
     private Button btnCheckin;
 
     long checkinStartTime;
@@ -73,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         tvFollowerCount = findViewById(R.id.profile_tv_follower_count);
         tvFollowingCount = findViewById(R.id.profile_tv_following_count);
         rvRecentCheckins = findViewById(R.id.profile_rv_recent_checkins);
+        llCheckin = findViewById(R.id.profile_ll_checkin);
         btnCheckin = findViewById(R.id.profile_btn_checkin);
 
         btnCheckin.setOnClickListener(this);
@@ -87,7 +90,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void attemptCheckin() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            checkinStartTime = new DateTime
             continueCheckin();
         } else {
             TravelationsApp.showToast(this, R.string.profile_toast_location_denied);
@@ -130,6 +132,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void updateCheckinCount() {
         tvCheckinCount.setText(String.valueOf(rvRecentCheckins.getAdapter().getItemCount()));
+    }
+
+    private void setCheckinControlEnabled(boolean enabled) {
+        btnCheckin.setEnabled(enabled);
+        llCheckin.setBackgroundColor(getResources().getColor(enabled ? R.color.colorAccentDark : R.color.gray));
+        btnCheckin.setText(enabled ? R.string.profile_btn_checkin : R.string.profile_btn_checking_in);
     }
 
     @Override
