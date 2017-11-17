@@ -37,7 +37,7 @@
     <string name="profile_tv_following_count_label">Following</string>
     <string name="profile_tv_your_recent_checkins">Your recent checkins</string>
     <string name="profile_btn_checkin">Check In</string>
-    <string name="profile_btn_checking_in">Checking In</string>
+    <string name="profile_btn_checking_in">Checking In…</string>
     <string name="profile_toast_location_denied">Location access is required to Check In.</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
     <string name="profile_toast_checkin_failure">Failed to Check In. Please try again.</string>

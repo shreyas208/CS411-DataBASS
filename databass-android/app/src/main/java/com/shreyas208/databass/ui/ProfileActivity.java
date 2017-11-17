@@ -89,9 +89,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void attemptCheckin() {
+        setCheckinControlEnabled(false);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             continueCheckin();
         } else {
+            setCheckinControlEnabled(true);
             TravelationsApp.showToast(this, R.string.profile_toast_location_denied);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
@@ -108,24 +110,23 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 if (checkinResponse == null) {
                     Log.e(TravelationsApp.LOG_TAG, "ui.ProfileActivity.continueCheckin.onResponse: response body was null");
                     TravelationsApp.showToast(ProfileActivity.this, R.string.profile_toast_checkin_failure);
-                    finish();
                 } else if (!checkinResponse.isSuccess()) {
                     Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), checkinResponse.getErrorCode()));
                     TravelationsApp.showToast(ProfileActivity.this, R.string.profile_toast_checkin_failure);
-                    finish();
                 } else {
                     TravelationsApp.showToast(ProfileActivity.this, String.format("Checked in at %s, %s", checkinResponse.getCityName(), checkinResponse.getCountryCode().toUpperCase()));
                     ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).addCheckin(checkinResponse.getCityName());
                     rvRecentCheckins.getAdapter().notifyDataSetChanged();
                     updateCheckinCount();
                 }
+                setCheckinControlEnabled(true);
             }
 
             @Override
             public void onFailure(Call<CheckinResponse> call, Throwable t) {
                 Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileActivity.continueCheckin.onFailure: request was unsuccessful, message:\n%s", t.getMessage()));
                 TravelationsApp.showToast(ProfileActivity.this, R.string.toast_request_failure);
-                finish();
+                setCheckinControlEnabled(true);
             }
         });
     }
