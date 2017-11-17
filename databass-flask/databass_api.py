@@ -349,7 +349,7 @@ def profile():
     #we need to get email_address, display_name, join_datetime, num_checkins, and recent_checkins
     email_address = user_info[0]
     display_name = user_info[1]
-    join_datetime = user_info[2]
+    join_date = user_info[2]
     num_checkins = user_info[3]
 
     cursor.execute("SELECT name, checkin_time " +
@@ -362,7 +362,7 @@ def profile():
 
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
 
-    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_datetime": join_datetime, "num_checkins": num_checkins, "recent_checkins": recent_checkins}
+    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "num_checkins": num_checkins, "recent_checkins": recent_checkins}
     return jsonify(content), status.HTTP_200_OK
 
 
