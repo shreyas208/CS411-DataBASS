@@ -114,7 +114,11 @@ public class TravelationsApp extends Application {
         spEditor.apply();
     }
 
-    public static void showToast(Context context, int message) {
+    public static void showToast(Context context, int messageId) {
+        Toast.makeText(context, messageId, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 

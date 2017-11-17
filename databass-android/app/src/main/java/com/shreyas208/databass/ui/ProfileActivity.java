@@ -1,6 +1,14 @@
 package com.shreyas208.databass.ui;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +26,7 @@ import android.widget.TextView;
 
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.model.CheckinResponse;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 import com.shreyas208.databass.api.service.DoNothingCallback;
@@ -42,6 +51,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private TextView tvDisplayName, tvUsername, tvJoinDate, tvCheckinCount, tvFollowerCount, tvFollowingCount;
     private RecyclerView rvRecentCheckins;
     private Button btnCheckin;
+
+    long checkinStartTime;
 
     /**
      * Creates the Profile Activity instance.
@@ -74,6 +85,53 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken()).enqueue(this);
     }
 
+    private void attemptCheckin() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            checkinStartTime = new DateTime
+            continueCheckin();
+        } else {
+            TravelationsApp.showToast(this, R.string.profile_toast_location_denied);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void continueCheckin() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        TravelationsApp.getApi().checkin(app.getUsername(), app.getAccessToken(), location.getLatitude(), location.getLongitude()).enqueue(new Callback<CheckinResponse>() {
+            @Override
+            public void onResponse(Call<CheckinResponse> call, Response<CheckinResponse> response) {
+                CheckinResponse checkinResponse = response.body();
+                if (checkinResponse == null) {
+                    Log.e(TravelationsApp.LOG_TAG, "ui.ProfileActivity.continueCheckin.onResponse: response body was null");
+                    TravelationsApp.showToast(ProfileActivity.this, R.string.profile_toast_checkin_failure);
+                    finish();
+                } else if (!checkinResponse.isSuccess()) {
+                    Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), checkinResponse.getErrorCode()));
+                    TravelationsApp.showToast(ProfileActivity.this, R.string.profile_toast_checkin_failure);
+                    finish();
+                } else {
+                    TravelationsApp.showToast(ProfileActivity.this, String.format("Checked in at %s, %s", checkinResponse.getCityName(), checkinResponse.getCountryCode().toUpperCase()));
+                    ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).addCheckin(checkinResponse.getCityName());
+                    rvRecentCheckins.getAdapter().notifyDataSetChanged();
+                    updateCheckinCount();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CheckinResponse> call, Throwable t) {
+                Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileActivity.continueCheckin.onFailure: request was unsuccessful, message:\n%s", t.getMessage()));
+                TravelationsApp.showToast(ProfileActivity.this, R.string.toast_request_failure);
+                finish();
+            }
+        });
+    }
+
+    private void updateCheckinCount() {
+        tvCheckinCount.setText(String.valueOf(rvRecentCheckins.getAdapter().getItemCount()));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -97,7 +155,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.profile_btn_checkin:
+                attemptCheckin();
+                break;
+        }
     }
 
     @Override
@@ -115,6 +177,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
             tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
             tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
+            tvJoinDate.setText(profileResponse.getJoinDate());
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
         }
@@ -168,6 +231,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         public void setRecentCheckins(List<RecentCheckin> recentCheckins) {
             this.recentCheckins = recentCheckins;
+        }
+
+        public void addCheckin(String city) {
+            recentCheckins.add(0, new RecentCheckin(city, "just now"));
         }
     }
 
