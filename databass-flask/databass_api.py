@@ -275,7 +275,7 @@ def search():
         return jsonify(content), status.HTTP_403_FORBIDDEN
 
     # Find all usernames similar to the provided username
-    cursor.execute("SELECT username, display_name FROM user WHERE username LIKE %s\%;", (search_username,))
+    cursor.execute("SELECT username, display_name FROM user WHERE username LIKE %s;", (search_username + "%",))
     results = cursor.fetchall()
     cursor.close()
 
