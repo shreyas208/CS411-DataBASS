@@ -1022,7 +1022,7 @@ def validateParameters(functionName, username=None, username2=None, password=Non
 
     # Check if display_name is valid
     if display_name is not None:
-        if (not all((c in ascii_letters + digits + '-' + '_' + ' ') for c in display_name)) or (not (len(display_name) >= 1 and len(display_name) <= 265)):
+        if (not all((c in ascii_letters + digits + '-' + '_' + ' ') for c in display_name)) or (not (len(display_name) >= 1 and len(display_name) <= 256)):
             error_code = "user_" + functionName + "_invalid_display_name"
 
             content = {"success": False, "error_code": error_code}
