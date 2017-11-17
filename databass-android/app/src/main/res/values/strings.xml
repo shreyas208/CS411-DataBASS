@@ -41,12 +41,15 @@
     <string name="profile_btn_checking_in">Checking In…</string>
     <string name="profile_toast_location_denied">Location access is required to Check In.</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
-    <string name="profile_toast_checkin_failure">Failed to Check In. Please try again.</string>
+    <string name="profile_toast_checkin_failure">Check In failed. Please try again.</string>
 
     <string name="settings_label">Travelations - Settings</string>
+    <string name="settings_et_display_name">Display Name</string>
+    <string name="settings_et_email_address">Email Address</string>
+    <string name="settings_et_password">Display Name</string>
+    <string name="settings_toast_display_name_empty">Display Name must not be empty.</string>
+    <string name="settings_toast_email_address_empty">Email Address must not be empty.</string>
+    <string name="settings_toast_success">Save successful!</string>
+    <string name="settings_toast_failure">Save failed. Please try again.</string>
 
-    <string name="done">Done</string>
-    <string name="edit_display_name">Edit display name</string>
-    <string name="logout">Logout</string>
-    <string name="settings">Settings</string>
 </resources>

@@ -49,8 +49,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private LinearLayout llCheckin;
     private Button btnCheckin;
 
-    long checkinStartTime;
-
     /**
      * Creates the Profile Activity instance.
      * @param savedInstanceState  previously saved instance
@@ -128,6 +126,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void updateCheckinCount() {
         tvCheckinCount.setText(String.valueOf(rvRecentCheckins.getAdapter().getItemCount()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        tvDisplayName.setText(app.getDisplayName());
     }
 
     private void setCheckinControlEnabled(boolean enabled) {

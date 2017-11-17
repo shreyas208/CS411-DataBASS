@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
-import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.service.TravelationsAPI;
 
 import retrofit2.Retrofit;
@@ -74,11 +73,21 @@ public class TravelationsApp extends Application {
         return username;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+        getSharedPreferences().edit().putString(SP_KEY_DISPLAY_NAME, displayName).apply();
+    }
+
     public String getDisplayName() {
         if (displayName == null) {
             displayName = getSharedPreferences().getString(SP_KEY_DISPLAY_NAME, "");
         }
         return displayName;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+        getSharedPreferences().edit().putString(SP_KEY_EMAIL_ADDRESS, emailAddress).apply();
     }
 
     public String getEmailAddress() {
