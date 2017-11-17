@@ -368,7 +368,6 @@ def profile():
     results = cursor.fetchall()
     cursor.close()
 
-    print results
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "checkin_count": checkin_count, "recent_checkins": recent_checkins, "following_count": following_count[0], "follower_count": follower_count[0]}
