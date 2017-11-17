@@ -385,7 +385,9 @@ def profile():
 
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
 
-    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "checkin_count": checkin_count, "recent_checkins": recent_checkins, "following_count": following_count[0], "follower_count": follower_count[0]}
+    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
+               "checkin_count": checkin_count, "recent_checkins": recent_checkins,
+               "following_count": following_count[0], "follower_count": follower_count[0]}
     return jsonify(content), status.HTTP_200_OK
 
 
@@ -1035,7 +1037,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
 
     # Check if email_address is valid
     if email_address is not None:
-        emailRegex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)")
+        email_regex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)")
 
         if not email_regex.match(email_address):
             error_code = "user_" + function_name + "_invalid_email"
