@@ -3,17 +3,23 @@ package com.shreyas208.databass.ui;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.model.ProfileResponse;
+import com.shreyas208.databass.api.model.RecentCheckin;
 import com.shreyas208.databass.api.service.DoNothingCallback;
 
 import java.util.ArrayList;
@@ -21,13 +27,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 /**
  * Profile Activity class.
  */
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, Callback<ProfileResponse> {
 
     private TravelationsApp app;
+
+    private TextView tvDisplayName, tvUsername, tvJoinDate, tvCheckinCount, tvFollowerCount, tvFollowingCount;
+    private RecyclerView rvRecentCheckins;
+    private Button btnCheckin;
 
     /**
      * Creates the Profile Activity instance.
@@ -41,44 +55,23 @@ public class ProfileActivity extends AppCompatActivity {
 
         app = (TravelationsApp) getApplication();
 
-        // Personalize text view
-        TextView welcomeTextView = (TextView) findViewById(R.id.welcomeTextView);
-        String welcome = "Welcome " + app.getDisplayName() + "!";
-        welcomeTextView.setText(welcome);
+        tvDisplayName = findViewById(R.id.profile_tv_display_name);
+        tvUsername = findViewById(R.id.profile_tv_username);
+        tvJoinDate = findViewById(R.id.profile_tv_join_date);
+        tvCheckinCount = findViewById(R.id.profile_tv_checkin_count);
+        tvFollowerCount = findViewById(R.id.profile_tv_follower_count);
+        tvFollowingCount = findViewById(R.id.profile_tv_following_count);
+        rvRecentCheckins = findViewById(R.id.profile_rv_recent_checkins);
+        btnCheckin = findViewById(R.id.profile_btn_checkin);
 
-        // Gather location and timestamp data
-        HashMap<String, String> locationStamps = new HashMap<>();
-        for (int i = 0; i < Dummy.locations.length; i++) {
+        btnCheckin.setOnClickListener(this);
+        rvRecentCheckins.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rvRecentCheckins.setAdapter(new RecentCheckinsAdapter());
 
-            locationStamps.put(Dummy.timestamps[i], Dummy.locations[i]);
+        tvDisplayName.setText(app.getDisplayName());
+        tvUsername.setText(app.getUsername());
 
-        }
-
-        // Create ListView adapter
-        List<HashMap<String, String>> listItems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(
-                this,
-                listItems,
-                R.layout.list_item,
-                new String[] { "First Line", "Second Line"},
-                new int[] { R.id.text1, R.id.text2
-        });
-
-        // Insert data into adapter
-        for (Object o : locationStamps.entrySet()) {
-
-            HashMap<String, String> resultMap = new HashMap<>();
-            Map.Entry pair = (Map.Entry) o;
-            resultMap.put("First Line", pair.getKey().toString());
-            resultMap.put("Second Line", pair.getValue().toString());
-            listItems.add(resultMap);
-
-        }
-
-        // Create list view
-        ListView locListView = (ListView) findViewById(R.id.locListView);
-        locListView.setAdapter(adapter);
-
+        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken()).enqueue(this);
     }
 
     @Override
@@ -103,31 +96,79 @@ public class ProfileActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Logout button callback function. Will open the Login Activity.
-     * @param view  view
-     */
-    public void clickLogoutButton(View view) {
-
-        // TODO
-        // Something with access tokens?
-
-        Toast.makeText(getApplicationContext(), "Logged out", Toast.LENGTH_LONG).show();
-
-        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivity(i);
+    public void onClick(View v) {
 
     }
 
-    /**
-     * Settings button callback function. Will open the Settings Activity.
-     * @param view  view
-     */
-    public void clickSettingsButton(View view) {
+    @Override
+    public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+        ProfileResponse profileResponse = response.body();
+        if (profileResponse == null) {
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
+            TravelationsApp.showToast(this, R.string.profile_toast_failure);
+            finish();
+        } else if (!profileResponse.isSuccess()) {
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), profileResponse.getErrorCode()));
+            TravelationsApp.showToast(this, R.string.profile_toast_failure);
+            finish();
+        } else {
+            tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
+            tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
+            tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
+            ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
+            rvRecentCheckins.getAdapter().notifyDataSetChanged();
+        }
+    }
 
-        Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivity(i);
+    @Override
+    public void onFailure(Call<ProfileResponse> call, Throwable t) {
+        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", this.getLocalClassName(), t.getMessage()));
+        TravelationsApp.showToast(this, R.string.toast_request_failure);
+        finish();
+    }
 
+    public class RecentCheckinsAdapter extends RecyclerView.Adapter<RecentCheckinsAdapter.ViewHolder> {
+
+        private List<RecentCheckin> recentCheckins;
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView tvCity, tvTime;
+
+            public ViewHolder(View v) {
+                super(v);
+                tvCity = v.findViewById(R.id.checkin_item_city_name);
+                tvTime = v.findViewById(R.id.checkin_item_time);
+            }
+        }
+
+        public RecentCheckinsAdapter() {
+
+        }
+
+        public RecentCheckinsAdapter(List<RecentCheckin> recentCheckins) {
+            this.recentCheckins = recentCheckins;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_recent_checkin_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            RecentCheckin recentCheckin = recentCheckins.get(position);
+            holder.tvCity.setText(recentCheckin.getCityName());
+            holder.tvTime.setText(recentCheckin.getCheckinTime());
+        }
+
+        @Override
+        public int getItemCount() {
+            return (recentCheckins == null) ? 0 : recentCheckins.size();
+        }
+
+        public void setRecentCheckins(List<RecentCheckin> recentCheckins) {
+            this.recentCheckins = recentCheckins;
+        }
     }
 
 }

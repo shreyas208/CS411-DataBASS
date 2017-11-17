@@ -11,18 +11,23 @@ import java.util.List;
 public class ProfileResponse {
 
     private boolean success;
-    private String errorCode;
+    @SerializedName("error_code") private String errorCode;
+    @SerializedName("email_address") private String emailAddress;
     @SerializedName("display_name") private String displayName;
     @SerializedName("join_date") private String joinDate;
-    @SerializedName("num_checkins") private int numCheckins;
+    @SerializedName("checkin_count") private int checkinCount;
+    @SerializedName("follower_count") private int followerCount;
+    @SerializedName("following_count") private int followingCount;
     @SerializedName("recent_checkins") private List<RecentCheckin> recentCheckins;
 
-    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int numCheckins, List<RecentCheckin> recentCheckins) {
+    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int followerCount, int followingCount, List<RecentCheckin> recentCheckins) {
         this.success = success;
         this.errorCode = errorCode;
         this.displayName = displayName;
         this.joinDate = joinDate;
-        this.numCheckins = numCheckins;
+        this.checkinCount = checkinCount;
+        this.followerCount = followerCount;
+        this.followingCount = followingCount;
         this.recentCheckins = recentCheckins;
     }
 
@@ -34,6 +39,10 @@ public class ProfileResponse {
         return errorCode;
     }
 
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
     public String getDisplayName() {
         return displayName;
     }
@@ -42,8 +51,16 @@ public class ProfileResponse {
         return joinDate;
     }
 
-    public int getNumCheckins() {
-        return numCheckins;
+    public int getCheckinCount() {
+        return checkinCount;
+    }
+
+    public int getFollowerCount() {
+        return followerCount;
+    }
+
+    public int getFollowingCount() {
+        return followingCount;
     }
 
     public List<RecentCheckin> getRecentCheckins() {

@@ -4,6 +4,7 @@ package com.shreyas208.databass;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.service.TravelationsAPI;
@@ -19,7 +20,7 @@ public class TravelationsApp extends Application {
 
     public static final String LOG_TAG = "Travelations";
 
-    private static final String API_BASE_URL = "http://fa17-cs411-18.cs.illinois.edu/";
+    private static final String API_BASE_URL = "http://fa17-cs411-18.cs.illinois.edu/api/";
     private static final String PREFERENCE_FILE = "com.shreyas208.databass.prefs";
     private static final String SP_KEY_USERNAME = "username";
     private static final String SP_KEY_ACCESS_TOKEN = "access_token";
@@ -111,6 +112,10 @@ public class TravelationsApp extends Application {
         spEditor.remove(SP_KEY_EMAIL_ADDRESS);
         spEditor.remove(SP_KEY_DISPLAY_NAME);
         spEditor.apply();
+    }
+
+    public static void showToast(Context context, int message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
 }

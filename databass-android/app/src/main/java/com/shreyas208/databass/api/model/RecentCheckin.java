@@ -7,6 +7,19 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class RecentCheckin {
-    @SerializedName("city_name") String cityName;
-    @SerializedName("checkin_time") String checkinTime;
+    @SerializedName("city_name") private String cityName;
+    @SerializedName("checkin_time") private String checkinTime;
+
+    public RecentCheckin(String cityName, String checkinTime) {
+        this.cityName = cityName;
+        this.checkinTime = checkinTime;
+    }
+
+    public String getCityName() {
+        return (cityName == null) ? "" : cityName;
+    }
+
+    public String getCheckinTime() {
+        return (checkinTime == null) ? "" : checkinTime;
+    }
 }

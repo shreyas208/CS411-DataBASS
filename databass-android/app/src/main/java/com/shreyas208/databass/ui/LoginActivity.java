@@ -1,5 +1,6 @@
 package com.shreyas208.databass.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -91,21 +92,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         TravelationsApp.getApi().login(username, password).enqueue(this);
     }
 
-    private void showToast(int message) {
-        Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
         LoginResponse loginResponse = response.body();
         if (loginResponse == null) {
-            Log.e(TravelationsApp.LOG_TAG, "LoginActivity.onResponse: response body was null");
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
             setControlsEnabled(true);
-            showToast(R.string.login_toast_failure);
+            TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
         } else if (!loginResponse.isSuccess()) {
-                Log.e(TravelationsApp.LOG_TAG, String.format("LoginActivity.onResponse: response was unsuccessful, code: %d, message: %s", response.code(), loginResponse.getErrorCode()));
+                Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), loginResponse.getErrorCode()));
             setControlsEnabled(true);
-            showToast(R.string.login_toast_failure);
+            TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
         } else {
             ((TravelationsApp) getApplication()).setLoginValues(username, loginResponse.getAccessToken(), loginResponse.getEmailAddress(), loginResponse.getDisplayName());
             Intent i = new Intent(this, ProfileActivity.class);
@@ -117,8 +114,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onFailure(Call<LoginResponse> call, Throwable t) {
-        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful", this.getLocalClassName()));
+        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", this.getLocalClassName(), t.getMessage()));
         setControlsEnabled(true);
-        showToast(R.string.toast_request_failure);
+        TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
     }
 }

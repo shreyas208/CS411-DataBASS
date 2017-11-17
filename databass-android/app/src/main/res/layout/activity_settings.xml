@@ -42,7 +42,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:onClick="clickUpdateDisplayNameButton"
-            android:text="@string/update" />
+            android:text="Update" />
 
         <Button
             android:id="@+id/doneButton"

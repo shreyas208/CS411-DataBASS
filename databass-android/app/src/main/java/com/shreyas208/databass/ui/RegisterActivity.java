@@ -95,19 +95,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String displayName = etDisplayName.getText().toString();
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || emailAddress.isEmpty() || displayName.isEmpty()) {
-            showToast(R.string.register_toast_empty_field);
+            TravelationsApp.showToast(this, R.string.register_toast_empty_field);
             setControlsEnabled(true);
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            showToast(R.string.register_toast_password_mismatch);
+            TravelationsApp.showToast(this, R.string.register_toast_password_mismatch);
             setControlsEnabled(true);
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
-            showToast(R.string.register_toast_invalid_email);
+            TravelationsApp.showToast(this, R.string.register_toast_invalid_email);
             setControlsEnabled(true);
             return;
         }
@@ -115,23 +115,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         TravelationsApp.getApi().register(username, password, emailAddress, displayName).enqueue(this);
     }
 
-    private void showToast(int message) {
-        Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
         GenericResponse genericResponse = response.body();
         if (genericResponse == null) {
-            Log.e(TravelationsApp.LOG_TAG, "RegisterActivity.onResponse: response body was null");
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
             setControlsEnabled(true);
-            showToast(R.string.register_toast_failure);
+            TravelationsApp.showToast(this, R.string.register_toast_failure);
         } else if (!genericResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("RegisterActivity.onResponse: response was unsuccessful, code: %d, message: %s", response.code(), genericResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), genericResponse.getErrorCode()));
             setControlsEnabled(true);
-            showToast(R.string.register_toast_failure);
+            TravelationsApp.showToast(this, R.string.register_toast_failure);
         } else {
-            showToast(R.string.register_toast_success);
+            TravelationsApp.showToast(this, R.string.register_toast_success);
             Intent i = new Intent(this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
@@ -141,8 +137,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onFailure(Call<GenericResponse> call, Throwable t) {
-        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful", this.getLocalClassName()));
+        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message: %s", this.getLocalClassName(), t.getMessage()));
         setControlsEnabled(true);
-        showToast(R.string.toast_request_failure);
+        TravelationsApp.showToast(this, R.string.toast_request_failure);
     }
 }

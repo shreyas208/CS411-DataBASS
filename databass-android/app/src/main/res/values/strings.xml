@@ -13,7 +13,7 @@
     <string name="login_btn_logging_in">Logging in…</string>
     <string name="login_tv_register">Don\'t have an account? Register ></string>
     <string name="login_toast_empty_field">Please enter your username and password.</string>
-    <string name="login_toast_failure">Login failed!</string>
+    <string name="login_toast_failure">Login failed. Please try again.</string>
 
     <string name="register_label">Travelations - Register</string>
     <string name="register_et_username_hint">Username</string>
@@ -28,7 +28,7 @@
     <string name="register_toast_password_mismatch">Password and Confirm Password do not match.</string>
     <string name="register_toast_invalid_email">Email address is not valid.</string>
     <string name="register_toast_success">Registration successful!</string>
-    <string name="register_toast_failure">Registration failed!</string>
+    <string name="register_toast_failure">Registration failed. Please try again.</string>
 
     <string name="profile_label">Travelations - Home</string>
     <string name="profile_menu_logout">Log out</string>
@@ -37,6 +37,7 @@
     <string name="profile_tv_following_count_label">Following</string>
     <string name="profile_tv_your_recent_checkins">Your recent checkins</string>
     <string name="profile_btn_checkin">Check In</string>
+    <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
 
     <string name="done">Done</string>
     <string name="edit_display_name">Edit display name</string>
