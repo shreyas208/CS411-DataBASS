@@ -16,7 +16,9 @@
         android:layout_marginTop="16dp"
         android:textColor="@color/darkGray"
         android:textSize="18sp"
-        android:text="@string/settings_et_display_name"/>
+        android:text="@string/settings_et_display_name"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +42,8 @@
             android:scaleType="centerCrop"
             android:layout_marginLeft="12dp"
             android:src="@drawable/ic_check_black_48dp"
-            android:tint="@color/white"/>
+            android:tint="@color/white"
+            android:layout_marginStart="12dp" />
 
     </LinearLayout>
 
@@ -52,7 +55,9 @@
         android:layout_marginTop="16dp"
         android:textColor="@color/darkGray"
         android:textSize="18sp"
-        android:text="@string/settings_et_email_address"/>
+        android:text="@string/settings_et_email_address"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -75,7 +80,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/ic_check_black_48dp"
-            android:tint="@color/white"/>
+            android:tint="@color/white"
+            android:layout_marginStart="12dp" />
 
     </LinearLayout>
 

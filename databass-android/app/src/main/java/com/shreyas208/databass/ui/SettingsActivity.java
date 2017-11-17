@@ -10,6 +10,7 @@ import android.widget.EditText;
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.GenericResponse;
+import com.shreyas208.databass.api.service.TravelationsAPI;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 attemptChangeDisplayName();
                 break;
             case R.id.settings_fab_email_address:
+                attemptChangeEmailAddress();
                 break;
         }
     }
@@ -85,6 +87,19 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
 
         TravelationsApp.getApi().changeDisplayName(app.getUsername(), app.getAccessToken(), displayName).enqueue(this);
+    }
+
+    private void attemptChangeEmailAddress() {
+        setControlsEnabled(false);
+
+        String emailAddress = etEmailAddress.getText().toString();
+        if (emailAddress.isEmpty()) {
+            setControlsEnabled(true);
+            TravelationsApp.showToast(this, R.string.settings_toast_email_address_empty);
+            return;
+        }
+
+        TravelationsApp.getApi().changeEmailAddress(app.getUsername(), app.getAccessToken(), emailAddress).enqueue(this);
     }
 
     @Override
