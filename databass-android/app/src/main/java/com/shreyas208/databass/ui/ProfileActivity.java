@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shreyas208.databass.R;
+import com.shreyas208.databass.TravelationsApp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,9 +36,11 @@ public class ProfileActivity extends AppCompatActivity {
         // TODO
         // Call API to get profile information
 
+        TravelationsApp app = (TravelationsApp) getApplication();
+
         // Personalize text view
         TextView welcomeTextView = (TextView) findViewById(R.id.welcomeTextView);
-        String welcome = "Welcome " + Dummy.displayName + "!";
+        String welcome = "Welcome " + app.getDisplayName() + "!";
         welcomeTextView.setText(welcome);
 
         // Gather location and timestamp data

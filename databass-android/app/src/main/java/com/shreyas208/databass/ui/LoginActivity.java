@@ -3,28 +3,42 @@ package com.shreyas208.databass.ui;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shreyas208.databass.R;
-import com.shreyas208.databass.api.service.TravelationsAPI;
+import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.model.LoginResponse;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
  * Login Activity class.
  */
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, Callback<LoginResponse> {
 
     /**
      * Dummy user for verification. Delete after login is actually implemented.
      */
-    private String testEmail = "test@test.com";
+    /*private String testEmail = "test@test.com";
     private String testPassword = "password";
-    private String testDisplayName = "Bob";
+    private String testDisplayName = "Bob";*/
+
+    private EditText etUsername;
+    private EditText etPassword;
+    private LinearLayout llLogin;
+    private Button btnLogin;
+    private TextView tvRegister;
+
+    private String username;
 
     /**
      * Creates the Login Activity instance.
@@ -32,84 +46,86 @@ public class LoginActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize API
-        if (Global.api == null) {
+        etUsername = findViewById(R.id.login_et_username);
+        etPassword = findViewById(R.id.login_et_password);
+        llLogin = findViewById(R.id.login_ll_login);
+        btnLogin = findViewById(R.id.login_btn_login);
+        tvRegister = findViewById(R.id.login_tv_register);
 
-            Retrofit.Builder builder = new Retrofit.Builder()
-                    .baseUrl("http://fa17-cs411-18.cs.illinois.edu/")
-                    .addConverterFactory(GsonConverterFactory.create());
+        btnLogin.setOnClickListener(this);
+        tvRegister.setOnClickListener(this);
 
-            Retrofit retrofit = builder.build();
-
-            Global.api  = retrofit.create(TravelationsAPI.class);
-
-        }
-
+        setControlsEnabled(true);
     }
 
-    /**
-     * Enter button for sending login information. Currently using the dummy account to test
-     * the verification.
-     * @param view  view
-     */
-    public void clickEnterButton(View view) {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.login_btn_login:
+                attemptLogin();
+                break;
+            case R.id.login_tv_register:
+                startActivity(new Intent(this, RegisterActivity.class));
+                finish();
+                break;
+        }
+    }
 
-        // Get fields
-        EditText emailLoginEditText = (EditText) findViewById(R.id.emailLoginEditText);
-        EditText passwordEditText = (EditText) findViewById(R.id.passwordLoginEditText);
+    private void setControlsEnabled(boolean enabled) {
+        btnLogin.setEnabled(enabled);
+        tvRegister.setEnabled(enabled);
+        llLogin.setBackgroundColor(getResources().getColor(enabled ? R.color.colorAccentDark : R.color.gray));
+        btnLogin.setText(enabled ? R.string.login_btn_login : R.string.login_btn_logging_in);
+    }
 
-        // Verify login
-        if (verifyLogin(emailLoginEditText.getText().toString(), passwordEditText.getText().toString())) {
+    private void attemptLogin() {
+        setControlsEnabled(false);
 
-            // TODO
-            // Maybe we should save app data such as access token in Global?
+        String username = etUsername.getText().toString();
+        String password = etPassword.getText().toString();
 
-            Dummy.email = emailLoginEditText.getText().toString();
-            Dummy.password = passwordEditText.getText().toString();
-            Dummy.displayName = testDisplayName;
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, getString(R.string.login_toast_empty_field), Toast.LENGTH_SHORT).show();
+            setControlsEnabled(true);
+            return;
+        }
 
-            Toast.makeText(getApplicationContext(), "Logged in", Toast.LENGTH_LONG).show();
+        this.username = username;
 
-            Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(i);
+        TravelationsApp.getApi().login(username, password).enqueue(this);
+    }
 
+    private void showToast(int message) {
+        Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+        LoginResponse loginResponse = response.body();
+        if (loginResponse == null) {
+            Log.e(TravelationsApp.LOG_TAG, "LoginActivity.onResponse: response body was null");
+            setControlsEnabled(true);
+            showToast(R.string.login_toast_failure);
+        } else if (!loginResponse.isSuccess()) {
+                Log.e(TravelationsApp.LOG_TAG, String.format("LoginActivity.onResponse: response was unsuccessful, code: %d, message: %s", response.code(), loginResponse.getErrorCode()));
+            setControlsEnabled(true);
+            showToast(R.string.login_toast_failure);
         } else {
-
-            // Incorrect login
-            Toast.makeText(getApplicationContext(), "Incorrect email or password", Toast.LENGTH_LONG).show();
-
+            ((TravelationsApp) getApplication()).setLoginValues(username, loginResponse.getAccessToken(), loginResponse.getEmailAddress(), loginResponse.getDisplayName());
+            Intent i = new Intent(this, ProfileActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
         }
-
     }
 
-    /**
-     * Helper method for verifying login.
-     * @param email     user email
-     * @param password  user password
-     * @return          true on success
-     */
-    private boolean verifyLogin(String email, String password) {
-
-        // TODO
-        // Call API to verify login
-
-        return email.equals(testEmail) && password.equals(testPassword);
-
+    @Override
+    public void onFailure(Call<LoginResponse> call, Throwable t) {
+        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful", this.getLocalClassName()));
+        setControlsEnabled(true);
+        showToast(R.string.toast_request_failure);
     }
-
-    /**
-     * Register button callback function. Will open the Register Activity.
-     * @param view  view
-     */
-    public void clickRegisterButton(View view) {
-
-        Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
-        startActivity(i);
-
-    }
-
 }

@@ -1,101 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.shreyas208.databass.ui.RegisterActivity">
-
-    <TextView
-        android:id="@+id/registerTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/register"
-        android:textSize="20sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.shreyas208.databass.ui.RegisterActivity">
 
     <EditText
-        android:id="@+id/emailRegisterTextView"
+        android:id="@+id/register_et_username"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registerTextView" />
+        style="@style/LoginRegisterEditText"
+        android:hint="@string/register_et_username_hint"
+        android:inputType="textNoSuggestions"/>
 
     <EditText
-        android:id="@+id/password1RegisterEditText"
+        android:id="@+id/register_et_password"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/displayNameRegisterTextView" />
+        style="@style/LoginRegisterEditText"
+        android:hint="@string/register_et_password_hint"
+        android:inputType="textPassword"/>
 
     <EditText
-        android:id="@+id/password2RegisterEditText"
+        android:id="@+id/register_et_confirm_password"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:hint="@string/retype_password"
-        android:inputType="textPassword"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password1RegisterEditText" />
+        style="@style/LoginRegisterEditText"
+        android:hint="@string/register_et_confirm_password_hint"
+        android:inputType="textPassword"/>
 
     <EditText
-        android:id="@+id/displayNameRegisterTextView"
+        android:id="@+id/register_et_email_address"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:hint="@string/display_name"
-        android:inputType="textPersonName"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailRegisterTextView" />
+        style="@style/LoginRegisterEditText"
+        android:hint="@string/register_et_email_address_hint"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:id="@+id/register_et_display_name"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/LoginRegisterEditText"
+        android:hint="@string/register_et_display_name_hint"
+        android:inputType="textPersonName"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/register_ll_register"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password2RegisterEditText">
+        android:layout_marginTop="12dp"
+        android:background="@color/colorAccentDark">
 
         <Button
-            android:id="@+id/enterRegisterButton"
-            android:layout_width="wrap_content"
+            android:id="@+id/register_btn_register"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="clickEnterRegisterButton"
-            android:text="@string/enter"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            android:text="@string/register_btn_register"
+            style="@style/MainButton">
+        </Button>
 
-        <Button
-            android:id="@+id/cancelRegisterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="clickCancelRegisterButton"
-            android:text="@string/cancel"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/register_tv_login"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/LoginRegisterHelpText"
+        android:text="@string/register_tv_login"/>
+
+</LinearLayout>

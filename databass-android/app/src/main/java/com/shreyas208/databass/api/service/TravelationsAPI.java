@@ -3,14 +3,16 @@ package com.shreyas208.databass.api.service;
 
 import com.shreyas208.databass.api.model.ChangeDisplayName;
 import com.shreyas208.databass.api.model.ChangePassword;
-import com.shreyas208.databass.api.model.Login;
-import com.shreyas208.databass.api.model.Logout;
+import com.shreyas208.databass.api.model.CheckinResponse;
+import com.shreyas208.databass.api.model.GenericResponse;
+import com.shreyas208.databass.api.model.LoginResponse;
 import com.shreyas208.databass.api.model.Profile;
-import com.shreyas208.databass.api.model.Registration;
 import com.shreyas208.databass.api.model.Search;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -22,19 +24,28 @@ public interface TravelationsAPI {
     // in order to see which kind of object is returned, either an error or success
 
     @POST("/api/user/register")
-    Call<Object> register(@Body Registration registration);
+    @FormUrlEncoded
+    Call<GenericResponse> register(@Field("username") String username, @Field("password") String password, @Field("email_address") String emailAddress, @Field("display_name") String displayName);
 
     @POST("/api/user/login")
-    Call<Object> login(@Body Login login);
+    @FormUrlEncoded
+    Call<LoginResponse> login(@Field("username") String username, @Field("password") String password);
 
     @POST("/api/user/logout")
-    Call<Object> logout(@Body Logout logout);
+    @FormUrlEncoded
+    Call<GenericResponse> logout(@Field("username") String username, @Field("access_token") String accessToken);
 
     @POST("/api/user/search")
-    Call<Object> search(@Body Search search);
+    @FormUrlEncoded
+    Call<Object> search(@Field("username") String username, @Field("access_token") String accessToken, @Field("search_username") String searchUsername);
 
     @POST("/api/user/profile")
-    Call<Object> profile(@Body Profile profile);
+    @FormUrlEncoded
+    Call<Object> profile(@Field("username") String username, @Field("access_token") String accessToken);
+
+    @POST("api/user/checkin")
+    @FormUrlEncoded
+    Call<CheckinResponse> checkin(@Field("username") String username, @Field("access_token") String accessToken, @Field("latitude") double latitude, @Field("longitude") double longitude);
 
     @POST("/api/user/changePassword")
     Call<Object> changePassword(@Body ChangePassword changePassword);
