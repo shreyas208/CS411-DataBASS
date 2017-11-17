@@ -32,6 +32,7 @@
 
     <string name="profile_label">Travelations - Home</string>
     <string name="profile_menu_logout">Log out</string>
+    <string name="profile_menu_settings">Settings</string>
     <string name="profile_tv_checkin_count_label">Checkins</string>
     <string name="profile_tv_follower_count_label">Followers</string>
     <string name="profile_tv_following_count_label">Following</string>
@@ -41,6 +42,8 @@
     <string name="profile_toast_location_denied">Location access is required to Check In.</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
     <string name="profile_toast_checkin_failure">Failed to Check In. Please try again.</string>
+
+    <string name="settings_label">Travelations - Settings</string>
 
     <string name="done">Done</string>
     <string name="edit_display_name">Edit display name</string>

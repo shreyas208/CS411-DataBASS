@@ -20,8 +20,10 @@
             android:label="@string/login_label"/>
         <activity android:name=".ui.RegisterActivity"
             android:label="@string/register_label"/>
-        <activity android:name=".ui.ProfileActivity"/>
-        <activity android:name=".ui.SettingsActivity"/>
+        <activity android:name=".ui.ProfileActivity"
+            android:label="@string/profile_label"/>
+        <activity android:name=".ui.SettingsActivity"
+            android:label="@string/settings_label"/>
         <activity android:name=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

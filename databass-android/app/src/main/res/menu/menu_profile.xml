@@ -4,4 +4,7 @@
     <item android:id="@+id/profile_menu_logout"
           android:title="@string/profile_menu_logout"
           app:showAsAction="never"/>
+    <item android:id="@+id/profile_menu_settings"
+          android:title="@string/profile_menu_settings"
+          app:showAsAction="never"/>
 </menu>

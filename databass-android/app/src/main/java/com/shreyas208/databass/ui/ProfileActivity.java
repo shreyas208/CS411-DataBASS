@@ -7,10 +7,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.shreyas208.databass.R;
@@ -32,10 +30,7 @@ import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 import com.shreyas208.databass.api.service.DoNothingCallback;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -159,6 +154,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(i);
                 finish();
                 break;
+            case R.id.profile_menu_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
         }
         return true;
     }
@@ -213,9 +210,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
-        public RecentCheckinsAdapter() {
-
-        }
+        public RecentCheckinsAdapter() { }
 
         public RecentCheckinsAdapter(List<RecentCheckin> recentCheckins) {
             this.recentCheckins = recentCheckins;
