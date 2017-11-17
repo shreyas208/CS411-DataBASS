@@ -25,13 +25,6 @@ import retrofit2.Response;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, Callback<LoginResponse> {
 
-    /**
-     * Dummy user for verification. Delete after login is actually implemented.
-     */
-    /*private String testEmail = "test@test.com";
-    private String testPassword = "password";
-    private String testDisplayName = "Bob";*/
-
     private EditText etUsername;
     private EditText etPassword;
     private LinearLayout llLogin;

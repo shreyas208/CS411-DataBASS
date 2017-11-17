@@ -3,6 +3,9 @@ package com.shreyas208.databass.ui;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -11,6 +14,7 @@ import android.widget.Toast;
 
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.service.DoNothingCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +27,8 @@ import java.util.Map;
  */
 public class ProfileActivity extends AppCompatActivity {
 
+    private TravelationsApp app;
+
     /**
      * Creates the Profile Activity instance.
      * @param savedInstanceState  previously saved instance
@@ -33,10 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // TODO
-        // Call API to get profile information
-
-        TravelationsApp app = (TravelationsApp) getApplication();
+        app = (TravelationsApp) getApplication();
 
         // Personalize text view
         TextView welcomeTextView = (TextView) findViewById(R.id.welcomeTextView);
@@ -76,6 +79,28 @@ public class ProfileActivity extends AppCompatActivity {
         ListView locListView = (ListView) findViewById(R.id.locListView);
         locListView.setAdapter(adapter);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_profile, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.profile_menu_logout:
+                TravelationsApp.getApi().logout(app.getUsername(), app.getAccessToken()).enqueue(new DoNothingCallback(this.getLocalClassName()));
+                app.clearLoginValues();
+                Intent i = new Intent(this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+                finish();
+                break;
+        }
+        return true;
     }
 
     /**

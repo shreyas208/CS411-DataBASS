@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ProfileCountText">
+        <item name="android:textColor">@color/colorAccentDark</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:layout_row">0</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:gravity">center</item>
+    </style>
+</resources>

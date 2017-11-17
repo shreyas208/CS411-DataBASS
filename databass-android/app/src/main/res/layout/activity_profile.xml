@@ -1,74 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.shreyas208.databass.ui.ProfileActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.shreyas208.databass.ui.ProfileActivity">
 
     <TextView
-        android:id="@+id/welcomeTextView"
-        android:layout_width="0dp"
+        android:id="@+id/profile_tv_display_name"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:text="Welcome!"
+        android:layout_marginLeft="@dimen/profile_view_spacing"
+        android:layout_marginRight="@dimen/profile_view_spacing"
+        android:layout_marginTop="@dimen/profile_view_spacing"
+        android:gravity="center"
+        android:textSize="32sp"
+        android:textColor="@color/colorPrimaryDark"
+        tools:text="Display Name"/>
+
+    <TextView
+        android:id="@+id/profile_tv_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/profile_view_spacing"
+        android:layout_marginRight="@dimen/profile_view_spacing"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
         android:textSize="20sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textStyle="bold"
+        android:textColor="@color/darkGray"
+        tools:text="username"/>
 
     <TextView
-        android:id="@+id/locVisitedTextView"
-        android:layout_width="0dp"
+        android:id="@+id/profile_tv_join_date"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/locations_you_ve_visited"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeTextView" />
-
-    <ListView
-        android:id="@+id/locListView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonLinearLayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/locVisitedTextView">
-
-    </ListView>
+        android:layout_marginLeft="@dimen/profile_view_spacing"
+        android:layout_marginRight="@dimen/profile_view_spacing"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/darkGray"
+        tools:text="Joined Nov 16, 2017"/>
 
     <LinearLayout
-        android:id="@+id/buttonLinearLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        android:layout_marginTop="@dimen/profile_view_spacing"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/logoutButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:onClick="clickLogoutButton"
-            android:text="@string/logout" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountText"
+                tools:text="23"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountLabelText"
+                android:text="@string/profile_tv_checkin_count_label"/>
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/settingsButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:onClick="clickSettingsButton"
-            android:text="@string/settings" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountText"
+                tools:text="15"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountLabelText"
+                android:text="@string/profile_tv_follower_count_label"/>
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountText"
+                tools:text="8"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                style="@style/ProfileCountLabelText"
+                android:text="@string/profile_tv_following_count_label"/>
+        </LinearLayout>
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/darkGray"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/profile_view_spacing"
+        android:layout_marginRight="@dimen/profile_view_spacing"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/darkGray"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="@string/profile_tv_your_recent_checkins"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeTextView"/>
+
+    <ListView
+        android:id="@+id/locListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorAccentDark">
+
+        <Button
+            android:id="@+id/profile_btn_checkin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/profile_btn_checkin"
+            style="@style/MainButton"/>
+
+    </LinearLayout>
+
+</LinearLayout>

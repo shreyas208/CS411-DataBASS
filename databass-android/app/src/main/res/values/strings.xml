@@ -30,17 +30,16 @@
     <string name="register_toast_success">Registration successful!</string>
     <string name="register_toast_failure">Registration failed!</string>
 
-    <string name="enter">Enter</string>
-    <string name="password">Password</string>
-    <string name="emailAddress">Email</string>
-    <string name="sign_in">Sign in</string>
-    <string name="title_activity_register">RegisterActivity</string>
-    <string name="display_name">Display name</string>
-    <string name="cancel">Cancel</string>
-    <string name="update">Update</string>
+    <string name="profile_label">Travelations - Home</string>
+    <string name="profile_menu_logout">Log out</string>
+    <string name="profile_tv_checkin_count_label">Checkins</string>
+    <string name="profile_tv_follower_count_label">Followers</string>
+    <string name="profile_tv_following_count_label">Following</string>
+    <string name="profile_tv_your_recent_checkins">Your recent checkins</string>
+    <string name="profile_btn_checkin">Check In</string>
+
     <string name="done">Done</string>
     <string name="edit_display_name">Edit display name</string>
     <string name="logout">Logout</string>
     <string name="settings">Settings</string>
-    <string name="locations_you_ve_visited">Locations you\'ve visited:</string>
 </resources>

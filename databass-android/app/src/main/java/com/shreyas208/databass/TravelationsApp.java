@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.service.TravelationsAPI;
 
 import retrofit2.Retrofit;
@@ -25,13 +26,13 @@ public class TravelationsApp extends Application {
     private static final String SP_KEY_DISPLAY_NAME = "display_name";
     private static final String SP_KEY_EMAIL_ADDRESS = "email_address";
 
+    private static TravelationsAPI api;
+    private static SharedPreferences sharedPreferences;
+
     private String username;
     private String accessToken;
     private String displayName;
     private String emailAddress;
-
-    private static TravelationsAPI api;
-    private static SharedPreferences sharedPreferences;
 
     public static TravelationsAPI getApi() {
         if (api == null) {
@@ -52,14 +53,6 @@ public class TravelationsApp extends Application {
             sharedPreferences = getSharedPreferences(PREFERENCE_FILE, MODE_PRIVATE);
         }
         return sharedPreferences;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        if (isLoggedIn()) {
-
-        }
     }
 
     public boolean isLoggedIn() {
@@ -106,4 +99,18 @@ public class TravelationsApp extends Application {
         spEditor.putString(SP_KEY_DISPLAY_NAME, displayName);
         spEditor.apply();
     }
+
+    public void clearLoginValues() {
+        this.username = null;
+        this.accessToken = null;
+        this.emailAddress = null;
+        this.displayName = null;
+        SharedPreferences.Editor spEditor = getSharedPreferences().edit();
+        spEditor.remove(SP_KEY_USERNAME);
+        spEditor.remove(SP_KEY_ACCESS_TOKEN);
+        spEditor.remove(SP_KEY_EMAIL_ADDRESS);
+        spEditor.remove(SP_KEY_DISPLAY_NAME);
+        spEditor.apply();
+    }
+
 }
