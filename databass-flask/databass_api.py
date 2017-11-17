@@ -365,8 +365,8 @@ def profile():
                    "WHERE id = city_id AND username=%s " +
                    "ORDER BY checkin_time DESC " +
                    "LIMIT 0,15;", (username,))
-    print results
     results = cursor.fetchall()
+    print results
     cursor.close()
 
     print results
