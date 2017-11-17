@@ -52,4 +52,5 @@
     <string name="settings_toast_success">Save successful!</string>
     <string name="settings_toast_failure">Save failed. Please try again.</string>
 
+    <string name="icon_content_description">Travelations</string>
 </resources>
