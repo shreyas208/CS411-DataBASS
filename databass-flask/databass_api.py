@@ -350,7 +350,15 @@ def profile():
     email_address = user_info[0]
     display_name = user_info[1]
     join_date = user_info[2]
-    num_checkins = user_info[3]
+    checkin_count = user_info[3]
+
+    #The result of this call should be returned as "following_count":
+    cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
+    following_count = cursor.fetchone()
+
+    #The result of this call should be returned as "follower_count":
+    cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
+    follower_count = cursor.fetchone()
 
     cursor.execute("SELECT name, checkin_time " +
                    "FROM city, checkin " +
@@ -363,7 +371,7 @@ def profile():
     print results
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
 
-    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "num_checkins": num_checkins, "recent_checkins": recent_checkins}
+    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "checkin_count": checkin_count, "recent_checkins": recent_checkins, "following_count": following_count, "follower_count": follower_count}
     return jsonify(content), status.HTTP_200_OK
 
 
