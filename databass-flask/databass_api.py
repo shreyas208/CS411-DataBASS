@@ -30,7 +30,7 @@ db = MySQL.connect(host="localhost", port=3306, user="flaskuser", password="tCU8
 # 4. Complete the search function
 # 5. Update the profile function to only return checkins over the past (week?  3 days?)
 # 6. Map country and region codes to their actual names
-# 7. Optimize the checkin query (currently takes about 6 secons to run)
+# 7. Optimize the checkin query (currently takes about 6 seconds to run)
 # 8. TEST THE FUNTIONALITY EXTENSIVELY!
 
 
@@ -371,7 +371,7 @@ def profile():
     print results
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
 
-    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "checkin_count": checkin_count, "recent_checkins": recent_checkins, "following_count": following_count, "follower_count": follower_count}
+    content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date, "checkin_count": checkin_count, "recent_checkins": recent_checkins, "following_count": following_count[0], "follower_count": follower_count[0]}
     return jsonify(content), status.HTTP_200_OK
 
 
