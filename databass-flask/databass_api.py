@@ -195,8 +195,6 @@ def logout():
 
     # Check if the access token is valid
     cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
-
-    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -258,8 +256,6 @@ def search():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-
-    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
     cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
@@ -326,7 +322,6 @@ def profile():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    #cursor.execute("SELECT access_token FROM user WHERE username='" + username + "';")
     cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
@@ -348,20 +343,25 @@ def profile():
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
 
-    cursor.execute("SELECT email_address, display_name, join_date, num_checkins, city_id FROM user, checkin WHERE user.username = checkin.username and user.username = %s;", (username,)) #query the database for that user
-    checkins = cursor.fetchall()
+    cursor.execute("SELECT email_address, display_name, join_date, num_checkins FROM user WHERE username=%s;", (username,)) #query the database for that user
+    user_info = cursor.fetchone()
 
     #we need to get email_address, display_name, join_datetime, num_checkins, and recent_checkins
-    email_address = checkins[0][0]
-    display_name = checkins[0][1]
-    join_datetime = checkins[0][2]
-    num_checkins = checkins[0][3]
+    email_address = user_info[0]
+    display_name = user_info[1]
+    join_datetime = user_info[2]
+    num_checkins = user_info[3]
 
-    cursor.execute("SELECT name FROM city WHERE id IN (SELECT city_id FROM user, checkin WHERE user.username = %s and checkin.username = %s);", (username, username))
-    city_names = cursor.fetchall()
+    cursor.execute("SELECT name, checkin_time " +
+                   "FROM city, checkin " +
+                   "WHERE id = city_id AND username=%s " +
+                   "ORDER BY checkin_time DESC " +
+                   "LIMIT 0,15;", (username,))
+    results = cursor.fetchall()
     cursor.close()
 
-    recent_checkins = [i[0] for i in city_names]
+    recent_checkins = [{"city_name": result[0], "checkin_time": result[1]} for result in results]
+
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_datetime": join_datetime, "num_checkins": num_checkins, "recent_checkins": recent_checkins}
     return jsonify(content), status.HTTP_200_OK
 
