@@ -343,10 +343,10 @@ def profile():
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
 
-    cursor.execute("SELECT email_address, display_name, join_date, num_checkins FROM user WHERE username=%s;", (username,)) #query the database for that user
+    cursor.execute("SELECT email_address, display_name, join_date, checkin_count FROM user WHERE username=%s;", (username,)) #query the database for that user
     user_info = cursor.fetchone()
 
-    #we need to get email_address, display_name, join_datetime, num_checkins, and recent_checkins
+    #we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
     email_address = user_info[0]
     display_name = user_info[1]
     join_date = user_info[2]
@@ -721,10 +721,10 @@ def checkin():
         final_result = results[0]
 
     cursor.execute("UPDATE user " +
-                   "SET num_checkins=" +
+                   "SET checkin_count=" +
                    "(" +
-                       "SELECT num_checkins + 1 " +
-                       "FROM (SELECT num_checkins FROM user WHERE username=%s) AS intermediate" +
+                       "SELECT checkin_count + 1 " +
+                       "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
                    ") " +
                    "WHERE username=%s;", (username, username))
 
