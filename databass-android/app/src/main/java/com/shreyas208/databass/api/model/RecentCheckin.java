@@ -2,13 +2,10 @@ package com.shreyas208.databass.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Shreyas Patil on 2017-11-16.
- */
 
 public class RecentCheckin {
-    @SerializedName("city_name") private String cityName;
-    @SerializedName("checkin_time") private String checkinTime;
+    @SerializedName("city_name") private final String cityName;
+    @SerializedName("checkin_time") private final String checkinTime;
 
     public RecentCheckin(String cityName, String checkinTime) {
         this.cityName = cityName;

@@ -48,8 +48,8 @@
     <string name="settings_et_email_address">Email Address</string>
     <string name="settings_toast_display_name_empty">Display Name must not be empty.</string>
     <string name="settings_toast_email_address_empty">Email Address must not be empty.</string>
-    <string name="settings_toast_success">Save successful!</string>
-    <string name="settings_toast_failure">Save failed. Please try again.</string>
+    <string name="settings_toast_success">Update successful!</string>
+    <string name="settings_toast_failure">Update failed. Please try again.</string>
 
     <string name="icon_content_description">Travelations</string>
 </resources>

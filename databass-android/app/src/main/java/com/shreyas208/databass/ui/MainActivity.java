@@ -11,9 +11,6 @@ import com.shreyas208.databass.TravelationsApp;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    Button btnLogin;
-    Button btnRegister;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +23,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_main);
 
-        btnLogin = (Button) findViewById(R.id.main_btn_login);
-        btnRegister = (Button) findViewById(R.id.main_btn_register);
+        Button btnLogin = findViewById(R.id.main_btn_login);
+        Button btnRegister = findViewById(R.id.main_btn_register);
 
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);

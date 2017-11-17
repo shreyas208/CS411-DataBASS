@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,7 +45,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private TravelationsApp app;
 
-    private TextView tvDisplayName, tvUsername, tvJoinDate, tvCheckinCount, tvFollowerCount, tvFollowingCount;
+    private TextView tvDisplayName;
+    private TextView tvJoinDate;
+    private TextView tvCheckinCount;
+    private TextView tvFollowerCount;
+    private TextView tvFollowingCount;
     private RecyclerView rvRecentCheckins;
     private LinearLayout llCheckin;
     private Button btnCheckin;
@@ -62,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         app = (TravelationsApp) getApplication();
 
         tvDisplayName = findViewById(R.id.profile_tv_display_name);
-        tvUsername = findViewById(R.id.profile_tv_username);
+        TextView tvUsername = findViewById(R.id.profile_tv_username);
         tvJoinDate = findViewById(R.id.profile_tv_join_date);
         tvCheckinCount = findViewById(R.id.profile_tv_checkin_count);
         tvFollowerCount = findViewById(R.id.profile_tv_follower_count);
@@ -95,10 +100,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @SuppressLint("MissingPermission")
     private void continueCheckin() {
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location location;
+        if (locationManager != null) {
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        } else {
+            return;
+        }
         TravelationsApp.getApi().checkin(app.getUsername(), app.getAccessToken(), location.getLatitude(), location.getLongitude()).enqueue(new Callback<CheckinResponse>() {
             @Override
-            public void onResponse(Call<CheckinResponse> call, Response<CheckinResponse> response) {
+            public void onResponse(@NonNull Call<CheckinResponse> call, @NonNull Response<CheckinResponse> response) {
                 CheckinResponse checkinResponse = response.body();
                 if (checkinResponse == null) {
                     Log.e(TravelationsApp.LOG_TAG, "ui.ProfileActivity.continueCheckin.onResponse: response body was null");
@@ -116,7 +126,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             }
 
             @Override
-            public void onFailure(Call<CheckinResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<CheckinResponse> call, @NonNull Throwable t) {
                 Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileActivity.continueCheckin.onFailure: request was unsuccessful, message:\n%s", t.getMessage()));
                 TravelationsApp.showToast(ProfileActivity.this, R.string.toast_request_failure);
                 setCheckinControlEnabled(true);
@@ -173,7 +183,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+    public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
         ProfileResponse profileResponse = response.body();
         if (profileResponse == null) {
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
@@ -194,7 +204,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onFailure(Call<ProfileResponse> call, Throwable t) {
+    public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", this.getLocalClassName(), t.getMessage()));
         TravelationsApp.showToast(this, R.string.toast_request_failure);
         finish();
@@ -205,7 +215,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         private List<RecentCheckin> recentCheckins;
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView tvCity, tvTime;
+            public final TextView tvCity;
+            public final TextView tvTime;
 
             public ViewHolder(View v) {
                 super(v);

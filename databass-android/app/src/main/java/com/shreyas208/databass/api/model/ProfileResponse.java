@@ -10,15 +10,15 @@ import java.util.List;
  */
 public class ProfileResponse {
 
-    private boolean success;
-    @SerializedName("error_code") private String errorCode;
+    private final boolean success;
+    @SerializedName("error_code") private final String errorCode;
     @SerializedName("email_address") private String emailAddress;
-    @SerializedName("display_name") private String displayName;
-    @SerializedName("join_date") private String joinDate;
-    @SerializedName("checkin_count") private int checkinCount;
-    @SerializedName("follower_count") private int followerCount;
-    @SerializedName("following_count") private int followingCount;
-    @SerializedName("recent_checkins") private List<RecentCheckin> recentCheckins;
+    @SerializedName("display_name") private final String displayName;
+    @SerializedName("join_date") private final String joinDate;
+    @SerializedName("checkin_count") private final int checkinCount;
+    @SerializedName("follower_count") private final int followerCount;
+    @SerializedName("following_count") private final int followingCount;
+    @SerializedName("recent_checkins") private final List<RecentCheckin> recentCheckins;
 
     public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int followerCount, int followingCount, List<RecentCheckin> recentCheckins) {
         this.success = success;

@@ -2,19 +2,23 @@ package com.shreyas208.databass.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Shreyas Patil on 2017-11-16.
- */
+
 
 public class CheckinResponse {
 
-    private boolean success;
-    @SerializedName("error_code") String errorCode;
-    @SerializedName("city_name") String cityName;
-    @SerializedName("region_name") String regionName;
-    @SerializedName("region_code") String regionCode;
-    @SerializedName("country_name") String countryName;
-    @SerializedName("country_code") String countryCode;
+    private final boolean success;
+    @SerializedName("error_code")
+    private final String errorCode;
+    @SerializedName("city_name")
+    private final String cityName;
+    @SerializedName("region_name")
+    private final String regionName;
+    @SerializedName("region_code")
+    private final String regionCode;
+    @SerializedName("country_name")
+    private final String countryName;
+    @SerializedName("country_code")
+    private final String countryCode;
 
     public CheckinResponse(boolean success, String errorCode, String cityName, String regionName, String regionCode, String countryName, String countryCode) {
         this.success = success;

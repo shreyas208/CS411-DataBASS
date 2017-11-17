@@ -1,6 +1,7 @@
 package com.shreyas208.databass.ui;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -10,7 +11,6 @@ import android.widget.EditText;
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.GenericResponse;
-import com.shreyas208.databass.api.service.TravelationsAPI;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,7 +22,7 @@ import retrofit2.Response;
  */
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, Callback<GenericResponse> {
 
-    TravelationsApp app;
+    private TravelationsApp app;
 
     private EditText etDisplayName, etEmailAddress;
     private FloatingActionButton fabDisplayName, fabEmailAddress;
@@ -103,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+    public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
         GenericResponse genericResponse = response.body();
         if (genericResponse == null) {
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
@@ -120,7 +120,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public void onFailure(Call<GenericResponse> call, Throwable t) {
+    public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
 
     }
 }

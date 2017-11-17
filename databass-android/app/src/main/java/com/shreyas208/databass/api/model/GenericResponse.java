@@ -2,13 +2,10 @@ package com.shreyas208.databass.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Shreyas Patil on 2017-11-16.
- */
 
 public class GenericResponse {
-    private boolean success;
-    @SerializedName("error_code") private String errorCode;
+    private final boolean success;
+    @SerializedName("error_code") private final String errorCode;
 
     public GenericResponse(boolean success, String errorCode) {
         this.success = success;

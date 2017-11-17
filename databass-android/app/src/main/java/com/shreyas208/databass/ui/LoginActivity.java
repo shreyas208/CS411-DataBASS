@@ -2,6 +2,7 @@ package com.shreyas208.databass.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -92,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+    public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
         LoginResponse loginResponse = response.body();
         if (loginResponse == null) {
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
@@ -112,7 +113,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onFailure(Call<LoginResponse> call, Throwable t) {
+    public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", this.getLocalClassName(), t.getMessage()));
         setControlsEnabled(true);
         TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);

@@ -8,11 +8,11 @@ import com.google.gson.annotations.SerializedName;
  */
 public class LoginResponse {
 
-    private boolean success;
+    private final boolean success;
     @SerializedName("error_code") private String errorCode;
-    @SerializedName("email_address") private String emailAddress;
-    @SerializedName("display_name") private String displayName;
-    @SerializedName("access_token") private String accessToken;
+    @SerializedName("email_address") private final String emailAddress;
+    @SerializedName("display_name") private final String displayName;
+    @SerializedName("access_token") private final String accessToken;
 
     public LoginResponse(boolean success, String emailAddress, String displayName, String accessToken) {
         this.success = success;
