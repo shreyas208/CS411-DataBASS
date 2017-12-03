@@ -681,37 +681,39 @@ def checkin():
     #               ") AS distpop " +
     #               "ORDER BY population DESC, distance ASC " +
     #               "LIMIT 0,1")
-    CONSTANT = 3959
-    DISTANCE_THRESHOLD = 3
+    cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude))
 
-    cursor.execute("SELECT * " +
-                   "FROM " +
-                   "(" +
-                   "(" +
-                   "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                   "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                   "sin(radians(latitude)))) AS distance " +
-                   "FROM city " +
-                   "HAVING distance < %s " +
-                   "ORDER BY population DESC " +
-                   "LIMIT 0, 1" +
-                   ")" +
-                   "UNION" +
-                   "(" +
-                   "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                   "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                   "sin(radians(latitude)))) AS distance " +
-                   "FROM city " +
-                   "HAVING distance < %s " +
-                   "ORDER BY distance " +
-                   "LIMIT 0, 1" +
-                   ")" +
-                   ") AS distpop " +
-                   "ORDER BY distance ASC, population DESC " +
-                   "LIMIT 0,2;", (
-                       CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
-                       latitude,
-                       DISTANCE_THRESHOLD))
+    #CONSTANT = 3959
+    #DISTANCE_THRESHOLD = 3
+    #
+    #cursor.execute("SELECT * " +
+    #               "FROM " +
+    #               "(" +
+    #               "(" +
+    #               "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #               "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY population DESC " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               "UNION" +
+    #               "(" +
+    #               "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #               "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY distance " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               ") AS distpop " +
+    #               "ORDER BY distance ASC, population DESC " +
+    #               "LIMIT 0,2;", (
+    #                   CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
+    #                   latitude,
+    #                   DISTANCE_THRESHOLD))
 
     results = cursor.fetchall()
 
