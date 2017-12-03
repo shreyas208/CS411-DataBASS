@@ -669,7 +669,7 @@ def checkin():
                           "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
                           "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
                           "sin(radians(latitude)))) AS distance " +
-                          "FROM (SELECT * FROM city WHERE city.latitude > (" + lowBoundLat +") AND city.latitude < (" + highBoundLat +") AND city.longitude > (" + lowBoundLong +") AND city.longitude < (" + highBoundLong +")) " +
+                          "FROM (SELECT * FROM city WHERE city.latitude > (" + lowBoundLat +") AND city.latitude < (" + highBoundLat +") AND city.longitude > (" + lowBoundLong +") AND city.longitude < (" + highBoundLong +")) as wwoop " +
                           "HAVING distance < 5 " +
                           "ORDER BY population DESC " +
                           "LIMIT 0, 1" +
