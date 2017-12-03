@@ -685,7 +685,7 @@ def checkin():
 #               "ORDER BY population DESC, distance ASC " +
 #               "LIMIT 0,1")
     results = cursor.callproc("query_checkin", (latitude, longitude))
-    print(results)
+    print(results[0])
     #CONSTANT = 3959
     #DISTANCE_THRESHOLD = 3
     #
