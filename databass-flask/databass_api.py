@@ -655,33 +655,36 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
-
-    # cursor.execute("SELECT * " +
-    #               "FROM " +
-    #               "(" +
-    #                   "(" +
-    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-    #                       "sin(radians(latitude)))) AS distance " +
-    #                       "FROM city " +
-    #                       "HAVING distance < 5 " +
-    #                       "ORDER BY population DESC " +
-    #                       "LIMIT 0, 1" +
-    #                   ")" +
-    #                   "UNION" +
-    #                   "(" +
-    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-    #                       "sin(radians(latitude)))) AS distance " +
-    #                       "FROM city " +
-    #                       "HAVING distance < 5 " +
-    #                       "ORDER BY distance " +
-    #                       "LIMIT 0, 1" +
-    #                   ")" +
-    #               ") AS distpop " +
-    #               "ORDER BY population DESC, distance ASC " +
-    #               "LIMIT 0,1")
-    cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude))
+lowBoundLat = latitude - 1
+highBoundLat = latitude + 1
+lowBoundLong = longitude - 1
+highBoundLong = longitude + 1
+cursor.execute("SELECT * " +
+              "FROM " +
+              "(" +
+                  "(" +
+                      "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                      "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                      "sin(radians(latitude)))) AS distance " +
+                      "FROM (SELECT * FROM city WHERE city.latitude > (" + lowBoundLat +") AND city.latitude < (" + highBoundLat +") AND city.longitude > (" + lowBoundLong +") AND city.longitude < (" + highBoundLong +")) " +
+                      "HAVING distance < 5 " +
+                      "ORDER BY population DESC " +
+                      "LIMIT 0, 1" +
+                  ")" +
+                  "UNION" +
+                  "(" +
+                      "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
+                      "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
+                      "sin(radians(latitude)))) AS distance " +
+                      "FROM city " +
+                      "HAVING distance < 5 " +
+                      "ORDER BY distance " +
+                      "LIMIT 0, 1" +
+                  ")" +
+              ") AS distpop " +
+              "ORDER BY population DESC, distance ASC " +
+              "LIMIT 0,1")
+    # cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude))
 
     #CONSTANT = 3959
     #DISTANCE_THRESHOLD = 3
