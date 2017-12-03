@@ -684,7 +684,7 @@ def checkin():
 #               ") AS distpop " +
 #               "ORDER BY population DESC, distance ASC " +
 #               "LIMIT 0,1")
-    cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude), multi=True)
+    results = cursor.callproc(query_checkin, (latitude, longitude))
 
     #CONSTANT = 3959
     #DISTANCE_THRESHOLD = 3
@@ -718,7 +718,7 @@ def checkin():
     #                   latitude,
     #                   DISTANCE_THRESHOLD))
 
-    results = cursor.fetchall()
+    #results = cursor.fetchall()
 
     if not results:
         error_code = "user_checkin_not_close_enough_to_city"
