@@ -684,7 +684,7 @@ def checkin():
 #               ") AS distpop " +
 #               "ORDER BY population DESC, distance ASC " +
 #               "LIMIT 0,1")
-    cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude))
+    cursor.execute("CALL query_checkin(%s, %s);", (latitude, longitude), multi=True)
 
     #CONSTANT = 3959
     #DISTANCE_THRESHOLD = 3
