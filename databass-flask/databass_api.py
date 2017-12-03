@@ -655,10 +655,10 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
-lowBoundLat = latitude - 1
-highBoundLat = latitude + 1
-lowBoundLong = longitude - 1
-highBoundLong = longitude + 1
+# lowBoundLat = latitude - 1
+# highBoundLat = latitude + 1
+# lowBoundLong = longitude - 1
+# highBoundLong = longitude + 1
 # cursor.execute("SELECT * " +
 #               "FROM " +
 #               "(" +
