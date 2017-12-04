@@ -771,13 +771,13 @@ def checkin():
 
     final_result = results[0]
 
-    cursor.execute("UPDATE user " +
-                   "SET checkin_count=" +
-                   "(" +
-                   "SELECT checkin_count + 1 " +
-                   "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
-                   ") " +
-                   "WHERE username=%s;", (username, username))
+    # cursor.execute("UPDATE user " +
+    #                "SET checkin_count=" +
+    #                "(" +
+    #                "SELECT checkin_count + 1 " +
+    #                "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
+    #                ") " +
+    #                "WHERE username=%s;", (username, username))
 
     cursor.execute("INSERT INTO checkin values(%s, %s, NOW());", (username, str(final_result[0])))
     db.commit()
@@ -984,10 +984,10 @@ def remove():
     # arguments are valid
 
     # remove user from checkin table
-    cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
+    #cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
 
     # remove user from follow table
-    cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
+    #cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
 
     # remove user from user table
     cursor.execute("DELETE FROM user WHERE username=%s;", (username,))
