@@ -689,36 +689,69 @@ def checkin():
     #               "LIMIT 0,1")
 
     #results = cursor.callproc("query_checkin", (latitude, longitude))
+    LAT_BUFFER = 0.1
+    DISTANCE_THRESHOLD = 5
 
+    cursor.execute("(" +
+	                   "SELECT * " +
+                       "FROM " +
+                       "(" +
+                           "SELECT *, gcdist(%s, %s, latitude, longitude) AS distance_mi " +
+                           "FROM city " +
+                           "WHERE latitude " +
+                           "BETWEEN (%s - %s) AND (%s + %s) " +
+                           "HAVING distance_mi < %s " +
+                           "ORDER BY distance_mi" +
+	                   ") AS city_tmp " +
+	                   "WHERE population > 0 " +
+	                   "ORDER BY distance_mi " +
+	                   "LIMIT 0,1" +
+                   ")" +
+                   "UNION" +
+                   "(" +
+	                   "SELECT * " +
+                       "FROM " +
+                       "(" +
+		                   "SELECT *, gcdist(%s, %s, latitude, longitude) AS distance_mi " +
+                           "FROM city " +
+                           "WHERE latitude BETWEEN (%s - %s) AND (%s + %s) " +
+                           "HAVING distance_mi < %s " +
+                           "ORDER BY distance_mi" +
+	                   ") AS city_tmp " +
+	                   "ORDER BY distance_mi " +
+                       "LIMIT 0,1" +
+                   ");", (
+                       latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD,
+                       latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD))
 
-    cursor.execute("SELECT * " +
-                   "FROM " +
-                   "(" +
-                   "(" +
-                   "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                   "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                  "sin(radians(latitude)))) AS distance " +
-                  "FROM city " +
-                  "HAVING distance < %s " +
-                  "ORDER BY population DESC " +
-                  "LIMIT 0, 1" +
-                  ")" +
-                  "UNION" +
-                  "(" +
-                  "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                  "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                  "sin(radians(latitude)))) AS distance " +
-                  "FROM city " +
-                  "HAVING distance < %s " +
-                  "ORDER BY distance " +
-                  "LIMIT 0, 1" +
-                  ")" +
-                  ") AS distpop " +
-                  "ORDER BY distance ASC, population DESC " +
-                  "LIMIT 0,2;", (
-                      CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
-                      latitude,
-                      DISTANCE_THRESHOLD))
+    # cursor.execute("SELECT * " +
+    #                "FROM " +
+    #                "(" +
+    #                "(" +
+    #                "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #                "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY population DESC " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               "UNION" +
+    #               "(" +
+    #               "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #               "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY distance " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               ") AS distpop " +
+    #               "ORDER BY distance ASC, population DESC " +
+    #               "LIMIT 0,2;", (
+    #                   CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
+    #                   latitude,
+    #                   DISTANCE_THRESHOLD))
 
     results = cursor.fetchall()
 
