@@ -371,8 +371,7 @@ def profile():
     cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
     following_count = cursor.fetchone()
 
-    cursor.execute("SELECT title,description,points FROM achievement WHERE id in (SELECT achievement_id FROM achieve WHERE username =%s;", (username,))
-    achievements = cursor.fetchall()
+
     # The result of this call should be returned as "follower_count":
     cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
     follower_count = cursor.fetchone()
@@ -389,7 +388,7 @@ def profile():
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins,
-               "following_count": following_count[0], "follower_count": follower_count[0], "achievements": achievements}
+               "following_count": following_count[0], "follower_count": follower_count[0]}
     return jsonify(content), status.HTTP_200_OK
 
 
