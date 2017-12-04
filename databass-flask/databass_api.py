@@ -657,8 +657,6 @@ def checkin():
     # 1. Use a square then a circle to query for cities
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
-    CONSTANT = 3959
-    DISTANCE_THRESHOLD = 3
 
     # lowBoundLat = latitude - 1
     # highBoundLat = latitude + 1
@@ -691,36 +689,72 @@ def checkin():
     #               "LIMIT 0,1")
 
     #results = cursor.callproc("query_checkin", (latitude, longitude))
+    LAT_BUFFER = 0.1
+    DISTANCE_THRESHOLD = 5
 
+    cursor.execute("(" +
+	                   "SELECT * " +
+                       "FROM " +
+                       "(" +
+                           "SELECT *, gcdist(%s, %s, latitude, longitude) AS distance_mi " +
+                           "FROM city " +
+                           "WHERE latitude " +
+                           "BETWEEN (%s - %s) AND (%s + %s) " +
+                           "HAVING distance_mi < %s " +
+                           "ORDER BY distance_mi" +
+	                   ") AS city_tmp " +
+	                   "WHERE population > 0 " +
+	                   "ORDER BY distance_mi " +
+	                   "LIMIT 0,1" +
+                   ")" +
+                   "UNION" +
+                   "(" +
+	                   "SELECT * " +
+                       "FROM " +
+                       "(" +
+		                   "SELECT *, gcdist(%s, %s, latitude, longitude) AS distance_mi " +
+                           "FROM city " +
+                           "WHERE latitude BETWEEN (%s - %s) AND (%s + %s) " +
+                           "HAVING distance_mi < %s " +
+                           "ORDER BY distance_mi" +
+	                   ") AS city_tmp " +
+	                   "ORDER BY distance_mi " +
+                       "LIMIT 0,1" +
+                   ");", (
+                       latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD,
+                       latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD))
 
-    cursor.execute("SELECT * " +
-                   "FROM " +
-                   "(" +
-                   "(" +
-                   "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                   "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                  "sin(radians(latitude)))) AS distance " +
-                  "FROM city " +
-                  "HAVING distance < %s " +
-                  "ORDER BY population DESC " +
-                  "LIMIT 0, 1" +
-                  ")" +
-                  "UNION" +
-                  "(" +
-                  "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-                  "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-                  "sin(radians(latitude)))) AS distance " +
-                  "FROM city " +
-                  "HAVING distance < %s " +
-                  "ORDER BY distance " +
-                  "LIMIT 0, 1" +
-                  ")" +
-                  ") AS distpop " +
-                  "ORDER BY distance ASC, population DESC " +
-                  "LIMIT 0,2;", (
-                      CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
-                      latitude,
-                      DISTANCE_THRESHOLD))
+    # CONSTANT = 3959
+    # DISTANCE_THRESHOLD = 3
+    #
+    # cursor.execute("SELECT * " +
+    #                "FROM " +
+    #                "(" +
+    #                "(" +
+    #                "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #                "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY population DESC " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               "UNION" +
+    #               "(" +
+    #               "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
+    #               "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
+    #               "sin(radians(latitude)))) AS distance " +
+    #               "FROM city " +
+    #               "HAVING distance < %s " +
+    #               "ORDER BY distance " +
+    #               "LIMIT 0, 1" +
+    #               ")" +
+    #               ") AS distpop " +
+    #               "ORDER BY distance ASC, population DESC " +
+    #               "LIMIT 0,2;", (
+    #                   CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
+    #                   latitude,
+    #                   DISTANCE_THRESHOLD))
 
     results = cursor.fetchall()
 
@@ -737,20 +771,15 @@ def checkin():
     # within 5 miles doesn't, return the most populated city.  Otherwise,
     # return the closest city.
 
-    if len(results) == 1:
-        final_result = results[0]
-    elif (results[0][4] == 0) and not (results[1][4] == 0):
-        final_result = results[1]
-    else:
-        final_result = results[0]
+    final_result = results[0]
 
-    cursor.execute("UPDATE user " +
-                   "SET checkin_count=" +
-                   "(" +
-                   "SELECT checkin_count + 1 " +
-                   "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
-                   ") " +
-                   "WHERE username=%s;", (username, username))
+    # cursor.execute("UPDATE user " +
+    #                "SET checkin_count=" +
+    #                "(" +
+    #                "SELECT checkin_count + 1 " +
+    #                "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
+    #                ") " +
+    #                "WHERE username=%s;", (username, username))
 
     cursor.execute("INSERT INTO checkin values(%s, %s, NOW());", (username, str(final_result[0])))
     db.commit()
@@ -957,10 +986,10 @@ def remove():
     # arguments are valid
 
     # remove user from checkin table
-    cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
+    #cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
 
     # remove user from follow table
-    cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
+    #cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
 
     # remove user from user table
     cursor.execute("DELETE FROM user WHERE username=%s;", (username,))
