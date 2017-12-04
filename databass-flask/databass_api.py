@@ -371,7 +371,7 @@ def profile():
     cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
     following_count = cursor.fetchone()
 
-    cursor.execute("SELECT title,description,points FROM achievement WHERE id in (SELECT achievement_id FROM achieve WHERE username =%s;", (username,))
+    cursor.execute("SELECT title,description,points FROM achievement WHERE id in (SELECT achievement_id FROM achieve WHERE username =%s", (username,))
     achievements = cursor.fetchall()
     # The result of this call should be returned as "follower_count":
     cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
