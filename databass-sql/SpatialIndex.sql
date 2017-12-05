@@ -41,11 +41,36 @@ SELECT *, gcdist(@mylat, @mylong, latitude, longitude) AS distance_mi FROM city 
 ORDER BY distance_mi LIMIT 0,1;
 
 // (single closest city) UNION (closest city with non-zero population)
+
 SET @mylat = 51.507351;
 SET @mylong = -0.127758;
 SET @latbuffer = 0.1;
-(SELECT * FROM (SELECT *, gcdist(@mylat, @mylong, latitude, longitude) AS distance_mi FROM city WHERE latitude BETWEEN (@mylat - @latbuffer) AND (@mylat + @latbuffer) HAVING distance_mi < 5 ORDER BY distance_mi) AS city_tmp
-WHERE population > 0 ORDER BY distance_mi LIMIT 0,1)
+(
+	SELECT *
+    FROM
+    (
+		SELECT *, gcdist(@mylat, @mylong, latitude, longitude) AS distance_mi
+        FROM city
+        WHERE latitude
+        BETWEEN (@mylat - @latbuffer) AND (@mylat + @latbuffer)
+        HAVING distance_mi < 5
+        ORDER BY distance_mi
+	) AS city_tmp
+	WHERE population > 0
+	ORDER BY distance_mi
+	LIMIT 0,1
+)
 UNION
-(SELECT * FROM (SELECT *, gcdist(@mylat, @mylong, latitude, longitude) AS distance_mi FROM city WHERE latitude BETWEEN (@mylat - @latbuffer) AND (@mylat + @latbuffer) HAVING distance_mi < 5 ORDER BY distance_mi) AS city_tmp
-ORDER BY distance_mi LIMIT 0,1);
+(
+	SELECT *
+    FROM
+    (
+		SELECT *, gcdist(@mylat, @mylong, latitude, longitude) AS distance_mi
+        FROM city
+        WHERE latitude BETWEEN (@mylat - @latbuffer) AND (@mylat + @latbuffer)
+        HAVING distance_mi < 5
+        ORDER BY distance_mi
+	) AS city_tmp
+	ORDER BY distance_mi
+    LIMIT 0,1
+);
