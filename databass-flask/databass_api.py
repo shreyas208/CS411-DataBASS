@@ -357,25 +357,37 @@ def profile():
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
 
-    cursor.execute("SELECT email_address, display_name, join_date, checkin_count FROM user WHERE username=%s;",
-                   (username,))  # query the database for that user
+    # cursor.execute("SELECT email_address, display_name, join_date, checkin_count FROM user WHERE username=%s;",
+    #                (username,))  # query the database for that user
+    # user_info = cursor.fetchone()
+    #
+    # # we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
+    # email_address = user_info[0]
+    # display_name = user_info[1]
+    # join_date = user_info[2]
+    # checkin_count = user_info[3]
+    #
+    # # The result of this call should be returned as "following_count":
+    # cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
+    # following_count = cursor.fetchone()
+    #
+    # # The result of this call should be returned as "follower_count":
+    # cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
+    # follower_count = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM profile WHERE username=%s;", (username,))  # query the database for that user
     user_info = cursor.fetchone()
 
     # we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
-    email_address = user_info[0]
-    display_name = user_info[1]
-    join_date = user_info[2]
-    checkin_count = user_info[3]
-
-    # The result of this call should be returned as "following_count":
-    cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
-    following_count = cursor.fetchone()
+    email_address = user_info[1]
+    display_name = user_info[2]
+    join_date = user_info[3]
+    checkin_count = user_info[4]
+    following_count = user_info[5]
+    follower_count = user_info[6]
 
     cursor.execute("SELECT title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
     achievements = cursor.fetchall()
-    # The result of this call should be returned as "follower_count":
-    cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
-    follower_count = cursor.fetchone()
 
     cursor.execute("SELECT name, checkin_time, latitude, longitude " +
                    "FROM city, checkin " +
