@@ -377,6 +377,7 @@ def profile():
 
     cursor.execute("SELECT * FROM profile WHERE username=%s;", (username,))  # query the database for that user
     user_info = cursor.fetchone()
+    print(user_info)
 
     # we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
     email_address = user_info[1]
@@ -401,7 +402,7 @@ def profile():
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins,
-               "following_count": following_count[0], "follower_count": follower_count[0], "achievements": achievements}
+               "following_count": following_count, "follower_count": follower_count, "achievements": achievements}
     return jsonify(content), status.HTTP_200_OK
 
 
