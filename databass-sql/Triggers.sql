@@ -46,24 +46,6 @@ delimiter ;
 
 delimiter //
 
-CREATE TRIGGER five_stars_achievement
-AFTER INSERT ON checkin
-FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM checkin
-	WHERE username = NEW.username
-) = 5 THEN
-CALL attain_achievement(NEW.username, "5_stars");
-END IF;
-END; //
-delimiter ;
-
-
-delimiter //
-
 CREATE TRIGGER frequent_traveler
 AFTER INSERT ON checkin
 FOR EACH ROW
@@ -162,7 +144,8 @@ IF
 	SELECT COUNT(*)
 	FROM follow
 	WHERE username_follower = NEW.username_follower
-) = 10 THEN
+) = 10 AND check_achievement(NEW.username_follower, "serial_stalker")
+THEN
 CALL attain_achievement(NEW.username_follower, "serial_stalker");
 END IF;
 END; //
@@ -181,7 +164,8 @@ IF
 	SELECT COUNT(*)
 	FROM follow
 	WHERE username_follower = NEW.username_follower
-) = 1 THEN
+) = 1 AND check_achievement(NEW.username_follower, "stalker")
+THEN
 CALL attain_achievement(NEW.username_follower, "stalker");
 END IF;
 END; //
