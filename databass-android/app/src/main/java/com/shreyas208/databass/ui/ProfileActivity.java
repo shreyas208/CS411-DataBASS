@@ -224,7 +224,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         public void addCheckin(String city) {
-            recentCheckins.add(0, new RecentCheckin(city, "just now"));
+            recentCheckins.add(0, new RecentCheckin(city, "just now", 0, 0));
         }
     }
 

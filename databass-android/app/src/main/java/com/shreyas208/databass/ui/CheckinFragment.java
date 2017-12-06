@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,10 +33,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.LOCATION_SERVICE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CheckinFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
+public class CheckinFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, LocationListener {
 
     private MapView mMapView;
     private GoogleMap mMap;
@@ -78,21 +81,92 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
 
     @SuppressLint("MissingPermission")
     private void continueGetLocation() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (locationManager == null) {
+        LocationManager locationManager;
+        /*if (locationManager == null) {
+            Log.i("INFO", "continueGetLocation bad");
             return;
         }
         mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Log.i("INFO", "continueGetLocation pass");*/
+
+        long MIN_TIME_BW_UPDATES = 10000;
+        float MIN_DISTANCE_CHANGE_FOR_UPDATES = 10000;
+
+        try {
+            locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+
+            if (locationManager == null) {
+                Log.i("INFO", "continueGetLocation locationManager null");
+                return;
+            }
+
+            boolean isGPSEnabled = locationManager
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            boolean isPassiveEnabled = locationManager
+                    .isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
+
+            boolean isNetworkEnabled = locationManager
+                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (isGPSEnabled || isNetworkEnabled || isPassiveEnabled) {
+
+                Log.i("INFO", "Location not Enabled");
+
+                // if GPS Enabled get lat/long using GPS Services
+                if (isGPSEnabled && mLocation == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d("GPS", "GPS Enabled");
+                    mLocation = locationManager
+                            .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+                if (isPassiveEnabled && mLocation == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.PASSIVE_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d("Network", "Network Enabled");
+                    mLocation = locationManager
+                            .getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                }
+
+                if (isNetworkEnabled && mLocation == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d("Network", "Network Enabled");
+                    mLocation = locationManager
+                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+            } else {
+                Log.i("INFO", "Location Not enabled");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         attemptShowLocationOnMap();
     }
 
     private void attemptShowLocationOnMap() {
         if (mMap == null || mLocation == null) {
+            if (mLocation == null) {
+                Log.i("INFO", "mLocation null");
+            } else {
+                Log.i("INFO", "mMap null");
+            }
             return;
         }
         LatLng latLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+        Log.i("INFO", "latitude = " + mLocation.getLatitude());
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        Log.i("INFO", "attemptShowLocationOnMap pass");
     }
 
     private void checkin() {
@@ -181,4 +255,23 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
         mMapView.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
 }
