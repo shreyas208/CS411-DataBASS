@@ -17,11 +17,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Main">
+    <style name="Splash">
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="MainButton" parent="Base.Widget.AppCompat.Button.Borderless">
+    <style name="SplashButton" parent="Base.Widget.AppCompat.Button.Borderless">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/white</item>
     </style>

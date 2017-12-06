@@ -5,7 +5,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.shreyas208.databass.ui.ProfileActivity">
+              tools:context="com.shreyas208.databass.ui.ProfileFragment">
 
     <TextView
         android:id="@+id/profile_tv_display_name"
@@ -133,21 +133,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="6dp"/>
-
-    <LinearLayout
-        android:id="@+id/checkin_ll_checkin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/colorAccentDark">
-
-        <Button
-            android:id="@+id/profile_btn_checkin"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/profile_btn_checkin"
-            style="@style/SplashButton"/>
-
-    </LinearLayout>
 
 </LinearLayout>

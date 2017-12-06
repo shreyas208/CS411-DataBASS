@@ -105,7 +105,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
         } else {
             ((TravelationsApp) getApplication()).setLoginValues(username, loginResponse.getAccessToken(), loginResponse.getEmailAddress(), loginResponse.getDisplayName());
-            Intent i = new Intent(this, ProfileActivity.class);
+            //Intent i = new Intent(this, ProfileActivity.class);
+            Intent i = new Intent(this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
             finish();

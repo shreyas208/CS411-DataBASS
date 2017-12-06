@@ -3,35 +3,51 @@
           package="com.shreyas208.databass">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-    <uses-feature android:name="android.hardware.location.gps" />
-    <uses-feature android:name="android.hardware.location.network" />
+    <uses-feature android:name="android.hardware.location.gps"/>
+    <uses-feature android:name="android.hardware.location.network"/>
 
     <application
         android:name=".TravelationsApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name=".ui.LoginActivity"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".ui.LoginActivity"
             android:label="@string/login_label"/>
-        <activity android:name=".ui.RegisterActivity"
+        <activity
+            android:name=".ui.RegisterActivity"
             android:label="@string/register_label"/>
-        <activity android:name=".ui.ProfileActivity"
+        <activity
+            android:name=".ui.ProfileActivity"
             android:label="@string/profile_label"/>
-        <activity android:name=".ui.SettingsActivity"
+        <activity
+            android:name=".ui.SettingsActivity"
             android:label="@string/settings_label"/>
-        <activity android:name=".ui.MainActivity"
+        <activity
+            android:name=".ui.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ui.MainActivity">
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
     </application>
 
 </manifest>

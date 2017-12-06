@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.shreyas208.databass.ui.CheckinFragment">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/checkin_map_view"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/checkin_ll_checkin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/colorAccentDark">
+
+            <Button
+                android:id="@+id/checkin_btn_checkin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/profile_btn_checkin"
+                style="@style/SplashButton"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

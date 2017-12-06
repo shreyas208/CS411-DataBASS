@@ -3,7 +3,6 @@ package com.shreyas208.databass.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -15,9 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,7 +25,6 @@ import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.CheckinResponse;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
-import com.shreyas208.databass.api.service.DoNothingCallback;
 
 import java.util.List;
 
@@ -73,7 +68,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         tvFollowerCount = findViewById(R.id.profile_tv_follower_count);
         tvFollowingCount = findViewById(R.id.profile_tv_following_count);
         rvRecentCheckins = findViewById(R.id.profile_rv_recent_checkins);
-        llCheckin = findViewById(R.id.profile_ll_checkin);
+        llCheckin = findViewById(R.id.checkin_ll_checkin);
         btnCheckin = findViewById(R.id.profile_btn_checkin);
 
         btnCheckin.setOnClickListener(this);
@@ -148,30 +143,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         btnCheckin.setEnabled(enabled);
         llCheckin.setBackgroundColor(getResources().getColor(enabled ? R.color.colorAccentDark : R.color.gray));
         btnCheckin.setText(enabled ? R.string.profile_btn_checkin : R.string.profile_btn_checking_in);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_profile, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.profile_menu_logout:
-                TravelationsApp.getApi().logout(app.getUsername(), app.getAccessToken()).enqueue(new DoNothingCallback(this.getLocalClassName()));
-                app.clearLoginValues();
-                Intent i = new Intent(this, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(i);
-                finish();
-                break;
-            case R.id.profile_menu_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-        }
-        return true;
     }
 
     public void onClick(View v) {

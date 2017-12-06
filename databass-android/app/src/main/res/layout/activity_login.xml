@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_btn_login"
-            style="@style/MainButton">
+            style="@style/SplashButton">
         </Button>
 
     </LinearLayout>
