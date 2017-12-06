@@ -377,7 +377,6 @@ def profile():
 
     cursor.execute("SELECT * FROM profile WHERE username=%s;", (username,))  # query the database for that user
     user_info = cursor.fetchone()
-    print(user_info)
 
     # we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
     email_address = user_info[1]
