@@ -101,7 +101,7 @@ def register():
     # Insert registration information into user table
     password_hash = bcrypt.generate_password_hash(password)
 
-    cursor.execute("INSERT INTO user values(%s, %s, %s, %s, NOW(), NULL, 0);",
+    cursor.execute("INSERT INTO user values(%s, %s, %s, %s, NOW(), NULL, 0, 0);",
                    (username, email_address, display_name, password_hash))
 
     db.commit()
