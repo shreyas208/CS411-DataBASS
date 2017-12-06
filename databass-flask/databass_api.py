@@ -385,7 +385,7 @@ def profile():
     results = cursor.fetchall()
     cursor.close()
 
-    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": result[2], "longitude": result[3]} for result in results]
+    recent_checkins = [{"city_name": result[0], "checkin_time": results[1], "latitude": results[2], "longitude": result[3]} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins,
