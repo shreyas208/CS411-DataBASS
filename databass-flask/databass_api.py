@@ -406,15 +406,16 @@ def profile(username):
 
     achievements = [{"id": result[0], "title": result[1], "description": result[2], "points": result[3]} for result in results]
 
-    cursor.execute("SELECT name, checkin_time, latitude, longitude, accent_name " +
-                   "FROM city, checkin " +
-                   "WHERE id = city_id AND username=%s " +
+    cursor.execute("SELECT city.name, checkin_time, latitude, longitude, accent_name, country.name " +
+                   "FROM city, checkin, country " +
+                   "WHERE id = city_id AND AND city.country = country.code AND username=%s " +
                    "ORDER BY checkin_time DESC " +
                    "LIMIT 0,15;", (logged_in_username,))
     results = cursor.fetchall()
+
     cursor.close()
 
-    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3]), "accent_name": result[4]} for result in results]
+    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3]), "accent_name": result[4], "country_name": result[5]} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins, "score": score,
