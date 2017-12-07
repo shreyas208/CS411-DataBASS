@@ -1,9 +1,11 @@
-CREATE TRIGGER update_checkin_count
+CREATE TRIGGER update_checkin_count_and_score
 AFTER INSERT ON checkin
 FOR EACH ROW
 UPDATE user
-SET checkin_count = checkin_count+1
+SET checkin_count = checkin_count+1, score = score + 1
 WHERE username = NEW.username;
+
+DROP TRIGGER update_checkin_count
 
 delimiter //
 
