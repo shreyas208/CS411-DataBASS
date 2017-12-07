@@ -888,7 +888,7 @@ def unfollow():
     # finished argument checking here
 
     # remove the follow to the table
-    cursor.execute("DELETE FROM follow WHERE username_follower=%s AND username_followee=%s;",
+    cursor.execute("DELETE FROM follow WHERE username_from=%s AND username_to=%s;",
                    (username_from, username_to))
     db.commit()
     cursor.close()
