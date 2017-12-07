@@ -45,7 +45,8 @@ db = MySQL.connect(host="localhost",
                    port=3306,
                    user="flaskuser",
                    password="tCU8PvBYEPP4qkun",
-                   database="cs_411_project")
+                   database="cs_411_project",
+                   buffered = True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
