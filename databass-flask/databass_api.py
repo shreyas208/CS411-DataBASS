@@ -178,6 +178,7 @@ def login():
     display_name = result[1]
 
     cursor.execute("SELECT email_token FROM user WHERE username=%s;", (username, ))
+    result = cursor.fetchone()
     email_token = result[0]
 
     if email_token is not None:
