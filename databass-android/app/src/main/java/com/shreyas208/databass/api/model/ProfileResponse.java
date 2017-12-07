@@ -19,9 +19,10 @@ public class ProfileResponse {
     @SerializedName("score") private final int score;
     @SerializedName("follower_count") private final int followerCount;
     @SerializedName("following_count") private final int followingCount;
+    @SerializedName("achievements") private final List<Achievement> achievements;
     @SerializedName("recent_checkins") private final List<RecentCheckin> recentCheckins;
 
-    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int score, int followerCount, int followingCount, List<RecentCheckin> recentCheckins) {
+    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int score, int followerCount, int followingCount, List<Achievement> achievements, List<RecentCheckin> recentCheckins) {
         this.success = success;
         this.errorCode = errorCode;
         this.displayName = displayName;
@@ -30,6 +31,7 @@ public class ProfileResponse {
         this.score = score;
         this.followerCount = followerCount;
         this.followingCount = followingCount;
+        this.achievements = achievements;
         this.recentCheckins = recentCheckins;
     }
 
@@ -67,6 +69,10 @@ public class ProfileResponse {
 
     public int getFollowingCount() {
         return followingCount;
+    }
+
+    public List<Achievement> getAchievements() {
+        return achievements;
     }
 
     public List<RecentCheckin> getRecentCheckins() {

@@ -1,10 +1,12 @@
 package com.shreyas208.databass.ui;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -13,11 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.model.Achievement;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 
@@ -43,9 +48,8 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     private TextView tvFollowerCount;
     private TextView tvFollowingCount;
     private TextView tvScore;
+    private RecyclerView rvAchievements;
     private RecyclerView rvRecentCheckins;
-    private LinearLayout llCheckin;
-    private Button btnCheckin;
 
     private TravelationsApp app;
 
@@ -85,8 +89,11 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         tvFollowerCount = getView().findViewById(R.id.profile_tv_follower_count);
         tvFollowingCount = getView().findViewById(R.id.profile_tv_following_count);
         tvScore = getView().findViewById(R.id.profile_tv_score);
+        rvAchievements = getView().findViewById(R.id.profile_rv_achievements);
         rvRecentCheckins = getView().findViewById(R.id.profile_rv_recent_checkins);
-        llCheckin = getView().findViewById(R.id.checkin_ll_checkin);
+
+        rvAchievements.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        rvAchievements.setAdapter(new AchievementsAdapter(new AchievementClickListener(getContext())));
 
         rvRecentCheckins.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         rvRecentCheckins.setAdapter(new RecentCheckinsAdapter());
@@ -138,7 +145,11 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
             tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
             tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
             tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
-            tvScore.setText(String.valueOf(profileResponse.getScore()));    
+            tvScore.setText(String.valueOf(profileResponse.getScore()));
+
+            ((AchievementsAdapter) rvAchievements.getAdapter()).setAchievements(profileResponse.getAchievements());
+            rvAchievements.getAdapter().notifyDataSetChanged();
+
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
 
@@ -170,10 +181,6 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         }
 
         public RecentCheckinsAdapter() { }
-
-        public RecentCheckinsAdapter(List<RecentCheckin> recentCheckins) {
-            this.recentCheckins = recentCheckins;
-        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -211,6 +218,66 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
 
         public void setRecentCheckins(List<RecentCheckin> recentCheckins) {
             this.recentCheckins = recentCheckins;
+        }
+
+    }
+
+    public class AchievementClickListener {
+        private final Context context;
+
+        public AchievementClickListener(final Context context) {
+            this.context = context;
+        }
+
+        public void onClick(Achievement achievement) {
+            TravelationsApp.showToast(context, achievement.getTitle() + ": " + achievement.getDescription());
+        }
+    }
+
+    public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapter.ViewHolder> {
+
+        private List<Achievement> achievements;
+        private AchievementClickListener listener;
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public final ImageView ivIcon;
+
+            public ViewHolder(View v) {
+                super(v);
+                ivIcon = v.findViewById(R.id.achievement_item_icon);
+            }
+        }
+
+        public AchievementsAdapter() { }
+
+        public AchievementsAdapter(AchievementClickListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_achievement_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            final Achievement achievement = achievements.get(position);
+            holder.ivIcon.setImageDrawable(getActivity().getResources().getDrawable(achievement.getDrawable()));
+            holder.ivIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(achievement);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return (achievements == null) ? 0 : achievements.size();
+        }
+
+        public void setAchievements(List<Achievement> achievements) {
+            this.achievements = achievements;
         }
 
     }
