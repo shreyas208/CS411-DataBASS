@@ -746,7 +746,7 @@ def checkin():
 
 
     content = {"success": True, "city_name": final_result[2], "region_name": "NA", "region_code": final_result[3],
-               "country_name": country_name, "country_code": final_result[1], "accent_name": final_result[7]}
+               "country_name": country_name[0], "country_code": final_result[1], "accent_name": final_result[7]}
     return jsonify(content), status.HTTP_200_OK
 
 
