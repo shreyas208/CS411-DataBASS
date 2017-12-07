@@ -99,10 +99,10 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
             public void onResponse(@NonNull Call<CheckinResponse> call, @NonNull Response<CheckinResponse> response) {
                 CheckinResponse checkinResponse = response.body();
                 if (checkinResponse == null) {
-                    Log.e(TravelationsApp.LOG_TAG, "ui.ProfileActivity.continueCheckin.onResponse: response body was null");
+                    Log.e(TravelationsApp.LOG_TAG, "ui.CheckinFragment.checkin.onResponse: response body was null");
                     TravelationsApp.showToast(getActivity(), R.string.profile_toast_checkin_failure);
                 } else if (!checkinResponse.isSuccess()) {
-                    Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getActivity().getLocalClassName(), response.code(), checkinResponse.getErrorCode()));
+                    Log.e(TravelationsApp.LOG_TAG, String.format("ui.CheckinFragment.checkin.onResponse: response was unsuccessful, code: %d, message: %s", getActivity().getLocalClassName(), response.code(), checkinResponse.getErrorCode()));
                     TravelationsApp.showToast(getActivity(), R.string.profile_toast_checkin_failure);
                 } else {
                     TravelationsApp.showToast(getActivity(), String.format("Checked in at %s, %s", checkinResponse.getCityName(), checkinResponse.getCountryCode().toUpperCase()));
@@ -112,7 +112,7 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
 
             @Override
             public void onFailure(@NonNull Call<CheckinResponse> call, @NonNull Throwable t) {
-                Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileActivity.continueCheckin.onFailure: request was unsuccessful, message:\n%s", t.getMessage()));
+                Log.e(TravelationsApp.LOG_TAG, String.format("ui.CheckinFragment.checkin.onFailure: request was unsuccessful, message:\n%s", t.getMessage()));
                 TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
                 setCheckinControlEnabled(true);
             }
