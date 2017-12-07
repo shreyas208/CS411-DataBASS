@@ -406,7 +406,7 @@ def profile(username):
     following_count = user_info[6]
     follower_count = user_info[7]
 
-    cursor.execute("SELECT title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
+    cursor.execute("SELECT id,title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
     achievements = cursor.fetchall()
 
     cursor.execute("SELECT name, checkin_time, latitude, longitude " +
