@@ -1079,7 +1079,7 @@ def send_email_verif(email_address, email_token):
     "content": "Welcome to Travelation!<br />Please verify your account <a href=\"http://fa17-cs411-18.cs.illinois.edu/verify?email_token=" + email_token + "\">here</a>."
     }
 
-    r = requests.post('https://mail.zoho.com/api/accounts/5601770000000008001/messages', json=payload, headers=headers)
+    r = requests.post('https://mail.zoho.com/api/accounts/5601770000000008001/messages', params=payload, headers=headers)
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
