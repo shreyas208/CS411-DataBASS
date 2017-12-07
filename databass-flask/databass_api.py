@@ -1072,7 +1072,7 @@ def email_verify():
 # -------------------------------------------------------------------------------------------------------------------- #
 #email verification request
 def send_email_verif(email_address, email_token):
-    headers = {'Authorization', 'Zoho-authtoken a61e6765b5f28645c9621a7057f29973'}
+    headers = {'Authorization': 'Zoho-authtoken a61e6765b5f28645c9621a7057f29973'}
 
     payload = {
     "fromAddress" : "travelations@shreyas208.com",
