@@ -7,24 +7,37 @@ WHERE username = NEW.username;
 
 delimiter //
 
-CREATE TRIGGER Welcome_Achievement
-AFTER INSERT ON user
+CREATE TRIGGER Welcome_Achievement_Before
+BEFORE INSERT ON user
 FOR EACH ROW
 BEGIN
-	UPDATE user
-    SET score = score +
+	SET NEW.score = 
     (
 		SELECT points
         FROM achievement
         WHERE id = "welcome"
-    )
-    WHERE username = NEW.username;
-    
+    );
+END//
+
+delimiter ;
+
+DROP TRIGGER Welcome_Achievement;
+
+delimiter //
+
+CREATE TRIGGER Welcome_Achievement_After
+AFTER INSERT ON user
+FOR EACH ROW
+BEGIN
     INSERT INTO achieve
     VALUES(NEW.username, "welcome");
 END//
 
 delimiter ;
+
+
+DROP TRIGGER welcome_achievement;
+
 
 delimiter //
 
@@ -188,3 +201,73 @@ CALL attain_achievement(NEW.username, "you_get_around");
 END IF;
 END; //
 delimiter ;
+
+
+
+delimiter //
+
+CREATE TRIGGER recent_checkin_polygon_achievement
+AFTER INSERT ON checkin
+FOR EACH ROW
+BEGIN
+	DECLARE CITY_THRESHOLD INT DEFAULT 5000;
+	
+	DECLARE done BOOLEAN DEFAULT FALSE;
+    DECLARE beginning POINT;
+    DECLARE p POINT;
+    DECLARE poly VARCHAR(255) DEFAULT 'POLYGON((';
+    DECLARE count INT DEFAULT 0;
+        
+	DECLARE cur CURSOR FOR
+    (
+		SELECT DISTINCT location
+		FROM city, checkin
+		WHERE id = city_id AND checkin.username = NEW.username
+		ORDER BY checkin_time DESC
+		LIMIT 0,15
+	);
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    OPEN cur;
+	
+	read_loop: LOOP
+		IF count = 0 THEN
+			FETCH cur INTO beginning;
+            
+            IF done THEN
+				LEAVE read_loop;
+            ELSE
+				SET p = beginning;
+			END IF;
+		ELSE
+			FETCH cur INTO p;
+		END IF;
+        
+		IF done THEN
+			LEAVE read_loop;
+		END IF;
+        
+        SET poly = CONCAT(poly, p.STX, ' ', p.STY, ', ');
+        
+        SET count = count + 1;
+	END LOOP;
+    
+    SET poly = CONCAT(poly, beginning.STX, ' ', beginning.STY, '))');
+    #Contains(GeomFromText('POLYGON((41.000497 -109.050149, 41.002380 -102.051881, 36.993237 -102.041959, 36.999037 -109.045220, 41.000497 -109.050149))'), location);
+	
+	IF
+	(
+		SELECT COUNT(*)
+        FROM city
+        WHERE Contains(GeomFromText(poly), location)
+	) >= CITY_THRESHOLD THEN
+	CALL attain_achievement(NEW.username, "recent_checkin_polygon");
+	END IF;
+    
+	CLOSE cur;
+END; //
+
+delimiter ;
+
+DROP TRIGGER recent_checkin_polygon_achievement;
