@@ -18,7 +18,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.maps.model.SquareCap;
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.ProfileResponse;
@@ -45,6 +44,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
     private Set<String> cities;
     private List<LatLng> allCoordinates;
 
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -62,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
         mMapView.getMapAsync(this);
 
         return v;
+
     }
 
     @Override
@@ -91,11 +92,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
                 .endCap(new RoundCap())
                 .jointType(JointType.ROUND));
 
-
     }
 
     @Override
     public void onResume() {
+
         super.onResume();
         Log.i("INFO", "onResume");
 
@@ -106,6 +107,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
         TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), app.getUsername()).enqueue(this);
 
         mMapView.onResume();
+
     }
 
     @Override
@@ -116,6 +118,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
 
     @Override
     public void onStop() {
+
         super.onStop();
         Log.i("INFO", "onStop");
 
@@ -124,36 +127,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
         allCoordinates = null;
 
         mMapView.onStop();
+
     }
 
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         mMapView.onDestroy();
+
     }
 
     @Override
     public void onLowMemory() {
+
         super.onLowMemory();
         mMapView.onLowMemory();
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
+
     }
 
     @Override
     public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
+
         ProfileResponse profileResponse = response.body();
+
         if (profileResponse == null) {
+
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", "MapFragment"));
-            TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+            TravelationsApp.showToast(getActivity(), R.string.map_toast_failure);
+
         } else if (!profileResponse.isSuccess()) {
+
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", "MapFragment", profileResponse.getErrorCode()));
-            TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+            TravelationsApp.showToast(getActivity(), R.string.map_toast_failure);
+
         } else {
+
             for (RecentCheckin checkin : profileResponse.getRecentCheckins()) {
                 if (!cities.contains(checkin.getCityName())) {
                     cities.add(checkin.getCityName());
@@ -161,13 +178,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
                 }
                 allCoordinates.add(new LatLng(checkin.getLatitude(), checkin.getLongitude()));
             }
+
             attemptAddMarkersToMap();
+
         }
     }
 
     @Override
     public void onFailure(@NonNull Call<ProfileResponse> call, Throwable t) {
+
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", "MapFragment", t.getMessage()));
         TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
+
     }
 }
