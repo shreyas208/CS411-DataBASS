@@ -11,6 +11,7 @@ from flask_api import status
 from flask_bcrypt import Bcrypt
 
 import requests
+import db_config as dbc
 
 # Connects Flask server to MySQL database
 import mysql.connector as MySQL
@@ -35,11 +36,11 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
 # Connect to the project database on the VM
-db = MySQL.connect(host="localhost",
-                   port=3306,
-                   user="flaskuser",
-                   password="tCU8PvBYEPP4qkun",
-                   database="cs_411_project",
+db = MySQL.connect(host=dbc.db_host,
+                   port=dbc.db_port,
+                   user=dbc.db_user,
+                   password=dbc.db_password,
+                   database=dbc.db_name,
                    buffered = True)
 
 
