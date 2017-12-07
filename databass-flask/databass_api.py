@@ -1,10 +1,3 @@
-# To-Do List:
-
-# 1. Map country and region codes to their actual names
-# 2. TEST THE FUNTIONALITY EXTENSIVELY!
-
-# -------------------------------------------------------------------------------------------------------------------- #
-
 # Import flask libraries
 from flask import Flask, request, jsonify
 from flask_api import status
@@ -368,27 +361,6 @@ def profile(username):
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_200_OK
 
-    # If this line of the profile() function is reached,
-    # all the profile input parameters are valid.
-
-    # cursor.execute("SELECT email_address, display_name, join_date, checkin_count FROM user WHERE username=%s;",
-    #                (username,))  # query the database for that user
-    # user_info = cursor.fetchone()
-    #
-    # # we need to get email_address, display_name, join_datetime, checkin_count, and recent_checkins
-    # email_address = user_info[0]
-    # display_name = user_info[1]
-    # join_date = user_info[2]
-    # checkin_count = user_info[3]
-    #
-    # # The result of this call should be returned as "following_count":
-    # cursor.execute("SELECT COUNT(*) FROM follow WHERE username_follower=%s", (username,))
-    # following_count = cursor.fetchone()
-    #
-    # # The result of this call should be returned as "follower_count":
-    # cursor.execute("SELECT COUNT(*) FROM follow WHERE username_followee=%s", (username,))
-    # follower_count = cursor.fetchone()
-
     cursor.execute("SELECT * FROM profile WHERE username=%s;", (username,))  # query the database for that user
     user_info = cursor.fetchone()
 
@@ -680,13 +652,6 @@ def checkin():
         return jsonify(content), status.HTTP_200_OK
 
     # Distance is in miles
-    # Paris latitude: 48.856062
-    # Paris longitude: 2.347510
-
-    # Suggestions for improving performance:
-    # 1. Use a square then a circle to query for cities
-    # 2. Parallel query execution- Run the two queries in Parallel
-    # 3. Run the query once in SQL and sort it twice in Python
 
     LAT_BUFFER = 0.1
     DISTANCE_THRESHOLD = 5
