@@ -15,6 +15,7 @@
 from flask import Flask, request, jsonify
 from flask_api import status
 from flask_bcrypt import Bcrypt
+
 import requests
 
 # Connects Flask server to MySQL database
@@ -45,7 +46,7 @@ db = MySQL.connect(host="localhost",
                    user="flaskuser",
                    password="tCU8PvBYEPP4qkun",
                    database="cs_411_project",
-                   buffered=True)
+                   buffered = True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -66,7 +67,7 @@ def register():
                                         ("display_name", display_name)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("register",
                                  username=username,
@@ -75,7 +76,7 @@ def register():
                                  display_name=display_name)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -95,7 +96,7 @@ def register():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the register() function is reached,
     # all the registration input parameters are valid.
@@ -131,12 +132,12 @@ def login():
     check = check_for_none("login", [("username", username), ("password", password)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("login", username=username, password=password)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -160,7 +161,7 @@ def login():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     # Check if the input password matches the password hash in the user table and therefore, correct
     is_correct_password = bcrypt.check_password_hash(str(result[2]), password)
@@ -171,7 +172,7 @@ def login():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     email = result[0]
     display_name = result[1]
@@ -185,7 +186,7 @@ def login():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     # Generate an access token and insert it into the user table
     access_token = binascii.hexlify(os.urandom(32)).decode()
@@ -211,12 +212,12 @@ def logout():
     check = check_for_none("logout", [("username", username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("logout", username=username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -237,14 +238,14 @@ def logout():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the logout() function is reached,
     # all the logout input parameters are valid.
@@ -272,12 +273,12 @@ def search():
     check = check_for_none("search", [("username", username), ("search_username", search_username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("search", username=username, username2=search_username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -298,14 +299,14 @@ def search():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # Find all usernames similar to the provided username
     cursor.execute("SELECT username, display_name FROM user WHERE username LIKE %s;", (search_username + "%",))
@@ -316,7 +317,7 @@ def search():
         error_code = "user_search_no_results_found"
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     users = [{"username": result[0], "display_name": result[1]} for result in results]
 
@@ -337,12 +338,12 @@ def profile(username):
     check = check_for_none("profile", [("username", logged_in_username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("profile", username=logged_in_username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -363,14 +364,14 @@ def profile(username):
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
@@ -405,8 +406,10 @@ def profile(username):
     following_count = user_info[6]
     follower_count = user_info[7]
 
-    cursor.execute("SELECT title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
-    achievements = cursor.fetchall()
+    cursor.execute("SELECT id,title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
+    results = cursor.fetchall()
+
+    achievement = [{"id": result[0], "title": result[1], "description": result[2], "points": result[3]} for result in results]
 
     cursor.execute("SELECT name, checkin_time, latitude, longitude " +
                    "FROM city, checkin " +
@@ -440,12 +443,12 @@ def change_password():
                            [("username", username), ("old_password", old_password), ("new_password", new_password)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("changePassword", username=username, password=old_password, password2=new_password)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -468,7 +471,7 @@ def change_password():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     # Check if the old password matches the password hash in the user table and therefore, correct
     is_correct_password = bcrypt.check_password_hash(str(result[0]), old_password)
@@ -479,14 +482,14 @@ def change_password():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[1]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changePassword() function is reached,
     # all the password change input parameters are valid.
@@ -516,12 +519,12 @@ def change_display_name():
     check = check_for_none("changeDisplayName", [("username", username), ("display_name", display_name)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("changeDisplayName", username=username, display_name=display_name)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -544,14 +547,14 @@ def change_display_name():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changeDisplayName() function is reached,
     # all the display name change input parameters are valid.
@@ -579,12 +582,12 @@ def change_email_address():
     check = check_for_none("changeEmailAddress", [("username", username), ("email_address", email_address)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("changeEmailAddress", username=username, email_address=email_address)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -607,14 +610,14 @@ def change_email_address():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changeEmailAddress() function is reached,
     # all the email address change input parameters are valid.
@@ -643,12 +646,12 @@ def checkin():
     check = check_for_none("checkin", [("username", username), ("latlong", latitude), ("latlong", longitude)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("checkin", username=username, latitude=latitude, longitude=longitude)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -671,14 +674,14 @@ def checkin():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # Distance is in miles
     # Paris latitude: 48.856062
@@ -794,7 +797,7 @@ def checkin():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     # Determine which city to return and check the user into.
     #
@@ -835,12 +838,12 @@ def follow():
                            [("follower_username", follower_username), ("followee_username", followee_username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("follow", username=follower_username, username2=followee_username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -863,14 +866,14 @@ def follow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
@@ -881,7 +884,7 @@ def follow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
     # finished argument checking here
 
     # add the follow to the table
@@ -907,12 +910,12 @@ def unfollow():
                            [("follower_username", follower_username), ("followee_username", followee_username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("unfollow", username=follower_username, username2=followee_username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -935,14 +938,14 @@ def unfollow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
@@ -953,7 +956,7 @@ def unfollow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
     # finished argument checking here
 
     # remove the follow to the table
@@ -979,12 +982,12 @@ def remove():
     check = check_for_none("remove", [("username", username)])
 
     if check is not None:
-        return jsonify(check), status.HTTP_400_BAD_REQUEST
+        return jsonify(check), status.HTTP_200_OK
 
     check2 = validate_parameters("remove", username=username)
 
     if check2 is not None:
-        return jsonify(check2), status.HTTP_400_BAD_REQUEST
+        return jsonify(check2), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -1005,14 +1008,14 @@ def remove():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     elif not (access_token == result[0]):
         error_code = "user_bad_access_token"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # arguments are valid
 
@@ -1036,12 +1039,12 @@ def remove():
 # Verify Email
 @app.route("/verify", methods=["GET"])
 def email_verify():
-    email_token = request.form.get('email_token')
+    email_token = request.args.get('email_token')
 
     if email_token is None:
         error_code = "invalid_email_token"
         content  ={"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
+        return jsonify(content), status.HTTP_200_OK
 
     try:
         cursor = db.cursor()
@@ -1051,7 +1054,6 @@ def email_verify():
         content = {"success": False, "error_code": error_code}
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
-
     cursor.execute("SELECT username FROM user WHERE email_token=%s;", (email_token,))
     result = cursor.fetchone()
 
@@ -1060,8 +1062,7 @@ def email_verify():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_400_BAD_REQUEST
-
+        return jsonify(content), status.HTTP_200_OK
     cursor.execute("UPDATE user SET email_token = NULL WHERE email_token=%s;",(email_token,))
     db.commit()
     cursor.close()
@@ -1168,11 +1169,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
 
     # Check if email_address is valid
     if email_address is not None:
-        #email_regex = re.compile(r"([a-zA-Z0-9]+)@([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)")
-        #email_regex_str = r'''(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"'''
-
-        email_regex = re.compile(r"/^\S+@\S+\.\S+$/")
-
+        email_regex = re.compile(r"[^@]+@[^@]+\.[^@]+")
         if not email_regex.match(email_address):
             error_code = "user_" + function_name + "_invalid_email"
 
