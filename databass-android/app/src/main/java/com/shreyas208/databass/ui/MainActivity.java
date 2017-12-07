@@ -107,8 +107,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
+    private void clearBackStack() {
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+            getSupportFragmentManager().popBackStackImmediate();
+        }
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        clearBackStack();
         if (item.getItemId() == R.id.nav_checkin) {
             getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, new CheckinFragment()).commit();
         } else if (item.getItemId() == R.id.nav_profile) {
@@ -164,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     protected void showFeed() {
         FeedFragment fragment = new FeedFragment();
-        getSupportFragmentManager().popBackStackImmediate();
+        clearBackStack();
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).commit();
     }
 
