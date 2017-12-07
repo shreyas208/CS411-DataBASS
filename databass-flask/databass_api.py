@@ -179,7 +179,7 @@ def login():
     cursor.execute("SELECT email_token FROM user WHERE username=%s;", (username, ))
     email_token = result[0]
 
-    if email_token != NULL:
+    if email_token is not None:
         error_code = "user_email_not_verified"
         cursor.close()
 
@@ -243,7 +243,7 @@ def logout():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the logout() function is reached,
     # all the logout input parameters are valid.
@@ -304,7 +304,7 @@ def search():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # Find all usernames similar to the provided username
     cursor.execute("SELECT username, display_name FROM user WHERE username LIKE %s;", (search_username + "%",))
@@ -369,7 +369,7 @@ def profile(username):
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the profile() function is reached,
     # all the profile input parameters are valid.
@@ -484,7 +484,7 @@ def change_password():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changePassword() function is reached,
     # all the password change input parameters are valid.
@@ -549,7 +549,7 @@ def change_display_name():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changeDisplayName() function is reached,
     # all the display name change input parameters are valid.
@@ -612,7 +612,7 @@ def change_email_address():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # If this line of the changeEmailAddress() function is reached,
     # all the email address change input parameters are valid.
@@ -676,7 +676,7 @@ def checkin():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # Distance is in miles
     # Paris latitude: 48.856062
@@ -868,7 +868,7 @@ def follow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
@@ -940,7 +940,7 @@ def unfollow():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
     result = cursor.fetchone()
@@ -1010,7 +1010,7 @@ def remove():
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
-        return jsonify(content), status.HTTP_403_FORBIDDEN
+        return jsonify(content), status.HTTP_200_OK
 
     # arguments are valid
 
