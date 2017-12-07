@@ -1,13 +1,7 @@
 # To-Do List:
 
-# 1. Add checks to each function to see if any of the parameters are None/NULL
-# 2. Add constraints to display_name and other parameters to avoid SQL Injection (a display name or parameter containing SQL queries)
-# 3. Add foreign key constraints to the checkin and follow tables to ensure proper updates and deletions
-# 4. Complete the search function
-# 5. Update the profile function to only return checkins over the past (week?  3 days?)
-# 6. Map country and region codes to their actual names
-# 7. Optimize the checkin query (currently takes about 6 secons to run)
-# 8. TEST THE FUNTIONALITY EXTENSIVELY!
+# 1. Map country and region codes to their actual names
+# 2. TEST THE FUNTIONALITY EXTENSIVELY!
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
@@ -59,7 +53,7 @@ def register():
     password = request.form.get('password')  # String (6 <= characters <= 256)
     email_address = request.form.get('email_address')  # String (valid email)
     display_name = request.form.get('display_name')  # String (1 <= characters <= 265)
-
+    print(username)
     # Check if all the registration input parameters are valid
     check = check_for_none("register", [("username", username),
                                         ("password", password),
@@ -692,37 +686,6 @@ def checkin():
     # 2. Parallel query execution- Run the two queries in Parallel
     # 3. Run the query once in SQL and sort it twice in Python
 
-    # lowBoundLat = latitude - 1
-    # highBoundLat = latitude + 1
-    # lowBoundLong = longitude - 1
-    # highBoundLong = longitude + 1
-    # cursor.execute("SELECT * " +
-    #               "FROM " +
-    #               "(" +
-    #                   "(" +
-    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-    #                       "sin(radians(latitude)))) AS distance " +
-    #                       "FROM city " +
-    #                       "HAVING distance < 5 " +
-    #                       "ORDER BY population DESC " +
-    #                       "LIMIT 0, 1" +
-    #                   ")" +
-    #                   "UNION" +
-    #                   "(" +
-    #                       "SELECT *, (3959 * acos(cos(radians(" + latitude + ")) * cos(radians(latitude)) * " +
-    #                       "cos(radians(longitude) - radians(" + longitude + ")) + sin(radians(" + latitude + ")) * " +
-    #                       "sin(radians(latitude)))) AS distance " +
-    #                       "FROM city " +
-    #                       "HAVING distance < 5 " +
-    #                       "ORDER BY distance " +
-    #                       "LIMIT 0, 1" +
-    #                   ")" +
-    #               ") AS distpop " +
-    #               "ORDER BY population DESC, distance ASC " +
-    #               "LIMIT 0,1")
-
-    #results = cursor.callproc("query_checkin", (latitude, longitude))
     LAT_BUFFER = 0.1
     DISTANCE_THRESHOLD = 5
 
@@ -758,38 +721,6 @@ def checkin():
                        latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD,
                        latitude, longitude, latitude, LAT_BUFFER, latitude, LAT_BUFFER, DISTANCE_THRESHOLD))
 
-    # CONSTANT = 3959
-    # DISTANCE_THRESHOLD = 3
-    #
-    # cursor.execute("SELECT * " +
-    #                "FROM " +
-    #                "(" +
-    #                "(" +
-    #                "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-    #                "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-    #               "sin(radians(latitude)))) AS distance " +
-    #               "FROM city " +
-    #               "HAVING distance < %s " +
-    #               "ORDER BY population DESC " +
-    #               "LIMIT 0, 1" +
-    #               ")" +
-    #               "UNION" +
-    #               "(" +
-    #               "SELECT *, (%s * acos(cos(radians(%s)) * cos(radians(latitude)) * " +
-    #               "cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * " +
-    #               "sin(radians(latitude)))) AS distance " +
-    #               "FROM city " +
-    #               "HAVING distance < %s " +
-    #               "ORDER BY distance " +
-    #               "LIMIT 0, 1" +
-    #               ")" +
-    #               ") AS distpop " +
-    #               "ORDER BY distance ASC, population DESC " +
-    #               "LIMIT 0,2;", (
-    #                   CONSTANT, latitude, longitude, latitude, DISTANCE_THRESHOLD, CONSTANT, latitude, longitude,
-    #                   latitude,
-    #                   DISTANCE_THRESHOLD))
-
     results = cursor.fetchall()
 
     if not results:
@@ -799,21 +730,11 @@ def checkin():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_200_OK
 
-    # Determine which city to return and check the user into.
-    #
     # If the closest city has no population and the most populated city
     # within 5 miles doesn't, return the most populated city.  Otherwise,
     # return the closest city.
 
     final_result = results[0]
-
-    # cursor.execute("UPDATE user " +
-    #                "SET checkin_count=" +
-    #                "(" +
-    #                "SELECT checkin_count + 1 " +
-    #                "FROM (SELECT checkin_count FROM user WHERE username=%s) AS intermediate" +
-    #                ") " +
-    #                "WHERE username=%s;", (username, username))
 
     cursor.execute("INSERT INTO checkin values(%s, %s, NOW());", (username, str(final_result[0])))
     db.commit()
@@ -1019,12 +940,6 @@ def remove():
 
     # arguments are valid
 
-    # remove user from checkin table
-    #cursor.execute("DELETE FROM checkin WHERE username=%s;", (username,))
-
-    # remove user from follow table
-    #cursor.execute("DELETE FROM follow WHERE username_follower=%s OR username_followee=%s;", (username, username))
-
     # remove user from user table
     cursor.execute("DELETE FROM user WHERE username=%s;", (username,))
     db.commit()
@@ -1170,6 +1085,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     # Check if email_address is valid
     if email_address is not None:
         email_regex = re.compile(r"[^@]+@[^@]+\.[^@]+")
+
         if not email_regex.match(email_address):
             error_code = "user_" + function_name + "_invalid_email"
 
