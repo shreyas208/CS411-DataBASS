@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 
 public interface TravelationsAPI {
@@ -37,10 +38,11 @@ public interface TravelationsAPI {
                         @Field("access_token") String accessToken,
                         @Field("search_username") String searchUsername);
 
-    @POST("user/profile")
+    @POST("user/profile/{requestUsername}")
     @FormUrlEncoded
     Call<ProfileResponse> profile(@Field("username") String username,
-                                  @Field("access_token") String accessToken);
+                                  @Field("access_token") String accessToken,
+                                  @Path("requestUsername") String requestUsername);
 
     @POST("user/checkin")
     @FormUrlEncoded
