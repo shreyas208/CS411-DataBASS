@@ -415,7 +415,7 @@ def profile(username):
 
     cursor.close()
 
-    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3]), "accent_name": result[4], "country_name": result[5]} for result in results]
+    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3]), "accent_name": result[4], "country_name": result[5][0]} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins, "score": score,
