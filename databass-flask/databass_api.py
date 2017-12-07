@@ -736,12 +736,17 @@ def checkin():
 
     final_result = results[0]
 
+    country_code = final_result[1]
+    cursor.execute("SELECT name FROM country WHERE code=%s;",(country_code,))
+    country_name = cursor.fetchone()
+
     cursor.execute("INSERT INTO checkin values(%s, %s, NOW());", (username, str(final_result[0])))
     db.commit()
     cursor.close()
 
+
     content = {"success": True, "city_name": final_result[2], "region_name": "NA", "region_code": final_result[3],
-               "country_name": "NA", "country_code": final_result[1], "accent_name": final_result[7]}
+               "country_name": country_name, "country_code": final_result[1], "accent_name": final_result[7]}
     return jsonify(content), status.HTTP_200_OK
 
 
