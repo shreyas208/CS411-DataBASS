@@ -100,6 +100,9 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         } else {
             tvDisplayName.setText(profileResponse.getDisplayName());
             tvJoinDate.setText(profileResponse.getJoinDate());
+            tvCheckinCount.setText(profileResponse.getCheckinCount());
+            tvFollowerCount.setText(profileResponse.getFollowerCount());
+            tvFollowingCount.setText(profileResponse.getFollowingCount());
         }
     }
 
