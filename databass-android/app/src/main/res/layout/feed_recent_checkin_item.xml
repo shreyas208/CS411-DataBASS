@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/checkin_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/profile_view_spacing"
+    android:paddingRight="@dimen/profile_view_spacing"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/checkin_item_city_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darkGray"
+            android:textSize="18sp"
+            tools:text="Champaign"/>
+
+        <TextView
+            android:id="@+id/checkin_item_byline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darkGray"
+            android:textSize="15sp"
+            tools:text="Thu, 16 Nov 2017 18:23:47 GMT"/>
+
+</LinearLayout>

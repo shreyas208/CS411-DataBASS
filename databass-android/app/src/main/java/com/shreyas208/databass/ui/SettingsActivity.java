@@ -137,6 +137,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
-
+        TravelationsApp.showToast(this, R.string.settings_toast_failure);
+        setControlsEnabled(true);
     }
 }

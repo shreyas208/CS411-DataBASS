@@ -66,6 +66,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        getActivity().setTitle("Map");
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;

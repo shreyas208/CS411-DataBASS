@@ -116,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).commit();
         } else if (item.getItemId() == R.id.nav_map) {
             getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, new MapFragment()).commit();
+        } else if (item.getItemId() == R.id.nav_feed) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, new FeedFragment()).commit();
         }
         return true;
     }
@@ -153,6 +155,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (mLocation != null) {
             locationSubscriber.newLocation();
         }
+    }
+
+    protected void showProfile(String username) {
+        ProfileFragment fragment = ProfileFragment.newInstance(username);
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).addToBackStack(null).commit();
     }
 
     protected void removeLocationSubscriber() {
