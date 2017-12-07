@@ -14,7 +14,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:background="@color/colorAccent"/>
 
     <LinearLayout
@@ -23,7 +23,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="6dp"
         android:orientation="horizontal"
         android:clipChildren="false"
         android:clipToPadding="false">

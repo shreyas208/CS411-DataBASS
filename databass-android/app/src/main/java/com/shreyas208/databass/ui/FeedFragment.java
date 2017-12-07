@@ -77,9 +77,9 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
     private void attemptFollowUser() {
         setFollowUserControlsEnabled(false);
 
-        String followUsername = etFollowUsername.getText().toString();
+        final String followUsername = etFollowUsername.getText().toString();
         if (followUsername.isEmpty()) {
-            setFollowUserControlsEnabled(false);
+            setFollowUserControlsEnabled(true);
             TravelationsApp.showToast(getActivity(), R.string.feed_toast_follow_username_empty);
             return;
         }
@@ -87,13 +87,25 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
         TravelationsApp.getApi().follow(app.getUsername(), app.getAccessToken(), followUsername).enqueue(new Callback<GenericResponse>() {
             @Override
             public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
-
+                GenericResponse genericResponse = response.body();
+                if (genericResponse == null) {
+                    Log.e(TravelationsApp.LOG_TAG, "ui.FeedFragment.follow.onResponse: response body was null");
+                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_failure);
+                } else if (!genericResponse.isSuccess()) {
+                    Log.e(TravelationsApp.LOG_TAG, String.format("ui.FeedFragment.follow.onResponse: response was unsuccessful, message: %s", genericResponse.getErrorCode()));
+                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_failure);
+                } else {
+                    TravelationsApp.showToast(getActivity(), "Followed " + followUsername);
+                    TravelationsApp.getApi().feed(app.getUsername(), app.getAccessToken()).enqueue(FeedFragment.this);
+                }
+                setFollowUserControlsEnabled(true);
             }
 
             @Override
             public void onFailure(Call<GenericResponse> call, Throwable t) {
-                Log.e(TravelationsApp.LOG_TAG, String.format("%s.follow.onFailure: request was unsuccessful, message: %s", "FeedFragment", t.getMessage()));
+                Log.e(TravelationsApp.LOG_TAG, String.format("ui.FeedFragment.follow.onFailure: request was unsuccessful, message: %s", t.getMessage()));
                 TravelationsApp.showToast(getActivity(), R.string.feed_toast_follow_failure);
+                setFollowUserControlsEnabled(true);
             }
         });
     }
@@ -108,7 +120,6 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
             Log.e(TravelationsApp.LOG_TAG, String.format("ui.FeedFragment.onResponse: response was unsuccessful, message: %s", feedResponse.getErrorCode()));
             TravelationsApp.showToast(getActivity(), R.string.feed_toast_failure);
         } else {
-            Log.i("LT", String.valueOf(feedResponse.getCheckins().size()));
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(feedResponse.getCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
         }
@@ -202,7 +213,9 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
 
     @Override
     public void onClick(View v) {
-
+        if (v.getId() == R.id.feed_fab_follow) {
+            attemptFollowUser();
+        }
     }
 
 }
