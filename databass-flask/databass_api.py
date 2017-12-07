@@ -53,7 +53,7 @@ def register():
     password = request.form.get('password')  # String (6 <= characters <= 256)
     email_address = request.form.get('email_address')  # String (valid email)
     display_name = request.form.get('display_name')  # String (1 <= characters <= 265)
-    print(username)
+
     # Check if all the registration input parameters are valid
     check = check_for_none("register", [("username", username),
                                         ("password", password),
@@ -1015,7 +1015,7 @@ def root():
 def check_for_none(function_name, params):
     for param in params:
         if param[1] is None:
-            error_code = "user_" + function_name + "_invalid_" + param[0]
+            error_code = "user_" + function_name + "_empty_field"
             content = {"success": False, "error_code": error_code}
             return content
     return None
