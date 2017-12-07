@@ -40,6 +40,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -56,10 +57,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         btnRegister.setOnClickListener(this);
         tvLogin.setOnClickListener(this);
+
     }
 
     public void onClick(View v) {
+
         switch (v.getId()) {
+
             case R.id.register_btn_register:
                 attemptRegistration();
                 break;
@@ -67,10 +71,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
                 break;
+
         }
+
     }
 
     private void setControlsEnabled(boolean enabled) {
+
         etUsername.setEnabled(enabled);
         etPassword.setEnabled(enabled);
         etConfirmPassword.setEnabled(enabled);
@@ -80,9 +87,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         tvLogin.setEnabled(enabled);
         llRegister.setBackgroundColor(getResources().getColor(enabled ? R.color.colorAccentDark : R.color.gray));
         btnRegister.setText(enabled ? R.string.register_btn_register : R.string.register_btn_registering);
+
     }
 
     private void attemptRegistration() {
+
         setControlsEnabled(false);
 
         String username = etUsername.getText().toString();
@@ -110,32 +119,44 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
         TravelationsApp.getApi().register(username, password, emailAddress, displayName).enqueue(this);
+
     }
 
     @Override
     public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+
         GenericResponse genericResponse = response.body();
+
         if (genericResponse == null) {
+
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
             setControlsEnabled(true);
             TravelationsApp.showToast(this, R.string.register_toast_failure);
+
         } else if (!genericResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), genericResponse.getErrorCode()));
+
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", getLocalClassName(), genericResponse.getErrorCode()));
             setControlsEnabled(true);
-            TravelationsApp.showToast(this, R.string.register_toast_failure);
+            TravelationsApp.showToast(this, genericResponse.getErrorString());
+
         } else {
+
             TravelationsApp.showToast(this, R.string.register_toast_success);
             Intent i = new Intent(this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
             finish();
+
         }
+
     }
 
     @Override
     public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message: %s", this.getLocalClassName(), t.getMessage()));
         setControlsEnabled(true);
         TravelationsApp.showToast(this, R.string.toast_request_failure);
+
     }
 }

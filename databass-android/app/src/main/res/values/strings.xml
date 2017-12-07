@@ -28,7 +28,11 @@
     <string name="register_tv_login">Already have an account? Log in ></string>
     <string name="register_toast_empty_field">All fields must be filled.</string>
     <string name="register_toast_password_mismatch">Password and Confirm Password do not match.</string>
+    <string name="register_toast_bad_credentials">Username or password is incorrectly formatted.</string>
     <string name="register_toast_invalid_email">Email address is not valid.</string>
+    <string name="register_toast_invalid_display_name">Display name is not valid.</string>
+    <string name="register_toast_invalid_password">Password is invalid.</string>
+    <string name="register_toast_username_in_use">Username is already in use.</string>
     <string name="register_toast_success">Registration successful! Please check your email to activate your account.</string>
     <string name="register_toast_failure">Registration failed. Please try again.</string>
 
