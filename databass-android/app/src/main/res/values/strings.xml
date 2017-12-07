@@ -49,6 +49,7 @@
     <string name="profile_tv_checkin_count_label">Checkins</string>
     <string name="profile_tv_follower_count_label">Followers</string>
     <string name="profile_tv_following_count_label">Following</string>
+    <string name="profile_tv_score_label">Score</string>
     <string name="profile_tv_recent_checkins">Recent Checkins</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
 
