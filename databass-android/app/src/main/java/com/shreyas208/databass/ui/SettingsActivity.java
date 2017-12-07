@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.shreyas208.databass.R;
@@ -26,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private EditText etDisplayName, etEmailAddress;
     private FloatingActionButton fabDisplayName, fabEmailAddress;
+    private Button removeUserButton;
 
     /**
      * Creates the Settings Activity instance.
@@ -42,9 +44,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         fabDisplayName = findViewById(R.id.settings_fab_display_name);
         etEmailAddress = findViewById(R.id.settings_et_email_address);
         fabEmailAddress = findViewById(R.id.settings_fab_email_address);
+        removeUserButton = findViewById(R.id.settings_button_remove_user);
 
         fabDisplayName.setOnClickListener(this);
         fabEmailAddress.setOnClickListener(this);
+        removeUserButton.setOnClickListener(this);
 
         etDisplayName.setText(app.getDisplayName());
         etEmailAddress.setText(app.getEmailAddress());
@@ -57,6 +61,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.settings_fab_email_address:
                 attemptChangeEmailAddress();
+                break;
+            case R.id.settings_button_remove_user:
+                attemptRemoveUser();
                 break;
         }
     }
@@ -74,6 +81,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private void setEmailAddressControlsEnabled(boolean enabled) {
         etEmailAddress.setEnabled(enabled);
         fabEmailAddress.setEnabled(enabled);
+    }
+
+    private void setRemoveControlsEnabled(boolean enabled) {
+        removeUserButton.setEnabled(enabled);
+    }
+
+    private void attemptRemoveUser() {
+        setRemoveControlsEnabled(false);
+        TravelationsApp.getApi().remove(app.getUsername(), app.getAccessToken());
     }
 
     private void attemptChangeDisplayName() {
