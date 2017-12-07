@@ -408,7 +408,7 @@ def profile(username):
 
     cursor.execute("SELECT city.name, checkin_time, latitude, longitude, accent_name, country.name " +
                    "FROM city, checkin, country " +
-                   "WHERE id = city_id AND AND city.country = country.code AND username=%s " +
+                   "WHERE id = city_id AND city.country = country.code AND username=%s " +
                    "ORDER BY checkin_time DESC " +
                    "LIMIT 0,15;", (logged_in_username,))
     results = cursor.fetchall()
