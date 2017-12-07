@@ -177,7 +177,8 @@ def login():
 
     cursor.execute("SELECT email_token FROM user WHERE username=%s;", (username, ))
     email_token = result[0]
-
+    print(email_token)
+    
     if email_token is not None:
         error_code = "user_email_not_verified"
         cursor.close()
@@ -1059,6 +1060,7 @@ def email_verify():
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_400_BAD_REQUEST
+
     cursor.execute("UPDATE user SET email_token = NULL WHERE email_token=%s;",(email_token,))
     db.commit()
     cursor.close()
