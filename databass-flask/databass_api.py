@@ -398,8 +398,9 @@ def profile(username):
     display_name = user_info[2]
     join_date = user_info[3]
     checkin_count = user_info[4]
-    following_count = user_info[5]
-    follower_count = user_info[6]
+    score = user_info[5]
+    following_count = user_info[6]
+    follower_count = user_info[7]
 
     cursor.execute("SELECT title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
     achievements = cursor.fetchall()
@@ -415,7 +416,7 @@ def profile(username):
     recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3])} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
-               "checkin_count": checkin_count, "recent_checkins": recent_checkins,
+               "checkin_count": checkin_count, "recent_checkins": recent_checkins, "score": score,
                "following_count": following_count, "follower_count": follower_count, "achievements": achievements}
     return jsonify(content), status.HTTP_200_OK
 
