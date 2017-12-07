@@ -28,9 +28,11 @@ import com.shreyas208.databass.api.model.RecentCheckin;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,6 +84,8 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        getActivity().setTitle("Profile");
+
         tvDisplayName = getView().findViewById(R.id.profile_tv_display_name);
         TextView tvUsername = getView().findViewById(R.id.profile_tv_username);
         tvJoinDate = getView().findViewById(R.id.profile_tv_join_date);

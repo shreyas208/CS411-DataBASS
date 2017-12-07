@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingTop="6dp"
+              tools:context="com.shreyas208.databass.ui.FeedFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/feed_rv_checkins"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorAccent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <EditText
+            android:id="@+id/feed_et_follow_username"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="@string/feed_follow_hint"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/feed_fab_follow"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/ic_person_add_black_24dp"
+            android:tint="@color/white"
+            android:scaleType="center"/>
+
+    </LinearLayout>
+
+</LinearLayout>

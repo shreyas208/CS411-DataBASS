@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="com.shreyas208.databass.ui.SettingsActivity">
 
@@ -41,7 +42,7 @@
             android:layout_marginLeft="12dp"
             android:src="@drawable/ic_check_black_48dp"
             android:tint="@color/white"
-            android:layout_marginStart="12dp" />
+            android:layout_marginStart="12dp"/>
 
     </LinearLayout>
 
@@ -79,7 +80,7 @@
             android:layout_marginLeft="12dp"
             android:src="@drawable/ic_check_black_48dp"
             android:tint="@color/white"
-            android:layout_marginStart="12dp" />
+            android:layout_marginStart="12dp"/>
 
     </LinearLayout>
 

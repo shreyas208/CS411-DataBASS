@@ -53,6 +53,11 @@
     <string name="profile_tv_recent_checkins">Recent Checkins</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
 
+    <string name="feed_toast_follow_username_empty">Follow Username must not be empty.</string>
+    <string name="feed_toast_failure">Failed to load feed. Please try again.</string>
+    <string name="feed_follow_hint">Follow username</string>
+    <string name="feed_toast_follow_failure">Failed to follow user. Please try again.</string>
+
     <string name="toast_location_denied">Location access is required to Check In.</string>
 
     <string name="checkin_btn_checkin">Check In</string>
