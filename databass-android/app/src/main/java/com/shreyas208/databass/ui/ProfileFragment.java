@@ -42,6 +42,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     private TextView tvCheckinCount;
     private TextView tvFollowerCount;
     private TextView tvFollowingCount;
+    private TextView tvScore;
     private RecyclerView rvRecentCheckins;
     private LinearLayout llCheckin;
     private Button btnCheckin;
@@ -83,6 +84,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         tvCheckinCount = getView().findViewById(R.id.profile_tv_checkin_count);
         tvFollowerCount = getView().findViewById(R.id.profile_tv_follower_count);
         tvFollowingCount = getView().findViewById(R.id.profile_tv_following_count);
+        tvScore = getView().findViewById(R.id.profile_tv_score);
         rvRecentCheckins = getView().findViewById(R.id.profile_rv_recent_checkins);
         llCheckin = getView().findViewById(R.id.checkin_ll_checkin);
 
@@ -136,6 +138,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
             tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
             tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
             tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
+            tvScore.setText(String.valueOf(profileResponse.getScore()));    
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
 
