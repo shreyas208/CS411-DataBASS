@@ -411,7 +411,7 @@ def profile(username):
 
     achievements = [{"id": result[0], "title": result[1], "description": result[2], "points": result[3]} for result in results]
 
-    cursor.execute("SELECT name, checkin_time, latitude, longitude " +
+    cursor.execute("SELECT name, checkin_time, latitude, longitude, accent_name " +
                    "FROM city, checkin " +
                    "WHERE id = city_id AND username=%s " +
                    "ORDER BY checkin_time DESC " +
@@ -419,7 +419,7 @@ def profile(username):
     results = cursor.fetchall()
     cursor.close()
 
-    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3])} for result in results]
+    recent_checkins = [{"city_name": result[0], "checkin_time": result[1], "latitude": float(result[2]), "longitude": float(result[3]), "accent_name": result[4]} for result in results]
 
     content = {"success": True, "email_address": email_address, "display_name": display_name, "join_date": join_date,
                "checkin_count": checkin_count, "recent_checkins": recent_checkins, "score": score,
@@ -820,7 +820,7 @@ def checkin():
     cursor.close()
 
     content = {"success": True, "city_name": final_result[2], "region_name": "NA", "region_code": final_result[3],
-               "country_name": "NA", "country_code": final_result[1]}
+               "country_name": "NA", "country_code": final_result[1], "accent_name": final_result[7]}
     return jsonify(content), status.HTTP_200_OK
 
 
