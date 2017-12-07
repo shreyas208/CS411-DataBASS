@@ -178,7 +178,7 @@ def login():
     cursor.execute("SELECT email_token FROM user WHERE username=%s;", (username, ))
     email_token = result[0]
 
-    if email_token != NULL:
+    if email_token is not None:
         error_code = "user_email_not_verified"
         cursor.close()
 
