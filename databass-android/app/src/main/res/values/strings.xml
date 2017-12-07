@@ -62,6 +62,8 @@
     <string name="settings_toast_success">Update successful!</string>
     <string name="settings_toast_failure">Update failed. Please try again.</string>
 
+    <string name="map_toast_failure">Failed to load map. Please try again.</string>
+
     <string name="icon_content_description">Travelations</string>
 
     <!-- TODO: Remove or change this placeholder text -->
