@@ -11,14 +11,12 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7"/>
+        android:layout_weight="6"/>
 
     <RelativeLayout
-        
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="4"
         android:gravity="center_horizontal">
 
         <LinearLayout
@@ -33,31 +31,42 @@
                 android:id="@+id/checkin_btn_checkin"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/profile_btn_checkin"
+                android:text="@string/checkin_btn_checkin"
                 style="@style/SplashButton"/>
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/checkin_ll_checkin_info"
+            android:alpha="0"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/checkin_ll_checkin"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp">
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/checkin_checked_in"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/checkin_tv_city_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="26sp"
-                tools:text="Champaign"
-                android:layout_marginBottom="5dp"/>
+                tools:text="Champaign"/>
 
             <TextView
+                android:id="@+id/checkin_tv_country_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
-                tools:text="United States"
-                android:layout_marginBottom="10dp"/>
+                tools:text="United States"/>
         </LinearLayout>
 
     </RelativeLayout>

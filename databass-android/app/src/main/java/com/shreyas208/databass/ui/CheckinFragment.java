@@ -1,16 +1,9 @@
 package com.shreyas208.databass.ui;
 
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,8 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -34,8 +27,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -48,6 +39,9 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
 
     private LinearLayout llCheckin;
     private Button btnCheckin;
+    private LinearLayout llCheckinInfo;
+    private TextView tvCityName;
+    private TextView tvCountryName;
 
     public CheckinFragment() {
         // Required empty public constructor
@@ -61,6 +55,10 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
 
         llCheckin = v.findViewById(R.id.checkin_ll_checkin);
         btnCheckin = v.findViewById(R.id.checkin_btn_checkin);
+        llCheckinInfo = v.findViewById(R.id.checkin_ll_checkin_info);
+        tvCityName = v.findViewById(R.id.checkin_tv_city_name);
+        tvCountryName = v.findViewById(R.id.checkin_tv_country_name);
+
         btnCheckin.setOnClickListener(this);
 
         mActivity = (MainActivity) getActivity();
@@ -91,10 +89,14 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
 
     private void checkin() {
         Location location = mActivity.getLocation();
+        llCheckinInfo.animate().alpha(0).setDuration(500).start();
 
         if (location == null) {
+            TravelationsApp.showToast(getActivity(), R.string.checkin_toast_location_unavailable);
             return;
         }
+
+        setCheckinControlEnabled(false);
 
         TravelationsApp.getApi().checkin(((MainActivity)getActivity()).getApp().getUsername(), ((MainActivity)getActivity()).getApp().getAccessToken(), location.getLatitude(), location.getLongitude()).enqueue(new Callback<CheckinResponse>() {
             @Override
@@ -102,12 +104,14 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
                 CheckinResponse checkinResponse = response.body();
                 if (checkinResponse == null) {
                     Log.e(TravelationsApp.LOG_TAG, "ui.CheckinFragment.checkin.onResponse: response body was null");
-                    TravelationsApp.showToast(getActivity(), R.string.profile_toast_checkin_failure);
+                    TravelationsApp.showToast(getActivity(), R.string.checkin_toast_checkin_failure);
                 } else if (!checkinResponse.isSuccess()) {
-                    Log.e(TravelationsApp.LOG_TAG, String.format("ui.CheckinFragment.checkin.onResponse: response was unsuccessful, code: %d, message: %s", getActivity().getLocalClassName(), checkinResponse.getErrorCode(), checkinResponse.getErrorCode()));
-                    TravelationsApp.showToast(getActivity(), R.string.profile_toast_checkin_failure);
+                    Log.e(TravelationsApp.LOG_TAG, String.format("ui.CheckinFragment.checkin.onResponse: response was unsuccessful, message: %s", checkinResponse.getErrorCode()));
+                    TravelationsApp.showToast(getActivity(), R.string.checkin_toast_checkin_failure);
                 } else {
-                    TravelationsApp.showToast(getActivity(), String.format("Checked in at %s, %s", checkinResponse.getAccentName(), checkinResponse.getCountryCode().toUpperCase()));
+                    tvCityName.setText(checkinResponse.getAccentName());
+                    tvCountryName.setText(checkinResponse.getCountryName());
+                    llCheckinInfo.animate().alpha(1).setDuration(500).start();
                 }
                 setCheckinControlEnabled(true);
             }
@@ -124,7 +128,7 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
     private void setCheckinControlEnabled(boolean enabled) {
         btnCheckin.setEnabled(enabled);
         llCheckin.setBackgroundColor(getResources().getColor(enabled ? R.color.colorAccentDark : R.color.gray));
-        btnCheckin.setText(enabled ? R.string.profile_btn_checkin : R.string.profile_btn_checking_in);
+        btnCheckin.setText(enabled ? R.string.checkin_btn_checkin : R.string.checkin_btn_checking_in);
     }
 
     @Override
