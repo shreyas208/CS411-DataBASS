@@ -1113,10 +1113,12 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     # Check if username is valid
     if username is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-            if function_name == "follow" or function_name == "unfollow":
-                error_code = "user_" + function_name + "_invalid_follower_username"
-            else:
-                error_code = "user_" + function_name + "_invalid_username"
+            #if function_name == "follow" or function_name == "unfollow":
+                #error_code = "user_" + function_name + "_invalid_follower_username"
+            #else:
+                #error_code = "user_" + function_name + "_invalid_username"
+
+            error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
             return content
@@ -1124,12 +1126,14 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     # Check if username is valid
     if username2 is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username2):
-            if function_name == "follow" or function_name == "unfollow":
-                error_code = "user_" + function_name + "_invalid_followee_username"
-            elif function_name == "search":
-                error_code = "user_" + function_name + "_invalid_search_username"
-            else:
-                error_code = "user_" + function_name + "_invalid_username"
+            #if function_name == "follow" or function_name == "unfollow":
+            #    error_code = "user_" + function_name + "_invalid_followee_username"
+            #elif function_name == "search":
+            #    error_code = "user_" + function_name + "_invalid_search_username"
+            #else:
+            #    error_code = "user_" + function_name + "_invalid_username"
+
+            error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
             return content
@@ -1138,10 +1142,12 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if password is not None:
         if (not all((c in ascii_letters + digits + punctuation) for c in password)) \
                 or (not (6 <= len(password) <= 256)):
-            if function_name == "changePassword":
-                error_code = "user_" + function_name + "_invalid_old_password"
-            else:
-                error_code = "user_" + function_name + "_invalid_password"
+            #if function_name == "changePassword":
+            #    error_code = "user_" + function_name + "_invalid_old_password"
+            #else:
+            #    error_code = "user_" + function_name + "_invalid_password"
+
+            error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
             return content
@@ -1150,10 +1156,12 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if password2 is not None:
         if (not all((c in ascii_letters + digits + punctuation) for c in password2)) \
                 or (not (6 <= len(password2) <= 256)):
-            if function_name == "changePassword":
-                error_code = "user_" + function_name + "_invalid_new_password"
-            else:
-                error_code = "user_" + function_name + "_invalid_password"
+            #if function_name == "changePassword":
+            #    error_code = "user_" + function_name + "_invalid_new_password"
+            #else:
+            #    error_code = "user_" + function_name + "_invalid_password"
+
+            error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
             return content
