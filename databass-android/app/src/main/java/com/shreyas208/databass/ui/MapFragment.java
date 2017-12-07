@@ -81,7 +81,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
 
         for (RecentCheckin checkin : checkins) {
             LatLng place = new LatLng(checkin.getLatitude(), checkin.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(place).title(checkin.getCityName()));
+            mMap.addMarker(new MarkerOptions().position(place).title(checkin.getAccentName()));
             Log.i("INFO", "Added city '" + checkin.getCityName() + "' to map");
         }
 

@@ -11,6 +11,8 @@ public class CheckinResponse {
     private final String errorCode;
     @SerializedName("city_name")
     private final String cityName;
+    @SerializedName("accent_name")
+    private final String accentName;
     @SerializedName("region_name")
     private final String regionName;
     @SerializedName("region_code")
@@ -20,10 +22,11 @@ public class CheckinResponse {
     @SerializedName("country_code")
     private final String countryCode;
 
-    public CheckinResponse(boolean success, String errorCode, String cityName, String regionName, String regionCode, String countryName, String countryCode) {
+    public CheckinResponse(boolean success, String errorCode, String cityName, String accentName, String regionName, String regionCode, String countryName, String countryCode) {
         this.success = success;
         this.errorCode = errorCode;
         this.cityName = cityName;
+        this.accentName = accentName;
         this.regionName = regionName;
         this.regionCode = regionCode;
         this.countryName = countryName;
@@ -40,6 +43,10 @@ public class CheckinResponse {
 
     public String getCityName() {
         return cityName;
+    }
+
+    public String getAccentName() {
+        return accentName;
     }
 
     public String getRegionName() {

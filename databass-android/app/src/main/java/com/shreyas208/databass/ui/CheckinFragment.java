@@ -107,7 +107,7 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
                     Log.e(TravelationsApp.LOG_TAG, String.format("ui.CheckinFragment.checkin.onResponse: response was unsuccessful, code: %d, message: %s", getActivity().getLocalClassName(), checkinResponse.getErrorCode(), checkinResponse.getErrorCode()));
                     TravelationsApp.showToast(getActivity(), R.string.profile_toast_checkin_failure);
                 } else {
-                    TravelationsApp.showToast(getActivity(), String.format("Checked in at %s, %s", checkinResponse.getCityName(), checkinResponse.getCountryCode().toUpperCase()));
+                    TravelationsApp.showToast(getActivity(), String.format("Checked in at %s, %s", checkinResponse.getAccentName(), checkinResponse.getCountryCode().toUpperCase()));
                 }
                 setCheckinControlEnabled(true);
             }
