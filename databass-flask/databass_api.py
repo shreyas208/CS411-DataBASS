@@ -1014,7 +1014,7 @@ def send_email_verif(email_address, email_token):
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # News Feed
-@app.route("api/user/feed", methods=["POST"])
+@app.route("/api/user/feed", methods=["POST"])
 def feed():
     # Read in feed input parameters
     username = request.form.get('username')  # String (a-z, A-Z, 0-9, -, _)
