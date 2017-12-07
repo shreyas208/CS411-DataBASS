@@ -156,10 +156,10 @@ IF
 (
 	SELECT COUNT(*)
 	FROM follow
-	WHERE username_follower = NEW.username_follower
-) = 10 AND check_achievement(NEW.username_follower, "serial_stalker")
+	WHERE username_from = NEW.username_from
+) = 10 AND check_achievement(NEW.username_from, "serial_stalker")
 THEN
-CALL attain_achievement(NEW.username_follower, "serial_stalker");
+CALL attain_achievement(NEW.username_from, "serial_stalker");
 END IF;
 END; //
 delimiter ;
@@ -176,10 +176,10 @@ IF
 (
 	SELECT COUNT(*)
 	FROM follow
-	WHERE username_follower = NEW.username_follower
-) = 1 AND check_achievement(NEW.username_follower, "stalker")
+	WHERE username_from = NEW.username_from
+) = 1 AND check_achievement(NEW.username_from, "stalker")
 THEN
-CALL attain_achievement(NEW.username_follower, "stalker");
+CALL attain_achievement(NEW.username_from, "stalker");
 END IF;
 END; //
 delimiter ;
