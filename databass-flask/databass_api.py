@@ -976,6 +976,7 @@ def email_verify():
         content = {"success": False, "error_code": error_code}
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
     cursor.execute("SELECT username FROM user WHERE email_token=%s;", (email_token,))
     result = cursor.fetchone()
 
@@ -985,6 +986,7 @@ def email_verify():
 
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_200_OK
+
     cursor.execute("UPDATE user SET email_token = NULL WHERE email_token=%s;",(email_token,))
     db.commit()
     cursor.close()
@@ -993,6 +995,7 @@ def email_verify():
     return jsonify(content), status.HTTP_200_OK
 
 # -------------------------------------------------------------------------------------------------------------------- #
+
 #email verification request
 def send_email_verif(email_address, email_token):
     headers = {'Authorization': 'Zoho-authtoken a61e6765b5f28645c9621a7057f29973'}
@@ -1007,6 +1010,77 @@ def send_email_verif(email_address, email_token):
     }
 
     r = requests.post('https://mail.zoho.com/api/accounts/5601770000000008001/messages', json=payload, headers=headers)
+
+# -------------------------------------------------------------------------------------------------------------------- #
+
+# News Feed
+@app.route("api/user/feed", methods=["POST"])
+def feed():
+    # Read in feed input parameters
+    username = request.form.get('username')  # String (a-z, A-Z, 0-9, -, _)
+    access_token = request.form.get('access_token')
+
+    # Check if all the feed input parameters are valid
+    check = check_for_none("feed", [("username", username)])
+
+    if check is not None:
+        return jsonify(check), status.HTTP_200_OK
+
+    check2 = validate_parameters("feed", username=username)
+
+    if check2 is not None:
+        return jsonify(check2), status.HTTP_200_OK
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Check if the access token is valid
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
+    result = cursor.fetchone()
+
+    # Return a bad username error if the username isn't in the table
+    if not result:
+        error_code = "user_feed_bad_username"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_200_OK
+
+    elif not (access_token == result[0]):
+        error_code = "user_bad_access_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_200_OK
+
+    # arguments are valid
+
+    #
+    cursor.execute("SELECT username, accent_name, country.name AS country_name, checkin_time " +
+                   "FROM checkin, city, country " +
+                   "WHERE username IN " +
+                   "(" +
+                       "SELECT username_to " +
+                       "FROM follow " +
+                       "WHERE username_from = %s" +
+                   ") AND " +
+                   "checkin.city_id = city.id AND city.country = country.code "
+                   "ORDER BY checkin_time DESC " +
+                   "LIMIT 0, 25;", (username,))
+
+    results = cursor.fetchall()
+    cursor.close()
+
+    checkins = [{"username": result[0], "accent_name": result[1], "country_name": result[2], "checkin_time": result[3]} for result in results]
+
+    content = {"success": True, "checkins": checkins}
+    return jsonify(content), status.HTTP_200_OK
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
