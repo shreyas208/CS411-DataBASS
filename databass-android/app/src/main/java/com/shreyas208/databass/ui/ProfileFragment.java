@@ -3,6 +3,7 @@ package com.shreyas208.databass.ui;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -102,27 +103,51 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     }
 
     @Override
-    public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+    public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
+
         ProfileResponse profileResponse = response.body();
+
         if (profileResponse == null) {
+
             Log.e(TravelationsApp.LOG_TAG, "ui.ProfileFragment.onResponse: response body was null");
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+
         } else if (!profileResponse.isSuccess()) {
+
             Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileFragment.onResponse: response was unsuccessful, message: %s", profileResponse.getErrorCode()));
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+
         } else {
+
             tvDisplayName.setText(profileResponse.getDisplayName());
-            tvJoinDate.setText(profileResponse.getJoinDate());
+
+            SimpleDateFormat inputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("M/d/yyyy", Locale.US);
+            String readableDate = "Travelator since ";
+
+            try {
+                readableDate += outputFormat.format(inputFormat.parse(profileResponse.getJoinDate()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                readableDate += "";
+            }
+
+            tvJoinDate.setText(readableDate);
             tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
             tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
             tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
+
         }
+        
     }
 
     @Override
-    public void onFailure(Call<ProfileResponse> call, Throwable t) {
+    public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
+
+        Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message: %s", "ProfileFragment", t.getMessage()));
+        TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
 
     }
 
