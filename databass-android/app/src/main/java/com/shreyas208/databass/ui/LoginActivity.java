@@ -116,6 +116,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message:\n%s", this.getLocalClassName(), t.getMessage()));
         setControlsEnabled(true);
-        TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
+        TravelationsApp.showToast(LoginActivity.this, R.string.toast_request_failure);
     }
 }

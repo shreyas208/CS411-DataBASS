@@ -79,18 +79,18 @@ public interface TravelationsAPI {
     @POST("user/follow")
     @FormUrlEncoded
     Call<GenericResponse> follow(@Field("username_from") String username,
-                        @Field("access_token") String accessToken,
-                        @Field("username_to") String usernameTo);
+                                 @Field("access_token") String accessToken,
+                                 @Field("username_to") String usernameTo);
 
     @POST("user/unfollow")
     @FormUrlEncoded
     Call<GenericResponse> unfollow(@Field("username_from") String username,
-                          @Field("access_token") String accessToken,
-                          @Field("username_to") String usernameTo);
+                                   @Field("access_token") String accessToken,
+                                   @Field("username_to") String usernameTo);
 
     @POST("user/remove")
     @FormUrlEncoded
-    Call<Object> remove(@Field("username") String username,
-                        @Field("access_token") String accessToken);
+    Call<GenericResponse> remove(@Field("username") String username,
+                                 @Field("access_token") String accessToken);
 
 }

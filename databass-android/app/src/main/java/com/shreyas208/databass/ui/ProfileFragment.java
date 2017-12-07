@@ -1,12 +1,12 @@
 package com.shreyas208.databass.ui;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -14,35 +14,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.Achievement;
+import com.shreyas208.databass.api.model.GenericResponse;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment implements Callback<ProfileResponse> {
+public class ProfileFragment extends Fragment implements Callback<ProfileResponse>, View.OnClickListener {
 
 
-    private static final String ARG_USERNAME = "username";
-    private String username;
+    private static final String ARG_USERNAME = "mUsername";
+    private String mUsername;
 
     private TextView tvDisplayName;
     private TextView tvJoinDate;
@@ -52,6 +47,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     private TextView tvScore;
     private RecyclerView rvAchievements;
     private RecyclerView rvRecentCheckins;
+    private FloatingActionButton fabUnfollow;
 
     private TravelationsApp app;
 
@@ -69,7 +65,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            username = getArguments().getString(ARG_USERNAME);
+            mUsername = getArguments().getString(ARG_USERNAME);
         }
     }
 
@@ -78,7 +74,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
                              Bundle savedInstanceState) {
 
         app = ((MainActivity) getActivity()).getApp();
-        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), username).enqueue(this);
+        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), mUsername).enqueue(this);
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -95,6 +91,12 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         tvScore = getView().findViewById(R.id.profile_tv_score);
         rvAchievements = getView().findViewById(R.id.profile_rv_achievements);
         rvRecentCheckins = getView().findViewById(R.id.profile_rv_recent_checkins);
+        fabUnfollow = getView().findViewById(R.id.profile_fab_unfollow);
+
+        if (!mUsername.equals(app.getUsername())) {
+            fabUnfollow.setVisibility(View.VISIBLE);
+            fabUnfollow.setOnClickListener(this);
+        }
 
         rvAchievements.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         rvAchievements.setAdapter(new AchievementsAdapter(new AchievementClickListener(getContext())));
@@ -102,7 +104,7 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         rvRecentCheckins.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         rvRecentCheckins.setAdapter(new RecentCheckinsAdapter());
 
-        tvUsername.setText(username);
+        tvUsername.setText(mUsername);
     }
 
     @Override
@@ -119,19 +121,13 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
 
         ProfileResponse profileResponse = response.body();
-
         if (profileResponse == null) {
-
             Log.e(TravelationsApp.LOG_TAG, "ui.ProfileFragment.onResponse: response body was null");
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
-
         } else if (!profileResponse.isSuccess()) {
-
             Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileFragment.onResponse: response was unsuccessful, message: %s", profileResponse.getErrorCode()));
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
-
         } else {
-
             tvDisplayName.setText(profileResponse.getDisplayName());
 
             SimpleDateFormat inputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
@@ -156,7 +152,6 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
 
             ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
             rvRecentCheckins.getAdapter().notifyDataSetChanged();
-
         }
         
     }
@@ -167,6 +162,32 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         Log.e(TravelationsApp.LOG_TAG, String.format("%s.onFailure: request was unsuccessful, message: %s", "ProfileFragment", t.getMessage()));
         TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.profile_fab_unfollow) {
+            TravelationsApp.getApi().unfollow(app.getUsername(), app.getAccessToken(), mUsername).enqueue(new Callback<GenericResponse>() {
+                @Override
+                public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                    GenericResponse genericResponse = response.body();
+                    if (genericResponse == null) {
+                        Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileFragment.unfollow.onResponse: response body was null"));
+                        TravelationsApp.showToast(getActivity(), R.string.profile_toast_unfollow_failure);
+                    } else if (!genericResponse.isSuccess()) {
+                        Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileFragment.unfollow.onResponse: response was unsuccessful, message: %s", genericResponse.getErrorCode()));
+                        TravelationsApp.showToast(getActivity(), R.string.profile_toast_unfollow_failure);
+                    } else {
+                        ((MainActivity) getActivity()).showFeed();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<GenericResponse> call, Throwable t) {
+                    TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
+                }
+            });
+        }
     }
 
     public class RecentCheckinsAdapter extends RecyclerView.Adapter<RecentCheckinsAdapter.ViewHolder> {

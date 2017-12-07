@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context="com.shreyas208.databass.ui.SettingsActivity">
+    tools:context="com.shreyas208.databass.ui.SettingsActivity"
+    android:clipChildren="false">
 
     <TextView
         android:layout_width="wrap_content"
@@ -25,7 +26,8 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:clipChildren="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:clipToPadding="false">
 
         <EditText
             android:id="@+id/settings_et_display_name"
@@ -64,7 +66,8 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:clipChildren="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:clipToPadding="false">
 
         <EditText
             android:id="@+id/settings_et_email_address"
@@ -85,18 +88,26 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/settings_button_remove_user"
-        android:layout_width="wrap_content"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/settings_ll_delete"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="0"
-        android:text="@string/settings_delete_account"
-        android:textColor="@color/darkGray"
-        android:textSize="18sp" />
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:background="@color/lightred">
+
+        <Button
+            android:id="@+id/settings_btn_delete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/settings_delete_account"
+            style="@style/SplashButton"/>
+
+    </LinearLayout>
 
 </LinearLayout>

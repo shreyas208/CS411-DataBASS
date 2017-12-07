@@ -8,6 +8,7 @@
     <color name="colorAccentDark">#805acb</color>
 
     <color name="white">#fff</color>
+    <color name="lightred">#ef5350</color>
     <color name="gray">#ccc</color>
     <color name="darkGray">#666666</color>
 </resources>

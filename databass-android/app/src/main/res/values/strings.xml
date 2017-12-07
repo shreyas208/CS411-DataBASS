@@ -52,6 +52,7 @@
     <string name="profile_tv_score_label">Score</string>
     <string name="profile_tv_recent_checkins">Recent Checkins</string>
     <string name="profile_toast_failure">Failed to load profile. Please try again.</string>
+    <string name="profile_toast_unfollow_failure">Failed to unfollow user. Please try again.</string>
 
     <string name="feed_toast_follow_username_empty">Follow Username must not be empty.</string>
     <string name="feed_toast_failure">Failed to load feed. Please try again.</string>
@@ -69,10 +70,13 @@
     <string name="settings_label">Travelations - Settings</string>
     <string name="settings_et_display_name">Display Name</string>
     <string name="settings_et_email_address">Email Address</string>
+    <string name="settings_btn_delete">Delete Account</string>
+    <string name="settings_btn_deleting">Deleting Account…</string>
     <string name="settings_toast_display_name_empty">Display Name must not be empty.</string>
     <string name="settings_toast_email_address_empty">Email Address must not be empty.</string>
     <string name="settings_toast_success">Update successful!</string>
     <string name="settings_toast_failure">Update failed. Please try again.</string>
+    <string name="settings_toast_delete_failure">Delete failed. Please try again.</string>
 
     <string name="map_toast_failure">Failed to load map. Please try again.</string>
 

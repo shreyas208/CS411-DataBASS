@@ -72,11 +72,6 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        getActivity().setTitle("Travelations");
-    }
-
-    @Override
     public void newLocation() {
         attemptShowLocationOnMap();
     }

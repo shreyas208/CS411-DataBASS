@@ -7,17 +7,34 @@
               android:orientation="vertical"
               tools:context="com.shreyas208.databass.ui.ProfileFragment">
 
-    <TextView
-        android:id="@+id/profile_tv_display_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="12dp"
         android:layout_marginLeft="@dimen/profile_view_spacing"
         android:layout_marginRight="@dimen/profile_view_spacing"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:textSize="32sp"
-        android:textColor="@color/colorPrimaryDark"
-        tools:text="Display Name"/>
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/profile_tv_display_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:textColor="@color/colorPrimaryDark"
+            tools:text="Display Name"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:visibility="gone"
+            android:id="@+id/profile_fab_unfollow"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_remove_black_18dp"
+            android:tint="@color/white"
+            android:scaleType="center"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/profile_tv_username"

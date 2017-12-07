@@ -90,13 +90,14 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
                 GenericResponse genericResponse = response.body();
                 if (genericResponse == null) {
                     Log.e(TravelationsApp.LOG_TAG, "ui.FeedFragment.follow.onResponse: response body was null");
-                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_failure);
+                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_follow_failure);
                 } else if (!genericResponse.isSuccess()) {
                     Log.e(TravelationsApp.LOG_TAG, String.format("ui.FeedFragment.follow.onResponse: response was unsuccessful, message: %s", genericResponse.getErrorCode()));
-                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_failure);
+                    TravelationsApp.showToast(getActivity(), R.string.feed_toast_follow_failure);
                 } else {
                     TravelationsApp.showToast(getActivity(), "Followed " + followUsername);
                     TravelationsApp.getApi().feed(app.getUsername(), app.getAccessToken()).enqueue(FeedFragment.this);
+                    etFollowUsername.setText("");
                 }
                 setFollowUserControlsEnabled(true);
             }
@@ -104,7 +105,7 @@ public class FeedFragment extends Fragment implements Callback<FeedResponse>, Vi
             @Override
             public void onFailure(Call<GenericResponse> call, Throwable t) {
                 Log.e(TravelationsApp.LOG_TAG, String.format("ui.FeedFragment.follow.onFailure: request was unsuccessful, message: %s", t.getMessage()));
-                TravelationsApp.showToast(getActivity(), R.string.feed_toast_follow_failure);
+                TravelationsApp.showToast(getActivity(), R.string.toast_request_failure);
                 setFollowUserControlsEnabled(true);
             }
         });

@@ -162,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).addToBackStack(null).commit();
     }
 
+    protected void showFeed() {
+        FeedFragment fragment = new FeedFragment();
+        getSupportFragmentManager().popBackStackImmediate();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).commit();
+    }
+
     protected void removeLocationSubscriber() {
         mLocationSubscriber = null;
     }
