@@ -101,11 +101,16 @@ def register():
     # Insert registration information into user table
     password_hash = bcrypt.generate_password_hash(password)
 
-    cursor.execute("INSERT INTO user values(%s, %s, %s, %s, NOW(), NULL, 0, 0);",
-                   (username, email_address, display_name, password_hash))
+    #generate a random email_token for the user, for char(128)
+    email_token = binascii.hexlify(os.urandom(64)).decode()
+
+    cursor.execute("INSERT INTO user values(%s, %s, %s, %s, NOW(), NULL, 0, 0, %s);",
+                   (username, email_address, display_name, password_hash, email_token))
 
     db.commit()
     cursor.close()
+
+    send_email_verif(email_address, email_token)
 
     content = {"success": True}
     return jsonify(content), status.HTTP_200_OK
@@ -168,6 +173,16 @@ def login():
 
     email = result[0]
     display_name = result[1]
+
+    cursor.execute("SELECT email_token FROM user WHERE username=%s;", (username, ))
+    email_token = result[0]
+
+    if email_token != NULL:
+        error_code = "user_email_not_verified"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
 
     # Generate an access token and insert it into the user table
     access_token = binascii.hexlify(os.urandom(32)).decode()
@@ -309,19 +324,19 @@ def search():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # User Profile
-@app.route("/api/user/profile", methods=["POST"])
-def profile():
+@app.route("/api/user/profile/<username>", methods=["POST"])
+def profile(username):
     # Read in profile input parameters
-    username = request.form.get('username')  # String (a-z, A-Z, 0-9, -, _)
+    logged_in_username = request.form.get('username')  # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
     # Check if all the profile input parameters are valid
-    check = check_for_none("profile", [("username", username)])
+    check = check_for_none("profile", [("username", logged_in_username)])
 
     if check is not None:
         return jsonify(check), status.HTTP_400_BAD_REQUEST
 
-    check2 = validate_parameters("profile", username=username)
+    check2 = validate_parameters("profile", username=logged_in_username)
 
     if check2 is not None:
         return jsonify(check2), status.HTTP_400_BAD_REQUEST
@@ -336,7 +351,7 @@ def profile():
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Check if the access token is valid
-    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username,))
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (logged_in_username,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
@@ -393,7 +408,7 @@ def profile():
                    "FROM city, checkin " +
                    "WHERE id = city_id AND username=%s " +
                    "ORDER BY checkin_time DESC " +
-                   "LIMIT 0,15;", (username,))
+                   "LIMIT 0,15;", (logged_in_username,))
     results = cursor.fetchall()
     cursor.close()
 
@@ -1011,6 +1026,58 @@ def remove():
     content = {"success": True}
     return jsonify(content), status.HTTP_200_OK
 
+
+# -------------------------------------------------------------------------------------------------------------------- #
+
+# Verify Email
+@app.route("/verify", methods=["GET"])
+def email_verify():
+    email_token = request.form.get('email_token')
+
+    if email_token is None:
+        error_code = "invalid_email_token"
+        content  ={"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+
+    try:
+        cursor = db.cursor()
+    except:
+        error_code = "connection_to_database_failed"
+
+        content = {"success": False, "error_code": error_code}
+        print(traceback.format_exc())
+        return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+    cursor.execute("SELECT username FROM user WHERE email_token=%s;", (email_token,))
+    result = cursor.fetchone()
+
+    if not result:
+        error_code = "bad_email_token"
+        cursor.close()
+
+        content = {"success": False, "error_code": error_code}
+        return jsonify(content), status.HTTP_400_BAD_REQUEST
+    cursor.execute("UPDATE user SET email_token = NULL WHERE email_token=%s;",(email_token,))
+    db.commit()
+    cursor.close()
+
+    content = {"success": True}
+    return jsonify(content), status.HTTP_200_OK
+
+# -------------------------------------------------------------------------------------------------------------------- #
+#email verification request
+def send_email_verif(email_address, email_token):
+    headers = {'Authorization', 'Zoho-authtoken a61e6765b5f28645c9621a7057f29973'}
+
+    payload = {
+    "fromAddress" : "travelations@shreyas208.com",
+    "toAddress": email_address,
+    "subject": "Travelations Account Verification",
+    "encoding": "UTF-8",
+    "mailFormat": "html",
+    "content": "Welcome to Travelation!<br />Please verify your account <a href=\"http://fa17-cs411-18.cs.illinois.edu/verify?email_token=" + email_token + "\">here</a>."
+    }
+
+    r = requests.post('https://mail.zoho.com/api/accounts/5601770000000008001/messages', json=payload, headers=headers)
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
