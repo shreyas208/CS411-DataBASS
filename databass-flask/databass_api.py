@@ -1032,9 +1032,9 @@ def remove():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # Verify Email
-@app.route("/verify", methods=["GET"])
-def email_verify():
-    email_token = request.form.get('email_token')
+@app.route("/verify/<email_token>", methods=["GET"])
+def email_verify(email_token):
+    #email_token = request.form.get('email_token')
 
     if email_token is None:
         error_code = "invalid_email_token"
