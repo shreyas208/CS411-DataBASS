@@ -5,6 +5,7 @@
     <string name="splash_btn_register">Register</string>
 
     <string name="toast_request_failure">Error; check your network connection and try again.</string>
+    <string name="toast_failure">Failed. Please try again.</string>
 
     <string name="login_label">Travelations - Log In</string>
     <string name="login_et_username_hint">Username</string>
@@ -34,7 +35,6 @@
     <string name="register_toast_invalid_password">Password is invalid.</string>
     <string name="register_toast_username_in_use">Username is already in use.</string>
     <string name="register_toast_success">Registration successful! Please check your email to activate your account.</string>
-    <string name="register_toast_failure">Registration failed. Please try again.</string>
 
     <string name="nav_checkin">Check In</string>
     <string name="nav_feed">Feed</string>
