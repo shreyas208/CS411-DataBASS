@@ -16,6 +16,8 @@ from flask import Flask, request, jsonify
 from flask_api import status
 from flask_bcrypt import Bcrypt
 
+import requests
+
 # Connects Flask server to MySQL database
 import mysql.connector as MySQL
 
