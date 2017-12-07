@@ -38,7 +38,7 @@ public class GenericResponse {
             case "user_register_empty_field":
                 return R.string.register_toast_empty_field;
             default:
-                return R.string.register_toast_failure;
+                return R.string.toast_failure;
 
         }
 
