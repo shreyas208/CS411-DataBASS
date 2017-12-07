@@ -1,9 +1,12 @@
-CREATE TRIGGER update_checkin_count
+CREATE TRIGGER update_checkin_count_and_score
 AFTER INSERT ON checkin
 FOR EACH ROW
 UPDATE user
-SET checkin_count = checkin_count+1
+SET checkin_count = checkin_count+1, score = score + 1
 WHERE username = NEW.username;
+
+DROP TRIGGER update_checkin_count;
+
 
 delimiter //
 
@@ -206,7 +209,7 @@ delimiter ;
 
 delimiter //
 
-CREATE TRIGGER recent_checkin_polygon_achievement
+CREATE TRIGGER traveling_far_and_wide_achievement
 AFTER INSERT ON checkin
 FOR EACH ROW
 BEGIN
@@ -262,7 +265,7 @@ BEGIN
         FROM city
         WHERE Contains(GeomFromText(poly), location)
 	) >= CITY_THRESHOLD THEN
-	CALL attain_achievement(NEW.username, "recent_checkin_polygon");
+	CALL attain_achievement(NEW.username, "traveling_far_and_wide");
 	END IF;
     
 	CLOSE cur;
@@ -270,4 +273,4 @@ END; //
 
 delimiter ;
 
-DROP TRIGGER recent_checkin_polygon_achievement;
+DROP TRIGGER traveling_far_and_wide_achievement;
