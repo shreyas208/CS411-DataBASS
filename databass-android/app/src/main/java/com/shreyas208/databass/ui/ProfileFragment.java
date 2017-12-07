@@ -108,6 +108,14 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (mUsername.equals(app.getUsername())) {
+            tvDisplayName.setText(app.getDisplayName());
+        }
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
