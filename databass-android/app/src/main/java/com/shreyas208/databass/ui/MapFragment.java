@@ -1,6 +1,7 @@
 package com.shreyas208.databass.ui;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,18 +10,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +42,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
     private GoogleMap mMap;
     private TravelationsApp app;
     private List<RecentCheckin> checkins;
+    private Set<String> cities;
+    private List<LatLng> allCoordinates;
 
     public MapFragment() {
         // Required empty public constructor
@@ -45,7 +54,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
                              Bundle savedInstanceState) {
 
         app = ((MainActivity) getActivity()).getApp();
-        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken()).enqueue(this);
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -58,27 +66,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
         Log.i(TravelationsApp.LOG_TAG, "map ready");
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        //attemptAddMarkersToMap();
 
-        if (checkins != null) {
-            for (RecentCheckin checkin : checkins) {
-                LatLng place = new LatLng(checkin.getLatitude(), checkin.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(place).title(checkin.getCityName()));
-            }
-        } else {
-            Log.e("INFO", "checkins null");
+    }
+
+    public void attemptAddMarkersToMap() {
+
+        if (mMap == null || checkins == null) {
+            return;
         }
+
+        for (RecentCheckin checkin : checkins) {
+            LatLng place = new LatLng(checkin.getLatitude(), checkin.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(place).title(checkin.getCityName()));
+            Log.i("INFO", "Added city '" + checkin.getCityName() + "' to map");
+        }
+
+        mMap.addPolyline(new PolylineOptions()
+                .clickable(false)
+                .addAll(allCoordinates).color(Color.argb(150, 128, 90, 203))
+                .endCap(new RoundCap())
+                .jointType(JointType.ROUND));
+
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("INFO", "onResume");
+
+        checkins = new ArrayList<>();
+        cities = new HashSet<>();
+        allCoordinates = new ArrayList<>();
+
+        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), app.getUsername()).enqueue(this);
+
         mMapView.onResume();
     }
 
@@ -91,6 +117,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
     @Override
     public void onStop() {
         super.onStop();
+        Log.i("INFO", "onStop");
+
+        checkins = null;
+        cities = null;
+        allCoordinates = null;
+
         mMapView.onStop();
     }
 
@@ -122,7 +154,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", "MapFragment", response.code(), profileResponse.getErrorCode()));
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
         } else {
-            checkins = profileResponse.getRecentCheckins();
+            for (RecentCheckin checkin : profileResponse.getRecentCheckins()) {
+                if (!cities.contains(checkin.getCityName())) {
+                    cities.add(checkin.getCityName());
+                    checkins.add(checkin);
+                }
+                allCoordinates.add(new LatLng(checkin.getLatitude(), checkin.getLongitude()));
+            }
+            attemptAddMarkersToMap();
         }
     }
 

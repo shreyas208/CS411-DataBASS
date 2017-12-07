@@ -78,7 +78,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         tvDisplayName.setText(app.getDisplayName());
         tvUsername.setText(app.getUsername());
 
-        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken()).enqueue(this);
+        //TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), ).enqueue(this);
     }
 
     private void attemptCheckin() {

@@ -12,10 +12,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.shreyas208.databass.R;
+import com.shreyas208.databass.TravelationsApp;
+import com.shreyas208.databass.api.model.ProfileResponse;
 
-public class ProfileFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ProfileFragment extends Fragment implements Callback<ProfileResponse> {
+
+
     private static final String ARG_USERNAME = "username";
-
     private String username;
 
     private TextView tvDisplayName;
@@ -26,6 +33,8 @@ public class ProfileFragment extends Fragment {
     private RecyclerView rvRecentCheckins;
     private LinearLayout llCheckin;
     private Button btnCheckin;
+
+    private TravelationsApp app;
 
     /*private OnFragmentInteractionListener mListener;*/
 
@@ -50,7 +59,12 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        app = ((MainActivity) getActivity()).getApp();
+        TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), username).enqueue(this);
         return inflater.inflate(R.layout.fragment_profile, container, false);
+
+
     }
 
     @Override
@@ -83,6 +97,16 @@ public class ProfileFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         /*mListener = null;*/
+    }
+
+    @Override
+    public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+
+    }
+
+    @Override
+    public void onFailure(Call<ProfileResponse> call, Throwable t) {
+
     }
 
     /*public interface OnFragmentInteractionListener {

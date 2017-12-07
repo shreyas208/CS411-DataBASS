@@ -16,16 +16,18 @@ public class ProfileResponse {
     @SerializedName("display_name") private final String displayName;
     @SerializedName("join_date") private final String joinDate;
     @SerializedName("checkin_count") private final int checkinCount;
+    @SerializedName("score") private final int score;
     @SerializedName("follower_count") private final int followerCount;
     @SerializedName("following_count") private final int followingCount;
     @SerializedName("recent_checkins") private final List<RecentCheckin> recentCheckins;
 
-    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int followerCount, int followingCount, List<RecentCheckin> recentCheckins) {
+    public ProfileResponse(boolean success, String errorCode, String displayName, String joinDate, int checkinCount, int score, int followerCount, int followingCount, List<RecentCheckin> recentCheckins) {
         this.success = success;
         this.errorCode = errorCode;
         this.displayName = displayName;
         this.joinDate = joinDate;
         this.checkinCount = checkinCount;
+        this.score = score;
         this.followerCount = followerCount;
         this.followingCount = followingCount;
         this.recentCheckins = recentCheckins;
@@ -53,6 +55,10 @@ public class ProfileResponse {
 
     public int getCheckinCount() {
         return checkinCount;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public int getFollowerCount() {
