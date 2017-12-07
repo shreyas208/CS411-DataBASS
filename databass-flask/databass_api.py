@@ -755,18 +755,18 @@ def checkin():
 # Follow User
 @app.route("/api/user/follow", methods=["POST"])
 def follow():
-    follower_username = request.form.get('follower_username')  # String (a-z, A-Z, 0-9, -, _)
-    followee_username = request.form.get('followee_username')  # String (a-z, A-Z, 0-9, -, _)
+    username_from = request.form.get('username_from')  # String (a-z, A-Z, 0-9, -, _)
+    username_to = request.form.get('username_to')  # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
     # Check if all the follow input parameters are valid
     check = check_for_none("follow",
-                           [("follower_username", follower_username), ("followee_username", followee_username)])
+                           [("username_from", username_from), ("username_to", username_to)])
 
     if check is not None:
         return jsonify(check), status.HTTP_200_OK
 
-    check2 = validate_parameters("follow", username=follower_username, username2=followee_username)
+    check2 = validate_parameters("follow", username=username_from, username2=username_to)
 
     if check2 is not None:
         return jsonify(check2), status.HTTP_200_OK
@@ -782,13 +782,13 @@ def follow():
 
     # Check if the access token is valid
 
-    # cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
-    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
+    # cursor.execute("SELECT access_token FROM user WHERE username='" + username_from + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username_from,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_follow_bad_follower_username"
+        error_code = "user_follow_bad_username_from"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -801,12 +801,12 @@ def follow():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_200_OK
 
-    cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
+    cursor.execute("SELECT * FROM user WHERE username=%s;", (username_to,))
     result = cursor.fetchone()
 
     # return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_follow_bad_followee_username"
+        error_code = "user_follow_bad_username_to"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -814,7 +814,7 @@ def follow():
     # finished argument checking here
 
     # add the follow to the table
-    cursor.execute("INSERT INTO follow VALUES (%s, %s);", (follower_username, followee_username))
+    cursor.execute("INSERT INTO follow VALUES (%s, %s);", (username_from, username_to))
     db.commit()
     cursor.close()
 
@@ -827,18 +827,18 @@ def follow():
 # Unfollow User
 @app.route("/api/user/unfollow", methods=["POST"])
 def unfollow():
-    follower_username = request.form.get('follower_username')  # String (a-z, A-Z, 0-9, -, _)
-    followee_username = request.form.get('followee_username')  # String (a-z, A-Z, 0-9, -, _)
+    username_from = request.form.get('username_from')  # String (a-z, A-Z, 0-9, -, _)
+    username_to = request.form.get('username_to')  # String (a-z, A-Z, 0-9, -, _)
     access_token = request.form.get('access_token')
 
     # Check if all the unfollow input parameters are valid
     check = check_for_none("unfollow",
-                           [("follower_username", follower_username), ("followee_username", followee_username)])
+                           [("username_from", username_from), ("username_to", username_to)])
 
     if check is not None:
         return jsonify(check), status.HTTP_200_OK
 
-    check2 = validate_parameters("unfollow", username=follower_username, username2=followee_username)
+    check2 = validate_parameters("unfollow", username=username_from, username2=username_to)
 
     if check2 is not None:
         return jsonify(check2), status.HTTP_200_OK
@@ -854,13 +854,13 @@ def unfollow():
 
     # Check if the access token is valid
 
-    # cursor.execute("SELECT access_token FROM user WHERE username='" + follower_username + "';")
-    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (follower_username,))
+    # cursor.execute("SELECT access_token FROM user WHERE username='" + username_from + "';")
+    cursor.execute("SELECT access_token FROM user WHERE username=%s;", (username_from,))
     result = cursor.fetchone()
 
     # Return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_unfollow_bad_follower_username"
+        error_code = "user_unfollow_bad_username_from"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -873,12 +873,12 @@ def unfollow():
         content = {"success": False, "error_code": error_code}
         return jsonify(content), status.HTTP_200_OK
 
-    cursor.execute("SELECT * FROM user WHERE username=%s;", (followee_username,))
+    cursor.execute("SELECT * FROM user WHERE username=%s;", (username_to,))
     result = cursor.fetchone()
 
     # return a bad username error if the username isn't in the table
     if not result:
-        error_code = "user_unfollow_bad_followee_username"
+        error_code = "user_unfollow_bad_username_to"
         cursor.close()
 
         content = {"success": False, "error_code": error_code}
@@ -887,7 +887,7 @@ def unfollow():
 
     # remove the follow to the table
     cursor.execute("DELETE FROM follow WHERE username_follower=%s AND username_followee=%s;",
-                   (follower_username, followee_username))
+                   (username_from, username_to))
     db.commit()
     cursor.close()
 
@@ -1035,7 +1035,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if username is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
             #if function_name == "follow" or function_name == "unfollow":
-                #error_code = "user_" + function_name + "_invalid_follower_username"
+                #error_code = "user_" + function_name + "_invalid_username_from"
             #else:
                 #error_code = "user_" + function_name + "_invalid_username"
 
@@ -1048,7 +1048,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if username2 is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username2):
             #if function_name == "follow" or function_name == "unfollow":
-            #    error_code = "user_" + function_name + "_invalid_followee_username"
+            #    error_code = "user_" + function_name + "_invalid_username_to"
             #elif function_name == "search":
             #    error_code = "user_" + function_name + "_invalid_search_username"
             #else:
