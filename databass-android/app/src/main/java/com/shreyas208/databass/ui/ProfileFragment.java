@@ -18,8 +18,11 @@ import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.ProfileResponse;
 import com.shreyas208.databass.api.model.RecentCheckin;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -151,9 +154,19 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         public void onBindViewHolder(ViewHolder holder, int position) {
             RecentCheckin recentCheckin = recentCheckins.get(position);
             String cityCounty = recentCheckin.getAccentName() + ", " + recentCheckin.getCountryName();
-            //SimpleDateFormat format = new SimpleDateFormat("")
+
+            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+            Date date;
+            try {
+                date = format.parse(recentCheckin.getCheckinTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+            String readableDate = new SimpleDateFormat("EEE, M/d/yyyy 'at' h:mm a", Locale.US).format(date);
+
             holder.tvCity.setText(cityCounty);
-            holder.tvTime.setText(recentCheckin.getCheckinTime());
+            holder.tvTime.setText(readableDate);
         }
 
         @Override
