@@ -43,7 +43,8 @@ db = MySQL.connect(host="localhost",
                    port=3306,
                    user="flaskuser",
                    password="tCU8PvBYEPP4qkun",
-                   database="cs_411_project")
+                   database="cs_411_project",
+                   buffered=True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -1048,6 +1049,7 @@ def email_verify():
         content = {"success": False, "error_code": error_code}
         print(traceback.format_exc())
         return jsonify(content), status.HTTP_500_INTERNAL_SERVER_ERROR
+
     cursor.execute("SELECT username FROM user WHERE email_token=%s;", (email_token,))
     result = cursor.fetchone()
 
