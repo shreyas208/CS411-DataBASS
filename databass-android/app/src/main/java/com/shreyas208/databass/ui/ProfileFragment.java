@@ -3,6 +3,7 @@ package com.shreyas208.databass.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,10 @@ import android.widget.TextView;
 import com.shreyas208.databass.R;
 import com.shreyas208.databass.TravelationsApp;
 import com.shreyas208.databass.api.model.ProfileResponse;
+import com.shreyas208.databass.api.model.RecentCheckin;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,6 +80,9 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         rvRecentCheckins = getView().findViewById(R.id.profile_rv_recent_checkins);
         llCheckin = getView().findViewById(R.id.checkin_ll_checkin);
 
+        rvRecentCheckins.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        rvRecentCheckins.setAdapter(new RecentCheckinsAdapter());
+
         tvUsername.setText(username);
     }
 
@@ -100,14 +108,62 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         } else {
             tvDisplayName.setText(profileResponse.getDisplayName());
             tvJoinDate.setText(profileResponse.getJoinDate());
-            tvCheckinCount.setText(profileResponse.getCheckinCount());
-            tvFollowerCount.setText(profileResponse.getFollowerCount());
-            tvFollowingCount.setText(profileResponse.getFollowingCount());
+            tvCheckinCount.setText(String.valueOf(profileResponse.getCheckinCount()));
+            tvFollowerCount.setText(String.valueOf(profileResponse.getFollowerCount()));
+            tvFollowingCount.setText(String.valueOf(profileResponse.getFollowingCount()));
+            ((RecentCheckinsAdapter) rvRecentCheckins.getAdapter()).setRecentCheckins(profileResponse.getRecentCheckins());
+            rvRecentCheckins.getAdapter().notifyDataSetChanged();
         }
     }
 
     @Override
     public void onFailure(Call<ProfileResponse> call, Throwable t) {
+
+    }
+
+    public class RecentCheckinsAdapter extends RecyclerView.Adapter<RecentCheckinsAdapter.ViewHolder> {
+
+        private List<RecentCheckin> recentCheckins;
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public final TextView tvCity;
+            public final TextView tvTime;
+
+            public ViewHolder(View v) {
+                super(v);
+                tvCity = v.findViewById(R.id.checkin_item_city_name);
+                tvTime = v.findViewById(R.id.checkin_item_time);
+            }
+        }
+
+        public RecentCheckinsAdapter() { }
+
+        public RecentCheckinsAdapter(List<RecentCheckin> recentCheckins) {
+            this.recentCheckins = recentCheckins;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_recent_checkin_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            RecentCheckin recentCheckin = recentCheckins.get(position);
+            String cityCounty = recentCheckin.getAccentName() + ", " + recentCheckin.getCountryName();
+            //SimpleDateFormat format = new SimpleDateFormat("")
+            holder.tvCity.setText(cityCounty);
+            holder.tvTime.setText(recentCheckin.getCheckinTime());
+        }
+
+        @Override
+        public int getItemCount() {
+            return (recentCheckins == null) ? 0 : recentCheckins.size();
+        }
+
+        public void setRecentCheckins(List<RecentCheckin> recentCheckins) {
+            this.recentCheckins = recentCheckins;
+        }
 
     }
 
