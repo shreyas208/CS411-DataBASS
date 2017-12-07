@@ -13,6 +13,8 @@
     <string name="login_btn_logging_in">Logging in…</string>
     <string name="login_tv_register">Don\'t have an account? Register ></string>
     <string name="login_toast_empty_field">Please enter your username and password.</string>
+    <string name="login_toast_not_verified">Login failed. Please check your email to verify your account.</string>
+    <string name="login_toast_bad_credentials">Login failed. Incorrect username or password.</string>
     <string name="login_toast_failure">Login failed. Please try again.</string>
 
     <string name="register_label">Travelations - Register</string>
@@ -27,7 +29,7 @@
     <string name="register_toast_empty_field">All fields must be filled.</string>
     <string name="register_toast_password_mismatch">Password and Confirm Password do not match.</string>
     <string name="register_toast_invalid_email">Email address is not valid.</string>
-    <string name="register_toast_success">Registration successful!</string>
+    <string name="register_toast_success">Registration successful! Please check your email to activate your account.</string>
     <string name="register_toast_failure">Registration failed. Please try again.</string>
 
     <string name="nav_checkin">Check In</string>

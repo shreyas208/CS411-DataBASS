@@ -100,12 +100,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             setControlsEnabled(true);
             TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
         } else if (!loginResponse.isSuccess()) {
-                Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), loginResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), loginResponse.getErrorCode()));
             setControlsEnabled(true);
-            TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
+            TravelationsApp.showToast(LoginActivity.this, loginResponse.getErrorString());
         } else {
             ((TravelationsApp) getApplication()).setLoginValues(username, loginResponse.getAccessToken(), loginResponse.getEmailAddress(), loginResponse.getDisplayName());
-            //Intent i = new Intent(this, ProfileActivity.class);
             Intent i = new Intent(this, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);

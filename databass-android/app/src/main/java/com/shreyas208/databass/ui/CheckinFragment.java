@@ -38,12 +38,12 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CheckinFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, LocationListener {
+public class CheckinFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, MainActivity.LocationSubscriber {
 
     private MapView mMapView;
     private GoogleMap mMap;
 
-    private Location mLocation;
+    private MainActivity mActivity;
 
     private LinearLayout llCheckin;
     private Button btnCheckin;
@@ -62,119 +62,39 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
         btnCheckin = v.findViewById(R.id.checkin_btn_checkin);
         btnCheckin.setOnClickListener(this);
 
+        mActivity = (MainActivity) getActivity();
+        mActivity.setLocationSubscriber(this);
+
         mMapView = v.findViewById(R.id.checkin_map_view);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
-        attemptGetLocation();
 
         return v;
     }
 
-    private void attemptGetLocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            continueGetLocation();
-        } else {
-            TravelationsApp.showToast(getActivity(), R.string.profile_toast_location_denied);
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void continueGetLocation() {
-        LocationManager locationManager;
-        /*if (locationManager == null) {
-            Log.i("INFO", "continueGetLocation bad");
-            return;
-        }
-        mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        Log.i("INFO", "continueGetLocation pass");*/
-
-        long MIN_TIME_BW_UPDATES = 10000;
-        float MIN_DISTANCE_CHANGE_FOR_UPDATES = 10000;
-
-        try {
-            locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
-            if (locationManager == null) {
-                Log.i("INFO", "continueGetLocation locationManager null");
-                return;
-            }
-
-            boolean isGPSEnabled = locationManager
-                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            boolean isPassiveEnabled = locationManager
-                    .isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
-
-            boolean isNetworkEnabled = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (isGPSEnabled || isNetworkEnabled || isPassiveEnabled) {
-
-                Log.i("INFO", "Location not Enabled");
-
-                // if GPS Enabled get lat/long using GPS Services
-                if (isGPSEnabled && mLocation == null) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d("GPS", "GPS Enabled");
-                    mLocation = locationManager
-                            .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                }
-                if (isPassiveEnabled && mLocation == null) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.PASSIVE_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d("Network", "Network Enabled");
-                    mLocation = locationManager
-                            .getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                }
-
-                if (isNetworkEnabled && mLocation == null) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Log.d("Network", "Network Enabled");
-                    mLocation = locationManager
-                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-            } else {
-                Log.i("INFO", "Location Not enabled");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    public void newLocation() {
         attemptShowLocationOnMap();
     }
 
     private void attemptShowLocationOnMap() {
-        if (mMap == null || mLocation == null) {
-            if (mLocation == null) {
-                Log.i("INFO", "mLocation null");
-            } else {
-                Log.i("INFO", "mMap null");
-            }
+        Log.i(TravelationsApp.LOG_TAG, "Attempt");
+        if (mMap == null || mActivity.getLocation() == null) {
             return;
         }
-        LatLng latLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-        Log.i("INFO", "latitude = " + mLocation.getLatitude());
+        LatLng latLng = new LatLng(mActivity.getLocation().getLatitude(), mActivity.getLocation().getLongitude());
         mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        Log.i("INFO", "attemptShowLocationOnMap pass");
     }
 
     private void checkin() {
-        if (mLocation == null) {
+        Location location = mActivity.getLocation();
+
+        if (location == null) {
             return;
         }
 
-        TravelationsApp.getApi().checkin(((MainActivity)getActivity()).getApp().getUsername(), ((MainActivity)getActivity()).getApp().getAccessToken(), mLocation.getLatitude(), mLocation.getLongitude()).enqueue(new Callback<CheckinResponse>() {
+        TravelationsApp.getApi().checkin(((MainActivity)getActivity()).getApp().getUsername(), ((MainActivity)getActivity()).getApp().getAccessToken(), location.getLatitude(), location.getLongitude()).enqueue(new Callback<CheckinResponse>() {
             @Override
             public void onResponse(@NonNull Call<CheckinResponse> call, @NonNull Response<CheckinResponse> response) {
                 CheckinResponse checkinResponse = response.body();
@@ -223,12 +143,14 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        mActivity.setLocationSubscriber(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
+        mActivity.removeLocationSubscriber();
     }
 
     @Override
@@ -253,25 +175,5 @@ public class CheckinFragment extends Fragment implements OnMapReadyCallback, Vie
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
     }
 }
