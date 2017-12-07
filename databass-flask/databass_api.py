@@ -410,7 +410,7 @@ def profile(username):
                    "FROM city, checkin, country " +
                    "WHERE id = city_id AND city.country = country.code AND username=%s " +
                    "ORDER BY checkin_time DESC " +
-                   "LIMIT 0,15;", (logged_in_username,))
+                   "LIMIT 0,15;", (username,))
     results = cursor.fetchall()
 
     cursor.close()
@@ -888,7 +888,7 @@ def unfollow():
     # finished argument checking here
 
     # remove the follow to the table
-    cursor.execute("DELETE FROM follow WHERE username_from=%s AND username_to=%s;",
+    cursor.execute("DELETE FROM follow WHERE username_follower=%s AND username_followee=%s;",
                    (username_from, username_to))
     db.commit()
     cursor.close()
