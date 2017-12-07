@@ -1158,7 +1158,7 @@ def validate_parameters(function_name, username=None, username2=None, password=N
 
     # Check if email_address is valid
     if email_address is not None:
-        email_regex = re.compile(r"/^\S+@\S+\.\S+$/")
+        email_regex = re.compile(r"[^@]+@[^@]+\.[^@]+")
         if not email_regex.match(email_address):
             error_code = "user_" + function_name + "_invalid_email"
 
