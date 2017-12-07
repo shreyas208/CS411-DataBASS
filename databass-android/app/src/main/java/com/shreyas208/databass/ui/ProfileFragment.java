@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,8 +64,6 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         app = ((MainActivity) getActivity()).getApp();
         TravelationsApp.getApi().profile(app.getUsername(), app.getAccessToken(), username).enqueue(this);
         return inflater.inflate(R.layout.fragment_profile, container, false);
-
-
     }
 
     @Override
@@ -77,7 +76,6 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         tvFollowingCount = getView().findViewById(R.id.profile_tv_following_count);
         rvRecentCheckins = getView().findViewById(R.id.profile_rv_recent_checkins);
         llCheckin = getView().findViewById(R.id.checkin_ll_checkin);
-        btnCheckin = getView().findViewById(R.id.profile_btn_checkin);
 
         tvUsername.setText(username);
     }
@@ -101,7 +99,17 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
 
     @Override
     public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
-
+        ProfileResponse profileResponse = response.body();
+        if (profileResponse == null) {
+            Log.e(TravelationsApp.LOG_TAG, "ui.ProfileFragment.onResponse: response body was null");
+            TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+        } else if (!profileResponse.isSuccess()) {
+            Log.e(TravelationsApp.LOG_TAG, String.format("ui.ProfileFragment.onResponse: response was unsuccessful, message: %s", profileResponse.getErrorCode()));
+            TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
+        } else {
+            tvDisplayName.setText(profileResponse.getDisplayName());
+            tvJoinDate.setText(profileResponse.getJoinDate());
+        }
     }
 
     @Override

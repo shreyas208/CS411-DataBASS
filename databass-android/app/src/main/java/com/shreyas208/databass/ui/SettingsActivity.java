@@ -109,7 +109,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", getLocalClassName()));
             TravelationsApp.showToast(this, R.string.settings_toast_failure);
         } else if (!genericResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), genericResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", getLocalClassName(), genericResponse.getErrorCode()));
             TravelationsApp.showToast(this, R.string.settings_toast_failure);
         } else {
             app.setDisplayName(etDisplayName.getText().toString());

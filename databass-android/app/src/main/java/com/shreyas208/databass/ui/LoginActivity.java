@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             setControlsEnabled(true);
             TravelationsApp.showToast(LoginActivity.this, R.string.login_toast_failure);
         } else if (!loginResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), loginResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", getLocalClassName(), loginResponse.getErrorCode()));
             setControlsEnabled(true);
             TravelationsApp.showToast(LoginActivity.this, loginResponse.getErrorString());
         } else {

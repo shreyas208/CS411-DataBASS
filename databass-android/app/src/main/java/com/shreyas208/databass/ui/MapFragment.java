@@ -151,7 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Callbac
             Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response body was null", "MapFragment"));
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
         } else if (!profileResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", "MapFragment", response.code(), profileResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", "MapFragment", profileResponse.getErrorCode()));
             TravelationsApp.showToast(getActivity(), R.string.profile_toast_failure);
         } else {
             for (RecentCheckin checkin : profileResponse.getRecentCheckins()) {

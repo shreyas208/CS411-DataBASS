@@ -22,7 +22,7 @@ public class DoNothingCallback implements Callback<Void> {
     @Override
     public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
         if (!response.isSuccessful()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d", logPrefix, response.code()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful", logPrefix));
         }
     }
 

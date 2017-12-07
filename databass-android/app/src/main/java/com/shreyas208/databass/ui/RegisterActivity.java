@@ -120,7 +120,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             setControlsEnabled(true);
             TravelationsApp.showToast(this, R.string.register_toast_failure);
         } else if (!genericResponse.isSuccess()) {
-            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, code: %d, message: %s", getLocalClassName(), response.code(), genericResponse.getErrorCode()));
+            Log.e(TravelationsApp.LOG_TAG, String.format("%s.onResponse: response was unsuccessful, message: %s", getLocalClassName(), genericResponse.getErrorCode()));
             setControlsEnabled(true);
             TravelationsApp.showToast(this, R.string.register_toast_failure);
         } else {
