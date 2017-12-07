@@ -1,10 +1,12 @@
 package com.shreyas208.databass.ui;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -153,19 +155,24 @@ public class ProfileFragment extends Fragment implements Callback<ProfileRespons
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             RecentCheckin recentCheckin = recentCheckins.get(position);
-            String cityCounty = recentCheckin.getAccentName() + ", " + recentCheckin.getCountryName();
+            String cityCountry = String.format("<b>%s</b>, %s", recentCheckin.getAccentName(), recentCheckin.getCountryName());
 
-            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-            Date date;
+            SimpleDateFormat inputFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("EEE, M/d/yyyy 'at' h:mm a", Locale.US);
+            String readableDate;
+
             try {
-                date = format.parse(recentCheckin.getCheckinTime());
+                readableDate = outputFormat.format(inputFormat.parse(recentCheckin.getCheckinTime()));
             } catch (ParseException e) {
                 e.printStackTrace();
-                return;
+                readableDate = "";
             }
-            String readableDate = new SimpleDateFormat("EEE, M/d/yyyy 'at' h:mm a", Locale.US).format(date);
 
-            holder.tvCity.setText(cityCounty);
+            if (Build.VERSION.SDK_INT >= 24) {
+                holder.tvCity.setText(Html.fromHtml(cityCountry, 0));
+            } else {
+                holder.tvCity.setText(Html.fromHtml(cityCountry));
+            }
             holder.tvTime.setText(readableDate);
         }
 
