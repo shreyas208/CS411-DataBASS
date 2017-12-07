@@ -403,7 +403,7 @@ def profile(username):
     cursor.execute("SELECT id,title,description,points FROM achievement WHERE id IN (SELECT achievement_id FROM achieve WHERE username =%s)", (username,))
     results = cursor.fetchall()
 
-    achievement = [{"id": result[0], "title": result[1], "description": result[2], "points": result[3]} for result in results]
+    achievements = [{"id": result[0], "title": result[1], "description": result[2], "points": result[3]} for result in results]
 
     cursor.execute("SELECT name, checkin_time, latitude, longitude " +
                    "FROM city, checkin " +
