@@ -429,7 +429,6 @@ def change_password():
 
     # Check if the old password and access token are valid
 
-    # cursor.execute("SELECT password_hash, access_token FROM user WHERE username='" + username + "';")
     cursor.execute("SELECT password_hash, access_token FROM user WHERE username=%s;", (username,))
     result = cursor.fetchone()
 
@@ -1025,8 +1024,7 @@ def feed():
         return jsonify(content), status.HTTP_200_OK
 
     # arguments are valid
-
-    #
+    
     cursor.execute("SELECT username, accent_name, country.name AS country_name, checkin_time " +
                    "FROM checkin, city, country " +
                    "WHERE username IN " +
@@ -1075,11 +1073,6 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     # Check if username is valid
     if username is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username):
-            #if function_name == "follow" or function_name == "unfollow":
-                #error_code = "user_" + function_name + "_invalid_username_from"
-            #else:
-                #error_code = "user_" + function_name + "_invalid_username"
-
             error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
@@ -1088,13 +1081,6 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     # Check if username is valid
     if username2 is not None:
         if not all((c in ascii_letters + digits + '-' + '_') for c in username2):
-            #if function_name == "follow" or function_name == "unfollow":
-            #    error_code = "user_" + function_name + "_invalid_username_to"
-            #elif function_name == "search":
-            #    error_code = "user_" + function_name + "_invalid_search_username"
-            #else:
-            #    error_code = "user_" + function_name + "_invalid_username"
-
             error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
@@ -1104,11 +1090,6 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if password is not None:
         if (not all((c in ascii_letters + digits + punctuation) for c in password)) \
                 or (not (6 <= len(password) <= 256)):
-            #if function_name == "changePassword":
-            #    error_code = "user_" + function_name + "_invalid_old_password"
-            #else:
-            #    error_code = "user_" + function_name + "_invalid_password"
-
             error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
@@ -1118,11 +1099,6 @@ def validate_parameters(function_name, username=None, username2=None, password=N
     if password2 is not None:
         if (not all((c in ascii_letters + digits + punctuation) for c in password2)) \
                 or (not (6 <= len(password2) <= 256)):
-            #if function_name == "changePassword":
-            #    error_code = "user_" + function_name + "_invalid_new_password"
-            #else:
-            #    error_code = "user_" + function_name + "_invalid_password"
-
             error_code = "user_" + function_name + "_bad_credentials"
 
             content = {"success": False, "error_code": error_code}
