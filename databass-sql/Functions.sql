@@ -1,6 +1,9 @@
 CREATE FUNCTION gcdist(lat1 FLOAT(7,4), long1 FLOAT(7,4), lat2 FLOAT(7,4), long2 FLOAT(7,4))
 RETURNS float(10,4) DETERMINISTIC
-RETURN (3959 * acos(cos(radians(lat2)) * cos(radians(lat1)) * cos(radians(long1) - radians(long2)) + sin(radians(lat2)) * sin(radians(lat1))))
+RETURN
+(
+	3959 * acos(cos(radians(lat2)) * cos(radians(lat1)) * cos(radians(long1) - radians(long2)) + sin(radians(lat2)) * sin(radians(lat1)))
+)
 
 
 

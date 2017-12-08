@@ -7,38 +7,46 @@ WHERE username = NEW.username;
 
 DROP TRIGGER update_checkin_count;
 
+
+
 delimiter //
 
 CREATE TRIGGER Welcome_Achievement_Before
 BEFORE INSERT ON user
 FOR EACH ROW
-BEGIN
-	SET NEW.score = 
-    (
-		SELECT points
-        FROM achievement
-        WHERE id = "welcome"
-    );
-END//
+IF (check_achievement(NEW.username, "welcome") = TRUE) THEN
+	BEGIN
+		SET NEW.score = 
+		(
+			SELECT points
+			FROM achievement
+			WHERE id = "welcome"
+		);
+	END;
+END IF//
 
 delimiter ;
 
-DROP TRIGGER Welcome_Achievement;
+DROP TRIGGER Welcome_Achievement_Before;
+
+
 
 delimiter //
 
 CREATE TRIGGER Welcome_Achievement_After
 AFTER INSERT ON user
 FOR EACH ROW
-BEGIN
-    INSERT INTO achieve
-    VALUES(NEW.username, "welcome");
-END//
+IF (check_achievement(NEW.username, "welcome") = TRUE) THEN
+	BEGIN
+		INSERT INTO achieve
+		VALUES(NEW.username, "welcome");
+	END;
+END IF//
 
 delimiter ;
 
+DROP TRIGGER Welcome_Achievement_After;
 
-DROP TRIGGER welcome_achievement;
 
 
 delimiter //
@@ -46,35 +54,43 @@ delimiter //
 CREATE TRIGGER five_stars_achievement
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM checkin
-	WHERE username = NEW.username
-) = 5 THEN
-CALL attain_achievement(NEW.username, "5_stars");
-END IF;
-END;//
+IF (check_achievement(NEW.username, "5_stars") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM checkin
+		WHERE username = NEW.username
+	) = 5 THEN
+	CALL attain_achievement(NEW.username, "5_stars");
+	END IF;
+END IF//
 
 delimiter ;
+
+DROP TRIGGER five_stars_achievement;
+
+
 
 delimiter //
 
 CREATE TRIGGER frequent_traveler
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(DISTINCT city_id) AS unique_cities
-	FROM checkin
-	WHERE username = NEW.username
-) = 10 THEN
-CALL attain_achievement(NEW.username, "frequent_traveler");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "frequent_traveler") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(DISTINCT city_id) AS unique_cities
+		FROM checkin
+		WHERE username = NEW.username
+	) = 10 THEN
+	CALL attain_achievement(NEW.username, "frequent_traveler");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER frequent_traveler;
+
 
 
 delimiter //
@@ -82,17 +98,21 @@ delimiter //
 CREATE TRIGGER just_getting_started
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM checkin
-	WHERE username = NEW.username
-) = 1 THEN
-CALL attain_achievement(NEW.username, "just_getting_started");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "just_getting_started") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM checkin
+		WHERE username = NEW.username
+	) = 1 THEN
+	CALL attain_achievement(NEW.username, "just_getting_started");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER just_getting_started;
+
 
 
 delimiter //
@@ -100,34 +120,43 @@ delimiter //
 CREATE TRIGGER nomad
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(DISTINCT city_id) AS unique_cities
-	FROM checkin
-	WHERE username = NEW.username
-) = 20 THEN
-CALL attain_achievement(NEW.username, "nomad");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "nomad") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(DISTINCT city_id) AS unique_cities
+		FROM checkin
+		WHERE username = NEW.username
+	) = 20 THEN
+	CALL attain_achievement(NEW.username, "nomad");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER nomad;
+
+
 
 delimiter //
 
 CREATE TRIGGER no_more_rookie_numbers
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM checkin
-	WHERE username = NEW.username
-) = 50 THEN
-CALL attain_achievement(NEW.username, "no_more_rookie_numbers");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "no_more_rookie_numbers") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM checkin
+		WHERE username = NEW.username
+	) = 50 THEN
+	CALL attain_achievement(NEW.username, "no_more_rookie_numbers");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER no_more_rookie_numbers;
+
 
 
 delimiter //
@@ -135,17 +164,21 @@ delimiter //
 CREATE TRIGGER on_your_way
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM checkin
-	WHERE username = NEW.username
-) = 10 THEN
-CALL attain_achievement(NEW.username, "on_your_way");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "on_your_way") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM checkin
+		WHERE username = NEW.username
+	) = 10 THEN
+	CALL attain_achievement(NEW.username, "on_your_way");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER on_your_way;
+
 
 
 delimiter //
@@ -153,18 +186,20 @@ delimiter //
 CREATE TRIGGER serial_stalker
 AFTER INSERT ON follow
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM follow
-	WHERE username_from = NEW.username_from
-) = 10 AND check_achievement(NEW.username_from, "serial_stalker")
-THEN
-CALL attain_achievement(NEW.username_from, "serial_stalker");
-END IF;
-END; //
+IF (check_achievement(NEW.username_from, "serial_stalker") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM follow
+		WHERE username_from = NEW.username_from
+	) = 10 THEN
+	CALL attain_achievement(NEW.username_from, "serial_stalker");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER serial_stalker;
 
 
 
@@ -173,18 +208,21 @@ delimiter //
 CREATE TRIGGER stalker
 AFTER INSERT ON follow
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(*)
-	FROM follow
-	WHERE username_from = NEW.username_from
-) = 1 AND check_achievement(NEW.username_from, "stalker")
-THEN
-CALL attain_achievement(NEW.username_from, "stalker");
-END IF;
-END; //
+IF (check_achievement(NEW.username_from, "stalker") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(*)
+		FROM follow
+		WHERE username_from = NEW.username_from
+	) = 1 THEN
+	CALL attain_achievement(NEW.username_from, "stalker");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER stalker;
+
 
 
 delimiter //
@@ -192,17 +230,20 @@ delimiter //
 CREATE TRIGGER you_get_around
 AFTER INSERT ON checkin
 FOR EACH ROW
-BEGIN
-IF
-(
-	SELECT COUNT(DISTINCT city_id) AS unique_cities
-	FROM checkin
-	WHERE username = NEW.username
-) = 5 THEN
-CALL attain_achievement(NEW.username, "you_get_around");
-END IF;
-END; //
+IF (check_achievement(NEW.username, "you_get_around") = TRUE) THEN
+	IF
+	(
+		SELECT COUNT(DISTINCT city_id) AS unique_cities
+		FROM checkin
+		WHERE username = NEW.username
+	) = 5 THEN
+	CALL attain_achievement(NEW.username, "you_get_around");
+	END IF;
+END IF//
+
 delimiter ;
+
+DROP TRIGGER you_get_around;
 
 
 
