@@ -1,3 +1,5 @@
+# Increments a user's number of checkins and adds a point to his/her score
+# every time a checkin occurs (whenever there is an insertion on the checkin table)
 CREATE TRIGGER update_checkin_count_and_score
 AFTER INSERT ON checkin
 FOR EACH ROW
@@ -9,6 +11,7 @@ DROP TRIGGER update_checkin_count;
 
 
 
+# Updates a user's score upon receiving the "Welcome!" achievement
 delimiter //
 
 CREATE TRIGGER Welcome_Achievement_Before
@@ -31,6 +34,8 @@ DROP TRIGGER Welcome_Achievement_Before;
 
 
 
+# Gives a user an achievement for creating an account (insertion on user table)
+# by inserting a record of the user and the "Welcome!" achievement into the achieve table
 delimiter //
 
 CREATE TRIGGER Welcome_Achievement_After
@@ -49,6 +54,7 @@ DROP TRIGGER Welcome_Achievement_After;
 
 
 
+# Gives a user an achievement for checking into 5 cities
 delimiter //
 
 CREATE TRIGGER five_stars_achievement
@@ -71,6 +77,7 @@ DROP TRIGGER five_stars_achievement;
 
 
 
+# Gives a user an achievement for checking into 10 distinct cities
 delimiter //
 
 CREATE TRIGGER frequent_traveler
@@ -93,6 +100,7 @@ DROP TRIGGER frequent_traveler;
 
 
 
+# Gives a user an achievement for checking into a city
 delimiter //
 
 CREATE TRIGGER just_getting_started
@@ -115,6 +123,7 @@ DROP TRIGGER just_getting_started;
 
 
 
+# Gives a user an achievement for checking into 20 distinct cities
 delimiter //
 
 CREATE TRIGGER nomad
@@ -137,6 +146,7 @@ DROP TRIGGER nomad;
 
 
 
+# Gives a user an achievement for checking into 50 cities
 delimiter //
 
 CREATE TRIGGER no_more_rookie_numbers
@@ -159,6 +169,7 @@ DROP TRIGGER no_more_rookie_numbers;
 
 
 
+# Gives a user an achievement for checking into 10 cities
 delimiter //
 
 CREATE TRIGGER on_your_way
@@ -181,6 +192,7 @@ DROP TRIGGER on_your_way;
 
 
 
+# Gives a user an achievement for following 10 users
 delimiter //
 
 CREATE TRIGGER serial_stalker
@@ -203,6 +215,7 @@ DROP TRIGGER serial_stalker;
 
 
 
+# Gives a user an achievement for following a user
 delimiter //
 
 CREATE TRIGGER stalker
@@ -225,6 +238,7 @@ DROP TRIGGER stalker;
 
 
 
+# Gives a user an achievement for checking into 5 distinct cities
 delimiter //
 
 CREATE TRIGGER you_get_around
@@ -244,73 +258,3 @@ END IF//
 delimiter ;
 
 DROP TRIGGER you_get_around;
-
-
-
-delimiter //
-
-CREATE TRIGGER traveling_far_and_wide_achievement
-AFTER INSERT ON checkin
-FOR EACH ROW
-BEGIN
-	DECLARE CITY_THRESHOLD INT DEFAULT 5000;
-	
-	DECLARE done BOOLEAN DEFAULT FALSE;
-    DECLARE beginning POINT;
-    DECLARE p POINT;
-    DECLARE poly VARCHAR(255) DEFAULT 'POLYGON((';
-    DECLARE count INT DEFAULT 0;
-        
-	DECLARE cur CURSOR FOR
-    (
-		SELECT DISTINCT location
-		FROM city, checkin
-		WHERE id = city_id AND checkin.username = NEW.username
-		ORDER BY checkin_time DESC
-		LIMIT 0,15
-	);
-    
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-	
-    OPEN cur;
-	
-	read_loop: LOOP
-		IF count = 0 THEN
-			FETCH cur INTO beginning;
-            
-            IF done THEN
-				LEAVE read_loop;
-            ELSE
-				SET p = beginning;
-			END IF;
-		ELSE
-			FETCH cur INTO p;
-		END IF;
-        
-		IF done THEN
-			LEAVE read_loop;
-		END IF;
-        
-        SET poly = CONCAT(poly, p.STX, ' ', p.STY, ', ');
-        
-        SET count = count + 1;
-	END LOOP;
-    
-    SET poly = CONCAT(poly, beginning.STX, ' ', beginning.STY, '))');
-    #Contains(GeomFromText('POLYGON((41.000497 -109.050149, 41.002380 -102.051881, 36.993237 -102.041959, 36.999037 -109.045220, 41.000497 -109.050149))'), location);
-	
-	IF
-	(
-		SELECT COUNT(*)
-        FROM city
-        WHERE Contains(GeomFromText(poly), location)
-	) >= CITY_THRESHOLD THEN
-	CALL attain_achievement(NEW.username, "traveling_far_and_wide");
-	END IF;
-    
-	CLOSE cur;
-END; //
-
-delimiter ;
-
-DROP TRIGGER traveling_far_and_wide_achievement;
