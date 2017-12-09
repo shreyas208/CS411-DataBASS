@@ -962,7 +962,7 @@ def email_verify():
 
 #email verification request
 def send_email_verif(email_address, email_token):
-    headers = {'Authorization': 'Zoho-authtoken a61e6765b5f28645c9621a7057f29973'}
+    headers = {'Authorization': dbc.zoho_authtoken}
 
     payload = {
     "fromAddress" : "travelations@shreyas208.com",
@@ -973,7 +973,7 @@ def send_email_verif(email_address, email_token):
     "content": "Welcome to Travelation!<br />Please verify your account <a href=\"http://fa17-cs411-18.cs.illinois.edu/verify?email_token=" + email_token + "\">here</a>."
     }
 
-    r = requests.post('https://mail.zoho.com/api/accounts/5601770000000008001/messages', json=payload, headers=headers)
+    r = requests.post('https://mail.zoho.com/api/accounts/' + dbc.zoho_accountid + '/messages', json=payload, headers=headers)
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
@@ -1024,7 +1024,7 @@ def feed():
         return jsonify(content), status.HTTP_200_OK
 
     # arguments are valid
-    
+
     cursor.execute("SELECT username, accent_name, country.name AS country_name, checkin_time " +
                    "FROM checkin, city, country " +
                    "WHERE username IN " +
